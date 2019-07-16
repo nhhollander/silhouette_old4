@@ -7,6 +7,14 @@ the original inception of this project, it has been cut down and re-built from
 the ground up several times, generally as a result of fundamental issues that
 could not be solved without re-writing a majority of the codebase.
 
+## Prerequisites
+
+Silhouette requires the following packages and utilities:
+
+ * `sdl2` - See `./scripts/install_sdl2_linux.sh`
+ * `glew` - See `./scripts/install_glew_linux.sh`
+ * `graphviz` - Required to build documentation
+
 ## Building
 
 Silhouette depends on the following libraries:

@@ -3,7 +3,7 @@
  * 
  *  This file defines the Configuration object and it's helper functions.
  * 
- *  Copyright 2018 Nicholas Hollander <nhhollander@wpi.edu>
+ *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
