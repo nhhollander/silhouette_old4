@@ -160,14 +160,14 @@ util::ConfigurationValue* util::Configuration::get(const char* key, bool quiet) 
     return lookup->second;
 }
 
-const volatile char** util::Configuration::get_stringp(const char* key, const char** default_) {
+const volatile char** util::Configuration::get_cstringp(const char* key, const char** default_) {
     // Get the value
     const util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile char**) default_;
     }
     // Return the string
-    return (const volatile char**) &cv->string_;
+    return (const volatile char**) &cv->cstring_;
 }
 
 const volatile int* util::Configuration::get_intp(const char* key, int* default_) {
@@ -206,14 +206,29 @@ const volatile bool* util::Configuration::get_boolp(const char* key, bool* defau
     return (const volatile bool*) &cv->bool_;
 }
 
-const char* util::Configuration::get_string(const char* key, const char* default_) {
+const std::string util::Configuration::get_string(const char* key, std::string default_) {
+    // Forward to standard string getter
+    return this->get_string(key, default_.c_str());
+}
+
+const std::string util::Configuration::get_string(const char* key, const char* default_) {
+    // Get the value
+    const util::ConfigurationValue* cv = this->get(key);
+    if(cv == nullptr) {
+        return std::string(default_);
+    }
+    // Return as a string
+    return std::string((char*) cv->cstring_);
+}
+
+const char* util::Configuration::get_cstring(const char* key, const char* default_) {
     // Get the value
     const util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return default_;
     }
     // Return the string
-    return (const char*) cv->string_;
+    return (const char*) cv->cstring_;
 }
 
 int util::Configuration::get_int(const char* key, int default_) {

@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
+#include <string>
 
 #include "util/fwd.hpp"
 
@@ -94,7 +95,9 @@ namespace util {
             const char* ref_name = nullptr;
 
             /// Value as a string
-            volatile char* string_ = nullptr;
+            volatile std::string string_;
+            /// Value as a c string
+            volatile char* cstring_ = nullptr;
             /// Value as an integer
             volatile int int_;
             /// Value as a double
@@ -108,8 +111,21 @@ namespace util {
             /*!
              *  Update the configuration value from a string.
              * 
-             *  If this value is locked, a warning will be printed to the
-             *  console and this method will return `false`.
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input string
+             * 
+             *  @return `true` on success, `false` on failure.
+             */
+            bool set(const std::string src);
+            /*!
+             *  Update the configuration value from a c string.
+             * 
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input c string
              * 
              *  @return `true` on success, `false` on failure.
              */
@@ -117,8 +133,10 @@ namespace util {
             /*!
              *  Update the configuration value from an integer.
              * 
-             *  If this value is locked, a warning will be printed to the
-             *  console and this method will return `false`.
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input integer
              * 
              *  @return `true` on success, `false` on failure.
              */
@@ -126,8 +144,10 @@ namespace util {
             /*!
              *  Update the configuration value from a double.
              * 
-             *  If this value is locked, a warning will be printed to the
-             *  console and this method will return `false`.
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input double
              * 
              *  @return `true` on success, `false` on failure.
              */
@@ -135,8 +155,10 @@ namespace util {
             /*!
              *  Update the configuration value from a boolean.
              * 
-             *  If this value is locked, a warning will be printed to the
-             *  console and this method will return `false`.
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input bool
              * 
              *  @return `true` on success, `false` on failure.
              */
@@ -250,7 +272,7 @@ namespace util {
             ConfigurationValue* get(const char* key, bool quiet = false);
 
             /*!
-             *  Get a string pointer.
+             *  Get a c string pointer.
              * 
              *  This method returns a pointer to the requested configuration
              *  value as a string.
@@ -262,7 +284,7 @@ namespace util {
              * 
              *  @return Pointer to the value, or `default_`
              */
-            const volatile char** get_stringp(const char* key, const char** default__ = nullptr);
+            const volatile char** get_cstringp(const char* key, const char** default__ = nullptr);
 
             /*!
              *  Get an integer pointer.
@@ -314,7 +336,37 @@ namespace util {
             const volatile bool* get_boolp(const char* key, bool* default_ = nullptr);
 
             /*!
-             *  Get a string.
+             *  Get a string (`std::string default_`).
+             * 
+             *  This method returns a `std::string` containing the requested
+             *  configuration value.
+             * 
+             *  In the event that no value can be located for the given key, the
+             *  optional `default_` parameter will be returned.
+             * 
+             *  @param key  Lookup key
+             * 
+             *  @return Value as a `std::string`, or `default_`
+             */
+            const std::string get_string(const char* key, std::string default_ = std::string(""));
+
+            /*!
+             *  Get a string (`char* default_`).
+             * 
+             *  This method returns a `std::string` containing the requested
+             *  configuration value.
+             * 
+             *  In the event that no value can be located for the given key, the
+             *  optional `default_` parameter will be returned.
+             * 
+             *  @param key  Lookup key
+             * 
+             *  @return Value as a `std::string`, or `default_`
+             */
+            const std::string get_string(const char* key, const char* default_ = "");
+
+            /*!
+             *  Get a c string.
              * 
              *  This method returns the requested configuration value as a
              *  string.
@@ -326,7 +378,7 @@ namespace util {
              * 
              *  @return The requested value, or `default_`
              */
-            const char* get_string(const char* key, const char* default_ = nullptr);
+            const char* get_cstring(const char* key, const char* default_ = nullptr);
 
             /*!
              *  Get an integer.

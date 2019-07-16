@@ -24,13 +24,18 @@ util::ConfigurationValue::ConfigurationValue(Configuration* parent, const char* 
 }
 
 util::ConfigurationValue::~ConfigurationValue() {
-    delete[] this->string_;
+    delete[] this->cstring_;
     delete[] this->ref_name;
 }
 
 // ==================
 // = PUBLIC MEMBERS =
 // ==================
+
+bool util::ConfigurationValue::set(const std::string src) {
+    // Forward as a c string
+    return this->set(src.c_str());
+}
 
 bool util::ConfigurationValue::set(const char* src) {
     // Check if this value is locked
@@ -39,9 +44,9 @@ bool util::ConfigurationValue::set(const char* src) {
         return false;
     }
     // Allocate a new string
-    delete[] this->string_;
-    this->string_ = new char[strlen(src) + 1];
-    strcpy((char*) this->string_, src);
+    delete[] this->cstring_;
+    this->cstring_ = new char[strlen(src) + 1];
+    strcpy((char*) this->cstring_, src);
     // Interpret as an integer
     this->int_ = atoi(src);
     // Interpret as a double
@@ -104,9 +109,9 @@ bool util::ConfigurationValue::set(int src) {
         return false;
     }
     // Interpretation of integers is pretty darn easy
-    delete[] this->string_;
-    this->string_ = new char[32];
-    snprintf((char*) this->string_, 32, "%i", src);
+    delete[] this->cstring_;
+    this->cstring_ = new char[32];
+    snprintf((char*) this->cstring_, 32, "%i", src);
     // Interpret as integer
     this->int_ = src;
     // Interpret as double
@@ -130,9 +135,9 @@ bool util::ConfigurationValue::set(double src) {
         return false;
     }
     // Interpretation of integers is pretty darn easy
-    delete[] this->string_;
-    this->string_ = new char[32];
-    snprintf((char*) this->string_, 32, "%f", src);
+    delete[] this->cstring_;
+    this->cstring_ = new char[32];
+    snprintf((char*) this->cstring_, 32, "%f", src);
     // Interpret as integer
     this->int_ = (int) src;
     // Interpret as double
@@ -155,21 +160,21 @@ bool util::ConfigurationValue::set(bool src) {
         WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
         return false;
     }
-    delete[] this->string_;
-    this->string_ = new char[6];
+    delete[] this->cstring_;
+    this->cstring_ = new char[6];
     if(src) {
-        this->string_[0] = 't';
-        this->string_[1] = 'r';
-        this->string_[2] = 'u';
-        this->string_[3] = 'e';
-        this->string_[4] = '\0';
+        this->cstring_[0] = 't';
+        this->cstring_[1] = 'r';
+        this->cstring_[2] = 'u';
+        this->cstring_[3] = 'e';
+        this->cstring_[4] = '\0';
     } else {
-        this->string_[0] = 'f';
-        this->string_[1] = 'a';
-        this->string_[2] = 'l';
-        this->string_[3] = 's';
-        this->string_[4] = 'e';
-        this->string_[5] = '\0';
+        this->cstring_[0] = 'f';
+        this->cstring_[1] = 'a';
+        this->cstring_[2] = 'l';
+        this->cstring_[3] = 's';
+        this->cstring_[4] = 'e';
+        this->cstring_[5] = '\0';
     }
     // Interpret as integer
     this->int_ = (int) src;

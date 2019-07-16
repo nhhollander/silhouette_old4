@@ -1,4 +1,6 @@
 # Ignore build files
 build/
+lib/
+bin/
 # Ignore generated documentation
 docs/generated
