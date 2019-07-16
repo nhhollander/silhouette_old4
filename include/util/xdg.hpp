@@ -44,26 +44,6 @@ namespace util::xdg {
      */
     std::string xdg_cache_home();
 
-    /*!
-     *  Get the user-specific runtime base directory.
-     * 
-     *  Remember to update the modified time on files in this directory at least
-     *  once every 6 hours and/or set the sticky bit to prevent them from being
-     *  cleaned up.
-     * 
-     *  This function has two operating modes.  If  the flag 
-     *  `ENABLE_XDG_RUNTIME_FALLBACK` is specified when building, this method
-     *  will attempt to utilize or create a runtime folder under the xdg cache
-     *  folder.  While this *should* be safe, it is possible that permissions on
-     *  the cache fallback folder could be incorrect, or the filesystem on which
-     *  the cache resides could not support required features.
-     *
-     *  > There is a single base directory relative to which user-specific
-     *  > runtime files and other file objects should be placed. This directory
-     *  > is defined by the environment variable `$XDG_RUNTIME_DIR`. 
-     */
-    std::string xdg_runtime_dir();
-
 }
 
 #endif
