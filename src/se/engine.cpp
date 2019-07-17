@@ -10,12 +10,16 @@
 
 #include "util/log.hpp"
 #include "util/config.hpp"
+#include "util/dirs.hpp"
 
 se::Engine::Engine() {
     // Load the base configuration
     DEBUG("Loading base configuration");
+    DEBUG("Hello");
     this->config = new util::Configuration("base_config");
-    this->config->load("config.json");
+    std::string cfgfile = util::dirs::app_data();
+    cfgfile += "/config.cfg";
+    this->config->load(cfgfile.c_str());
 
     INFO("Engine construction complete");
 }

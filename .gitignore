@@ -4,3 +4,6 @@ lib/
 bin/
 # Ignore generated documentation
 docs/generated
+# Ignore temporary engine files
+data/temp/
+data/cache/

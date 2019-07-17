@@ -34,7 +34,7 @@ add_library(seutil SHARED
     src/util/debugstrings.cpp
     src/util/hash.cpp
     src/util/log.cpp
-    src/util/xdg.cpp
+    src/util/dirs.cpp
 )
 
 # Add the silhouette library

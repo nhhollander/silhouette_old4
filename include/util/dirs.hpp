@@ -25,8 +25,7 @@ namespace util::dirs {
      *  Data that is specific to a single user on the system should be stored in
      *  this folder.
      */
-    std::string user_data(const char* appname);
-    std::string user_data(std::string appname);
+    std::string user_data();
 
     /*!
      *  Get the temp data base folder.
@@ -34,8 +33,7 @@ namespace util::dirs {
      *  Data that is used for runtime file storage.  Don't expect things saved
      *  here to be there next time the program is run.
      */
-    std::string temp_data(const char* appname);
-    std::string temp_data(std::string appname);
+    std::string temp_data();
 
     /*!
      *  Get the cache data base folder.
@@ -45,8 +43,7 @@ namespace util::dirs {
      *  here will probably still be available next time the program is run, but
      *  it's not guarenteed.
      */
-    std::string cache_data(const char* appname);
-    std::string cache_data(std::string appname);
+    std::string cache_data();
 
     /*!
      *  Get the application data base folder.
@@ -54,8 +51,7 @@ namespace util::dirs {
      *  Read-only application resources.  You shouldn't be modifying files in
      *  this directory.
      */
-    std::string app_data(const char* appname);
-    std::string app_data(std::string appname);
+    std::string app_data();
 
 }
 

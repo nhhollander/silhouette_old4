@@ -21,10 +21,13 @@ clean:
 	@rm -rdf lib/*
 	@printf "\033[33mDeleting generated documentation...\033[0m\n"
 	@rm -rdf doc/generated/*
+	@printf "\033[33mDeleting temporary files and cache...\033[0m\n"
+	@rm -rdf data/temp/*
+	@rm -rdf data/cache/*
 
 run: all
 	@printf "\033[33mRunning Project...\033[0m\n"
-	@./bin/se_test
+	@./scripts/debug_launch.sh
 
 debug: all
 	@printf "\033[33mDebugging Project...\033[0m\n"
