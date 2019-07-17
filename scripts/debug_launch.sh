@@ -14,5 +14,11 @@ export SE_APPNAME=se_test
 mkdir -p $SE_DEBUG_TEMPDATA
 mkdir -p $SE_DEBUG_CACHEDATA
 
+# Remove temporary files (because they can't be expected to survive)
+if [ ! -z "$SE_DEBUG_TEMPDATA" ]; then
+    echo "Clearing temporary debug files"
+    rm -rdf $SE_DEBUG_TEMPDATA/*
+fi
+
 # Launch the program
 ./bin/se_test
