@@ -90,6 +90,7 @@ int util::Configuration::parse(const char* config_data) {
         }
     }
 
+    DEBUG("Loaded [%i] configuration entries", entry_count);
     return entry_count;
 
 }
@@ -136,7 +137,7 @@ int util::Configuration::load(const char* fname) {
             fname, errno, strerror(errno));
     }
 
-    DEBUG("Loaded %u bytes of config data", filesize);
+    DEBUG("Loaded [%u] bytes of config data", filesize);
 
     // Pass the data to the parser
     int line_count = this->parse(fdata);

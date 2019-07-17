@@ -15,7 +15,6 @@
 se::Engine::Engine() {
     // Load the base configuration
     DEBUG("Loading base configuration");
-    DEBUG("Hello");
     this->config = new util::Configuration("base_config");
     std::string cfgfile = util::dirs::app_data();
     cfgfile += "/config.cfg";
