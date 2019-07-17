@@ -8,6 +8,8 @@
 
 #include "se/engine.hpp"
 
+#include "se/graphics/graphicsController.hpp"
+
 #include "util/log.hpp"
 #include "util/config.hpp"
 #include "util/dirs.hpp"
@@ -19,6 +21,10 @@ se::Engine::Engine() {
     std::string cfgfile = util::dirs::app_data();
     cfgfile += "/config.cfg";
     this->config->load(cfgfile.c_str());
+
+    // Initialize graphics
+    this->graphics_controller = new se::graphics::GraphicsController(this);
+
 
     INFO("Engine construction complete");
 }

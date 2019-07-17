@@ -13,6 +13,11 @@
 
 #include "se/fwd.hpp"
 
+#include <SDL2/SDL.h>
+#include <GL/glew.h>
+#include <SDL2/SDL_opengl.h>
+#include <GL/glu.h>
+
 namespace se::graphics {
 
     /*!
@@ -26,9 +31,28 @@ namespace se::graphics {
         private:
 
             /*!
-             *  Parent Engine Instance
+             *  Parent Engine Instance.
              */
             se::Engine* engine = nullptr;
+
+            /*
+             *  SDL2 window object.
+             */
+            SDL_Window* window = nullptr;
+
+            /*!
+             *  OpenGL context.
+             */
+            SDL_GLContext glcontext;
+
+            /*!
+             *  Graphics Thread.
+             * 
+             *  This method is spawned as the body of the graphics thread.  It
+             *  will continue to run for as long as `se::engine::threads_run` is
+             *  set to true.
+             */
+            void graphics_thread();
 
         public:
 

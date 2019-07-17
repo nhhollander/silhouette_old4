@@ -37,6 +37,14 @@ namespace se {
             util::Configuration* config = nullptr;
 
             /*!
+             *  Thread Run Flag.
+             * 
+             *  When set to false, all engine threads (graphics, input, etc.)
+             *  will terminate at their earliest convenience.
+             */
+            bool threads_run = true;
+
+            /*!
              *  Graphics Controller Instance.
              */
             se::graphics::GraphicsController* graphics_controller = nullptr;
@@ -53,11 +61,6 @@ namespace se {
             
 
     };
-
-    /*!
-     *  Default Engine Pointer.
-     */
-    se::Engine* default_engine;
 
 }
 
