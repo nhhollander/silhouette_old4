@@ -17,6 +17,23 @@ se::graphics::GraphicsController::GraphicsController(se::Engine* engine) {
     DEBUG("Initializing new graphics controller");
     this->engine = engine;
 
+    // Start the graphics thread
+    this->graphics_thread = std::thread(&se::graphics::GraphicsController::graphics_thread_main, this);
+}
+
+se::graphics::GraphicsController::~GraphicsController() {
+    
+    if(this->graphics_thread.joinable()) {
+        DEBUG("Waiting for graphics thread to exit");
+        this->graphics_thread.join();
+    }
+
+}
+
+void se::graphics::GraphicsController::graphics_thread_main() {
+    util::log::set_thread_name("RENDER");
+    INFO("Hello from the render thread!");
+
     // Initialize SDL2 in OpenGL mode
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         FATAL("Failed to initialize SDL2 [%s]", SDL_GetError());
@@ -61,5 +78,20 @@ se::graphics::GraphicsController::GraphicsController(se::Engine* engine) {
     if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
         ERROR("Failed to configure vsync [%s]", SDL_GetError());
     }
+    
+    INFO("Graphics initialization complete");
+
+    // Main render loop
+    while(this->engine->threads_run) {
+        this->render();
+    }
+
+    DEBUG("Render thread terminated");
+
+}
+
+void se::graphics::GraphicsController::render() {
+
+    DEBUG("RENDER!");
 
 }

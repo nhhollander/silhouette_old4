@@ -25,10 +25,13 @@ se::Engine::Engine() {
     // Initialize graphics
     this->graphics_controller = new se::graphics::GraphicsController(this);
 
-
     INFO("Engine construction complete");
 }
 
 se::Engine::~Engine() {
+
+    this->threads_run = false;
+
+    delete this->graphics_controller;
     INFO("Engine destruction complete");
 }

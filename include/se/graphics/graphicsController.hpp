@@ -17,6 +17,7 @@
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>
 #include <GL/glu.h>
+#include <thread>
 
 namespace se::graphics {
 
@@ -46,13 +47,28 @@ namespace se::graphics {
             SDL_GLContext glcontext;
 
             /*!
+             *  Graphics Thread Object.
+             */
+            std::thread graphics_thread;
+
+            /*!
              *  Graphics Thread.
              * 
              *  This method is spawned as the body of the graphics thread.  It
              *  will continue to run for as long as `se::engine::threads_run` is
              *  set to true.
              */
-            void graphics_thread();
+            void graphics_thread_main();
+
+            /*!
+             *  Render Loop.
+             * 
+             *  *Note: This method should only be called from the render loop*
+             * 
+             *  This method is called for each frame to be rendered, limited by
+             *  `render.fps_cap`
+             */
+            void render();
 
         public:
 
@@ -60,6 +76,9 @@ namespace se::graphics {
              *  Construct a new graphics controller.
              */
             GraphicsController(se::Engine* engine);
+
+            /// Destroy this graphics controller
+            ~GraphicsController();
     };
 
 }
