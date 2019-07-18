@@ -90,6 +90,11 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     int initial_fps_cap = this->engine->config->get_int("render.fpscap");
     this->target_frame_time = 1000000000 / initial_fps_cap;
     auto frame_start = std::chrono::system_clock::now();
+    // Variables for benchmarking
+    auto bm_render_start_time = std::chrono::system_clock::now();
+    uint32_t bm_total_frame_count = 0;
+    uint64_t bm_total_frame_time_ns = 0; // 2^64ns = ~585 years
+    uint32_t bm_late_frames = 0;
 
     // Main render loop
     while(this->engine->threads_run) {
@@ -99,13 +104,39 @@ void se::graphics::GraphicsController::graphics_thread_main() {
 
         auto duration_std = std::chrono::system_clock::now() - frame_start;
         int duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_std).count();
-        auto wait_time = (target_frame_time - duration_ns);
-        if(wait_time > 0) {
-            std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
-        } else {
-            WARN("FPS under cap!");
+        bm_total_frame_time_ns += duration_ns;
+        bm_total_frame_count++;
+        if(this->target_frame_time > 0) {
+            auto wait_time = (target_frame_time - duration_ns);
+            if(wait_time > 0) {
+                std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
+            } else {
+                WARN("FPS under cap!");
+                bm_late_frames++;
+            }
         }
     }
+
+    // Calculate benchmarking
+    if(bm_total_frame_count == 0) {
+        WARN("No frames rendered! Benchmarking results are INVALID!");
+        bm_total_frame_count++;
+    }
+    float bm_total_frame_time_ms = bm_total_frame_time_ns / 1000000.0;
+    uint64_t bm_total_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - bm_render_start_time).count();
+    double bm_total_time_ms = bm_total_time_ns / 1000000.0;
+    uint64_t bm_average_frame_time_ns = bm_total_frame_time_ns / bm_total_frame_count;
+    double bm_average_frame_time_ms = bm_average_frame_time_ns / 1000000.0;
+    float bm_average_render_load = (((float) bm_total_frame_time_ns) / (bm_total_time_ns) * 100);
+    float bm_average_fps = bm_total_frame_count / (bm_total_time_ms / 1000.0);
+    INFO("Total Frames Rendered: %u", bm_total_frame_count);
+    INFO("Time spent rendering: %uns (%.3fms)", bm_total_frame_time_ns, bm_total_frame_time_ms);
+    INFO("Total time elapsed: %uns (%.3fms)", bm_total_time_ns, bm_total_time_ms);
+    INFO("Average frame time: %uns (%.3fms)", bm_average_frame_time_ns, bm_average_frame_time_ms);
+    INFO("Average render load: %.2f%%", bm_average_render_load);
+    INFO("Late Frames: %u", bm_late_frames);
+    INFO("Average FPS: %.3f", bm_average_fps);
+
 
     DEBUG("Render thread terminated");
 
