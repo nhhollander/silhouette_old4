@@ -83,6 +83,8 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
         ERROR("Failed to configure vsync [%s]", SDL_GetError());
     }
+    // 58 111 166
+    glClearColor(0.227, 0.434, 0.648, 1.0);
     
     INFO("Graphics initialization complete");
 
@@ -98,6 +100,9 @@ void se::graphics::GraphicsController::graphics_thread_main() {
 
     // Main render loop
     while(this->engine->threads_run) {
+
+        /* Graphics tasks are processed outside of the timed loop in order to
+         * reduce their impact on FPS. */
         frame_start = std::chrono::system_clock::now();
 
         this->render();
@@ -106,7 +111,7 @@ void se::graphics::GraphicsController::graphics_thread_main() {
         int duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_std).count();
         bm_total_frame_time_ns += duration_ns;
         bm_total_frame_count++;
-        if(this->target_frame_time > 0) {
+        if(this->target_frame_time > 0) {  // Negative fps caps mean disabled
             auto wait_time = (target_frame_time - duration_ns);
             if(wait_time > 0) {
                 std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
@@ -117,7 +122,7 @@ void se::graphics::GraphicsController::graphics_thread_main() {
         }
     }
 
-    // Calculate benchmarking
+    // Calculate and print benchmarking values
     if(bm_total_frame_count == 0) {
         WARN("No frames rendered! Benchmarking results are INVALID!");
         bm_total_frame_count++;
@@ -144,7 +149,9 @@ void se::graphics::GraphicsController::graphics_thread_main() {
 
 void se::graphics::GraphicsController::render() {
 
-    DEBUG("RENDER!");
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    SDL_GL_SwapWindow(this->window);
 
 }
 
@@ -152,4 +159,20 @@ void se::graphics::GraphicsController::recalculate_fps_limit(util::Configuration
     INFO("FPS limit changed to %i", value->int_);
     int fps_cap = value->int_;
     this->target_frame_time = 1000000000 / fps_cap;
+}
+
+void se::graphics::GraphicsController::process_tasks() {
+    /* Tasks are executed one at a time to allow a frame to render in between.
+     * While this could potentially increase the time it takes for all pending
+     * tasks to complete, it prevents the graphics thread from becoming
+     * frozen if there is a surge of jobs. */
+    if(this->tasks.size() > 0) {
+        GraphicsTask task = this->tasks.front();
+        task();
+        this->tasks.pop();
+    }
+}
+
+void se::graphics::GraphicsController::submit_graphics_task(GraphicsTask task) {
+    this->tasks.push(task);
 }

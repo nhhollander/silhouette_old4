@@ -45,7 +45,7 @@ add_library(silhouette SHARED
 # Enable the internal library flag
 #target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)
 # Link to required libraries
-target_link_libraries(silhouette SDL2 seutil GLEW)
+target_link_libraries(silhouette GL SDL2 seutil GLEW)
 
 # Add the test implementation
 add_executable(se_test

@@ -19,8 +19,17 @@
 #include <SDL2/SDL_opengl.h>
 #include <GL/glu.h>
 #include <thread>
+#include <functional>
+#include <queue>
 
 namespace se::graphics {
+
+    /*!
+     *  Render Thread Task.
+     * 
+     *  Represents a task that needs to be executed on the render thread.
+     */
+    typedef std::function<void(void)> GraphicsTask;
 
     /*!
     *  Graphics Controller.
@@ -60,6 +69,11 @@ namespace se::graphics {
             int target_frame_time = -1;
 
             /*!
+             *  Graphics Tasks.
+             */
+            std::queue<GraphicsTask> tasks;
+
+            /*!
              *  Graphics Thread.
              * 
              *  This method is spawned as the body of the graphics thread.  It
@@ -78,6 +92,19 @@ namespace se::graphics {
              */
             void render();
 
+            /*!
+             *  Recalculate FPS limit.
+             * 
+             *  Invoke this method by updating the `render.fpscap` configuration
+             *  value.
+             */
+            void recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config);
+
+            /*!
+             *  Process pending graphics tasks.
+             */
+            void process_tasks();
+
         public:
 
             /*
@@ -89,12 +116,13 @@ namespace se::graphics {
             ~GraphicsController();
 
             /*!
-             *  Recalculate FPS limit.
+             *  Submit a graphics task.
              * 
-             *  Invoke this method by updating the `render.fpscap` configuration
-             *  value.
+             *  Sometimes things need to be done on the graphics thread due to
+             *  thread safety requirements, such as shader compilation or
+             *  texture loading.
              */
-            void recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config);
+            void submit_graphics_task(GraphicsTask task);
 
     };
 
