@@ -13,7 +13,6 @@
 
 #include "se/fwd.hpp"
 #include "util/fwd.hpp"
-#include "util/config.hpp"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -29,7 +28,7 @@ namespace se::graphics {
     *  The graphics controller is responsible for initializing OpenGL and
     *  managing the render pipeline.
     */
-    class GraphicsController: public util::ConfigChangeHandler {
+    class GraphicsController {
 
         private:
 
@@ -96,8 +95,6 @@ namespace se::graphics {
              *  value.
              */
             void recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config);
-
-            void handle_config_change(util::ConfigurationValue* value, util::Configuration* config);
 
     };
 

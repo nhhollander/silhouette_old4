@@ -36,7 +36,8 @@ se::graphics::GraphicsController::~GraphicsController() {
 void se::graphics::GraphicsController::graphics_thread_main() {
     util::log::set_thread_name("RENDER");
     INFO("Hello from the render thread!");
-    this->engine->config->get("render.fpscap")->add_change_handler(this);
+    util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(se::graphics::GraphicsController::recalculate_fps_limit);
+    this->engine->config->get("render.fpscap")->add_change_handler(handler);
 
     // Initialize SDL2 in OpenGL mode
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -85,8 +86,10 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     
     INFO("Graphics initialization complete");
 
-    // Variables for FPS cap
-
+    // Set up the FPS cap
+    int initial_fps_cap = this->engine->config->get_int("render.fpscap");
+    this->target_frame_time = 1000000000 / initial_fps_cap;
+    
 
     // Main render loop
     while(this->engine->threads_run) {
@@ -104,15 +107,8 @@ void se::graphics::GraphicsController::render() {
 
 }
 
-void se::graphics::GraphicsController::handle_config_change(util::ConfigurationValue* value, util::Configuration* config) {
-    if(strcmp(value->ref_name, "render.vsync") == 0) {
-        
-    }
-}
-
 void se::graphics::GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
-    DEBUG("%p %p %p", this, value, config);
-    return;
+    INFO("FPS limit changed to %i", value->int_);
     int fps_cap = value->int_;
     this->target_frame_time = 1000000000 / fps_cap;
 }

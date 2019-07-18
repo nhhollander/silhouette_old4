@@ -200,13 +200,8 @@ int util::ConfigurationValue::lock_status() {
     return this->write_lock;
 }
 
-void util::ConfigurationValue::add_change_handler(ConfigChangeHandler* handler, void* this_) {
-    if(this_ == nullptr) {
-        //ConfigChangeHandler new_handler = std::bind(handler, this_, std::placeholders::_1, std::placeholders::_2);
-        //ConfigChangeHandler = [handler,this_](util::ConfigurationValue* a, util::Configuration* b){handler(this_,a,b);}
-    } else {
-        this->change_handlers.push_back(handler);
-    }
+void util::ConfigurationValue::add_change_handler(ConfigChangeHandler handler) {
+    this->change_handlers.push_back(handler);
 }
 
 // ===================
@@ -216,6 +211,6 @@ void util::ConfigurationValue::add_change_handler(ConfigChangeHandler* handler, 
 void util::ConfigurationValue::invoke_change_handlers() {
     // Invoke those handlers
     for(auto handler : this->change_handlers) {
-        (*handler).handle_config_change(this, this->parent);
+        handler(this, this->parent);
     }
 }

@@ -22,21 +22,32 @@
 #define CV_WRITE_LOCK_NEXTWRITE 1
 #define CV_WRITE_LOCK_LOCKED 2
 
+/*!
+ *  Create a local change handler.
+ * 
+ *  Because of the way that c++ is, it's basically impossible to pass a pointer
+ *  to a member function anywhere.  The easiest way to get around this is to
+ *  use the black magic known as `std::bind` to create a callable object with
+ *  the object reference built in.  This macro takes the static name of a member
+ *  function and automatically converts it to a static callable with the
+ *  appropriate arguments needed to be treated as a `util::ConfigChangeHandler`.
+ * 
+ *  For example, to create a static configuration change handler that wraps the
+ *  method `bar` in class `Foo` in namespace `baz`, you would do the following:
+ * 
+ *  ```c++
+ *  util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(baz::Foo::bar);
+ *  ```
+ */
+#define CREATE_LOCAL_CHANGE_HANDLER(func) \
+    (util::ConfigChangeHandler) \
+    std::bind( \
+        &func, this, std::placeholders::_1, std::placeholders::_2);
+
 namespace util {
 
-    /*!
-     *  Configuration Change Handler.
-     * 
-     *  This interface provides a way for classes to handle configuration
-     *  changes.
-     */
-    class ConfigChangeHandler {
-
-        public:
-
-            virtual void handle_config_change(ConfigurationValue* value, Configuration* config) = 0;
-
-    };
+    /// Configuration change handler
+    typedef std::function<void(util::ConfigurationValue*,util::Configuration*)> ConfigChangeHandler;
 
     /*!
      *  Configuration Value Container.
@@ -57,7 +68,7 @@ namespace util {
             util::Configuration* parent;
 
             /// Change handlers
-            std::vector<ConfigChangeHandler*> change_handlers;
+            std::vector<ConfigChangeHandler> change_handlers;
 
             /// Invoke change handlers
             void invoke_change_handlers();
@@ -182,12 +193,8 @@ namespace util {
 
             /*!
              *  Add a change handler.
-             * 
-             *  For non-static change handlers, the optional `this_` parameter
-             *  may be populated, and will automatically be bound to the
-             *  function call.
              */
-            void add_change_handler(ConfigChangeHandler* handler, void* this_ = nullptr);
+            void add_change_handler(ConfigChangeHandler handler);
 
             /// Configuration value constructor
             ConfigurationValue(util::Configuration* parent, const char* ref_name = "<unnamed>");
