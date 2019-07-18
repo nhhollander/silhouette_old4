@@ -13,6 +13,9 @@
 #include "util/config.hpp"
 #include "util/log.hpp"
 
+#include <chrono>
+#include <typeinfo>
+
 se::graphics::GraphicsController::GraphicsController(se::Engine* engine) {
     DEBUG("Initializing new graphics controller");
     this->engine = engine;
@@ -33,6 +36,7 @@ se::graphics::GraphicsController::~GraphicsController() {
 void se::graphics::GraphicsController::graphics_thread_main() {
     util::log::set_thread_name("RENDER");
     INFO("Hello from the render thread!");
+    this->engine->config->get("render.fpscap")->add_change_handler(this);
 
     // Initialize SDL2 in OpenGL mode
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -41,8 +45,8 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     }
 
     // Configure the OpenGL version
-    int gl_major = this->engine->config->get_int("gl.major", -1);
-    int gl_minor = this->engine->config->get_int("gl.minor", -1);
+    int gl_major = this->engine->config->get_int("render.gl.major", -1);
+    int gl_minor = this->engine->config->get_int("render.gl.minor", -1);
     if(gl_major == -1 || gl_minor == -1) {
         FATAL("Opengl version missing! [%i.%i]", gl_major, gl_minor);
         return;
@@ -74,15 +78,19 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     }
 
     // Configure the OpenGL instance
-    bool vsync = this->engine->config->get_bool("gl.vsync",false);
+    bool vsync = this->engine->config->get_bool("render.vsync",false);
     if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
         ERROR("Failed to configure vsync [%s]", SDL_GetError());
     }
     
     INFO("Graphics initialization complete");
 
+    // Variables for FPS cap
+
+
     // Main render loop
     while(this->engine->threads_run) {
+        
         this->render();
     }
 
@@ -94,4 +102,17 @@ void se::graphics::GraphicsController::render() {
 
     DEBUG("RENDER!");
 
+}
+
+void se::graphics::GraphicsController::handle_config_change(util::ConfigurationValue* value, util::Configuration* config) {
+    if(strcmp(value->ref_name, "render.vsync") == 0) {
+        
+    }
+}
+
+void se::graphics::GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
+    DEBUG("%p %p %p", this, value, config);
+    return;
+    int fps_cap = value->int_;
+    this->target_frame_time = 1000000000 / fps_cap;
 }

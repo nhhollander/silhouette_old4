@@ -24,8 +24,19 @@
 
 namespace util {
 
-    // Configuration change handler
-    typedef std::function<void(util::ConfigurationValue*,util::Configuration*)> ConfigChangeHandler;
+    /*!
+     *  Configuration Change Handler.
+     * 
+     *  This interface provides a way for classes to handle configuration
+     *  changes.
+     */
+    class ConfigChangeHandler {
+
+        public:
+
+            virtual void handle_config_change(ConfigurationValue* value, Configuration* config) = 0;
+
+    };
 
     /*!
      *  Configuration Value Container.
@@ -46,7 +57,7 @@ namespace util {
             util::Configuration* parent;
 
             /// Change handlers
-            std::vector<ConfigChangeHandler> change_handlers;
+            std::vector<ConfigChangeHandler*> change_handlers;
 
             /// Invoke change handlers
             void invoke_change_handlers();
@@ -169,8 +180,14 @@ namespace util {
             /// Get the lock status
             int lock_status();
 
-            /// Add a change handler
-            void add_change_handler(ConfigChangeHandler handler);
+            /*!
+             *  Add a change handler.
+             * 
+             *  For non-static change handlers, the optional `this_` parameter
+             *  may be populated, and will automatically be bound to the
+             *  function call.
+             */
+            void add_change_handler(ConfigChangeHandler* handler, void* this_ = nullptr);
 
             /// Configuration value constructor
             ConfigurationValue(util::Configuration* parent, const char* ref_name = "<unnamed>");

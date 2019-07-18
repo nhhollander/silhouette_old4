@@ -12,6 +12,8 @@
 #define _SE_GRAPHICS_GRAPHICSCONTROLLER_H_
 
 #include "se/fwd.hpp"
+#include "util/fwd.hpp"
+#include "util/config.hpp"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -27,7 +29,7 @@ namespace se::graphics {
     *  The graphics controller is responsible for initializing OpenGL and
     *  managing the render pipeline.
     */
-    class GraphicsController {
+    class GraphicsController: public util::ConfigChangeHandler {
 
         private:
 
@@ -52,6 +54,13 @@ namespace se::graphics {
             std::thread graphics_thread;
 
             /*!
+             *  Target frame time used for FPS limit.
+             * 
+             *  Negative values disable FPS cap.
+             */
+            int target_frame_time = -1;
+
+            /*!
              *  Graphics Thread.
              * 
              *  This method is spawned as the body of the graphics thread.  It
@@ -66,7 +75,7 @@ namespace se::graphics {
              *  *Note: This method should only be called from the render loop*
              * 
              *  This method is called for each frame to be rendered, limited by
-             *  `render.fps_cap`
+             *  `render.fpscap`
              */
             void render();
 
@@ -79,6 +88,17 @@ namespace se::graphics {
 
             /// Destroy this graphics controller
             ~GraphicsController();
+
+            /*!
+             *  Recalculate FPS limit.
+             * 
+             *  Invoke this method by updating the `render.fpscap` configuration
+             *  value.
+             */
+            void recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config);
+
+            void handle_config_change(util::ConfigurationValue* value, util::Configuration* config);
+
     };
 
 }

@@ -13,6 +13,7 @@
 
 namespace util {
 
+    class ConfigChangeHandler;
     class Configuration;
     class ConfigurationValue;
      
