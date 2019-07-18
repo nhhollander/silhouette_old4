@@ -101,9 +101,9 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     // Main render loop
     while(this->engine->threads_run) {
 
-        /* Graphics tasks are processed outside of the timed loop in order to
-         * reduce their impact on FPS. */
         frame_start = std::chrono::system_clock::now();
+
+        this->process_tasks();
 
         this->render();
 
