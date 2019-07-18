@@ -89,12 +89,22 @@ void se::graphics::GraphicsController::graphics_thread_main() {
     // Set up the FPS cap
     int initial_fps_cap = this->engine->config->get_int("render.fpscap");
     this->target_frame_time = 1000000000 / initial_fps_cap;
-    
+    auto frame_start = std::chrono::system_clock::now();
 
     // Main render loop
     while(this->engine->threads_run) {
-        
+        frame_start = std::chrono::system_clock::now();
+
         this->render();
+
+        auto duration_std = std::chrono::system_clock::now() - frame_start;
+        int duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_std).count();
+        auto wait_time = (target_frame_time - duration_ns);
+        if(wait_time > 0) {
+            std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
+        } else {
+            WARN("FPS under cap!");
+        }
     }
 
     DEBUG("Render thread terminated");
