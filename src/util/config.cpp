@@ -126,10 +126,10 @@ int util::Configuration::load(const char* fname) {
         return -4;
     }
     // Read the data
-    if(fread(fdata, 1, filesize, cfile) < 0) {
-        ERROR("Failed to read contents of config file [%s] [%i: %s]",
-            fname, errno, strerror(errno));
-        return -5;
+    size_t read_count = fread(fdata, 1, filesize, cfile);
+    if(read_count < filesize) {
+        WARN("Read fewer bytes than expected from config file [%s] (expected %i got %i)",
+            fname, filesize, read_count);
     }
     // Close the file
     if(fclose(cfile) != 0) {
