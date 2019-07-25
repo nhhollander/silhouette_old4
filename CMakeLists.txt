@@ -3,7 +3,7 @@ project(silhouette_engine)
 
 # Enable DEBUGGING MODE AW YEAH
 set(CMAKE_BUILD_TYPE Debug)
-SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -gstabs")
+SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -gstabs -Wall")
 SET(CMAKE_C_FLAGS_DEBUG "-O0 -gstabs")
 
 # Set compilation flags
@@ -41,6 +41,8 @@ add_library(seutil SHARED
 add_library(silhouette SHARED
     src/se/engine.cpp
     src/se/graphics/graphicsController.cpp
+    src/se/graphics/shader.cpp
+    src/se/graphics/shaderProgram.cpp
 )
 # Enable the internal library flag
 #target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)

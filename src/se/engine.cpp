@@ -26,8 +26,6 @@ se::Engine::Engine() {
     this->graphics_controller = new se::graphics::GraphicsController(this);
 
     INFO("Engine construction complete");
-
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
 se::Engine::~Engine() {

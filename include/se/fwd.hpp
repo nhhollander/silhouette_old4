@@ -18,6 +18,9 @@ namespace se {
     namespace graphics {
 
         class GraphicsController;
+        class Shader;
+        class ShaderProgram;
+        class Texture;
 
     }
 

@@ -78,6 +78,14 @@ void se::graphics::GraphicsController::graphics_thread_main() {
         return;
     }
 
+    // Initialize GLEW
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+    if(glewError != GLEW_OK) {
+        FATAL("Failed to initialize GLEW! [%s]", glewGetErrorString(glewError));
+        return;
+    }
+
     // Configure the OpenGL instance
     bool vsync = this->engine->config->get_bool("render.vsync",false);
     if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
@@ -116,7 +124,7 @@ void se::graphics::GraphicsController::graphics_thread_main() {
             if(wait_time > 0) {
                 std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
             } else {
-                WARN("FPS under cap!");
+                WARN("Dropping frames!");
                 bm_late_frames++;
             }
         }

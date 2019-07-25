@@ -12,6 +12,7 @@ make
 
 printf "\033[1;32mInstalling\033[0m\n"
 sudo make install
+sudo cp /usr/lib64/libGLEW.* /usr/lib/x84_64-linux-gnu/
 
 printf "\033[1;32mCleaning up\033[0m\n"
 cd ../
