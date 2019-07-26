@@ -13,6 +13,10 @@
 
 #include "se/fwd.hpp"
 
+#include <vector>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 namespace se::graphics {
 
     /*!
@@ -41,8 +45,33 @@ namespace se::graphics {
 
             /*!
              *  Raw Vertex Data.
+             * 
+             *  This variable may be cleared after binding.
              */
-            float* raw_vertex_data = nullptr;
+            std::vector<glm::vec3> vertex_data;
+            
+            /*!
+             *  Raw UV Data.
+             * 
+             *  This variable may be cleared after binding.
+             */
+            std::vector<glm::vec2> uv_data;
+
+            /*!
+             *  Raw Normal Data.
+             * 
+             *  This variable may be cleared after binding.
+             */
+            std::vector<glm::vec3> normal_data;
+
+            /// OpenGL vertex buffer ID
+            unsigned int gl_vertex_buffer_id = 0;
+        
+            /// OpenGL uv buffer ID
+            unsigned int gl_uv_buffer_id = 0;
+
+            /// OpenGL normal buffer ID
+            unsigned int gl_normal_buffer_id = 0;
 
             /*!
              *  Bind geometry to the GPU.

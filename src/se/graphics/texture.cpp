@@ -166,6 +166,7 @@ void Texture::load_() {
 }
 
 void Texture::unload_() {
+    DEBUG("Unloading [%s], waiting for unbind", this->name);
     this->resource_state = GraphicsResourceState::NOT_LOADED;
     std::function job = [this](){this->unbind();};
     this->engine->graphics_controller->submit_graphics_task(job);

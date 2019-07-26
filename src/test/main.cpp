@@ -10,7 +10,7 @@
 
 #include "se/engine.hpp"
 #include "util/log.hpp"
-#include "se/graphics/texture.hpp"
+#include "se/graphics/geometry.hpp"
 
 #include <thread>
 
@@ -21,15 +21,13 @@ int main() {
     INFO("Hello World!");
 
     Engine e;
-    //graphics::ShaderProgram* prog = graphics::ShaderProgram::get_program(&e, "test", "test");
-    //prog->wait_for_loading();
 
-    se::graphics::Texture* text = graphics::Texture::get_texture(&e, "test");
-    DEBUG("Incrementing active users to cause test texture load");
-    text->increment_active_users();
-    while(text->get_resource_state() != se::graphics::GraphicsResourceState::LOADED) {}
-    DEBUG("Decrementing active users to cause test texture unload");
-    text->decrement_active_users();
+    se::graphics::Geometry* geom = graphics::Geometry::get_geometry(&e, "suzanne");
+    DEBUG("Incrementing active users to cause test model load");
+    geom->increment_active_users();
+    while(geom->get_resource_state() != se::graphics::GraphicsResourceState::LOADED) {}
+    DEBUG("Decrementing active users to cause test geometry unload");
+    geom->decrement_active_users();
 
     std::this_thread::sleep_for(std::chrono::seconds(2));
 }
