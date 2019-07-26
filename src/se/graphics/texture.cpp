@@ -130,9 +130,10 @@ void Texture::load_() {
     png_read_info(png_ptr, info_ptr);
     this->width = png_get_image_width(png_ptr, info_ptr);
     this->height = png_get_image_height(png_ptr, info_ptr);
-    png_byte color_type = png_get_color_type(png_ptr, info_ptr);
-    png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-    int number_of_passes = png_set_interlace_handling(png_ptr);
+    //png_byte color_type = png_get_color_type(png_ptr, info_ptr);
+    //png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+    //int number_of_passes = png_set_interlace_handling(png_ptr);
+    // TODO: What do the above 3 variables actually mean, and why should I care?
     uint32_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
     png_read_update_info(png_ptr, info_ptr);
 
@@ -175,7 +176,7 @@ void Texture::unload_() {
 // ====================
 
 Texture* Texture::get_texture(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins("%p:%s", engine, name);
+    uint32_t hash = util::hash::ejenkins("texture:%p:%s", engine, name);
     GraphicsResource* resource = Texture::get_resource(hash);
     if(resource == nullptr) {
         DEBUG("Texture [%s] not in cache :(", name);

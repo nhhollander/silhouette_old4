@@ -32,14 +32,15 @@ add_library(seutil SHARED
     src/util/config.cpp
     src/util/configvalue.cpp
     src/util/debugstrings.cpp
+    src/util/dirs.cpp
     src/util/hash.cpp
     src/util/log.cpp
-    src/util/dirs.cpp
 )
 
 # Add the silhouette library
 add_library(silhouette SHARED
     src/se/engine.cpp
+    src/se/graphics/geometry.cpp
     src/se/graphics/graphicsController.cpp
     src/se/graphics/graphicsResource.cpp
     src/se/graphics/shader.cpp

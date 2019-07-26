@@ -17,8 +17,7 @@ namespace se::graphics {
 
     /*!
      *  Texture Class.
-     * 
-     *   */
+     */
     class Texture : public GraphicsResource {
 
         private:
