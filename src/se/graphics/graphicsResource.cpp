@@ -8,12 +8,16 @@
 
 #include "se/graphics/graphicsResource.hpp"
 
+#include "util/hash.hpp"
+
+using namespace se::graphics;
+
 // ============================
 // == DEBUG/HELPER FUNCTIONS ==
 // ============================
 
 #define _GRS_CASE_(n) case(GraphicsResourceState::n): return #n;
-const char* se::graphics::graphics_resource_state_name(GraphicsResourceState state) {
+const char* graphics_resource_state_name(GraphicsResourceState state) {
     switch(state) {
         _GRS_CASE_(NOT_LOADED)
         _GRS_CASE_(LOADING)
@@ -24,10 +28,47 @@ const char* se::graphics::graphics_resource_state_name(GraphicsResourceState sta
     }
 }
 
-#define _GRT_CASE_(n) case(GraphicsResourceType::n): return #n;
-const char* se::graphics::graphics_resource_type_name(GraphicsResourceType type) {
-    switch(type) {
-        _GRT_CASE_(TEST_TYPE)
-        default: return "<invalid GraphicsResourceType>";
+// ====================
+// == STATIC MEMBERS ==
+// ====================
+
+std::map<uint32_t,GraphicsResource*> GraphicsResource::resource_cache;
+
+GraphicsResource* GraphicsResource::get_resource(uint32_t unique_id) {
+    auto search = GraphicsResource::resource_cache.find(unique_id);
+    if(search == GraphicsResource::resource_cache.end()) {
+        return nullptr;
+    } else {
+        return search->second;
     }
+}
+
+// ====================
+// == PUBLIC METHODS ==
+// ====================
+
+GraphicsResourceState GraphicsResource::get_resource_state() {
+    return this->resource_state;
+}
+
+void GraphicsResource::add_resource_dependency(GraphicsResource* resource) {
+    this->resource_dependencies.push_back(resource);
+    resource->add_resource_dependent(this);
+}
+
+// =====================
+// == PRIVATE METHODS ==
+// =====================
+
+void GraphicsResource::add_resource_dependent(GraphicsResource* resource) {
+    this->resource_dependents.push_back(resource);
+}
+
+bool GraphicsResource::resource_unloadable() {
+    for(auto it : this->resource_dependents) {
+        if(it->resource_state != GraphicsResourceState::NOT_LOADED) {
+            return false;
+        }
+    }
+    return true;
 }
