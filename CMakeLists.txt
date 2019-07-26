@@ -41,6 +41,7 @@ add_library(seutil SHARED
 add_library(silhouette SHARED
     src/se/engine.cpp
     src/se/graphics/graphicsController.cpp
+    src/se/graphics/graphicsResource.cpp
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
 )
