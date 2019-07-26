@@ -51,24 +51,6 @@ GraphicsResourceState GraphicsResource::get_resource_state() {
     return this->resource_state;
 }
 
-void GraphicsResource::add_resource_dependency(GraphicsResource* resource) {
-    this->resource_dependencies.push_back(resource);
-    resource->add_resource_dependent(this);
-}
-
 // =====================
 // == PRIVATE METHODS ==
 // =====================
-
-void GraphicsResource::add_resource_dependent(GraphicsResource* resource) {
-    this->resource_dependents.push_back(resource);
-}
-
-bool GraphicsResource::resource_unloadable() {
-    for(auto it : this->resource_dependents) {
-        if(it->resource_state != GraphicsResourceState::NOT_LOADED) {
-            return false;
-        }
-    }
-    return true;
-}

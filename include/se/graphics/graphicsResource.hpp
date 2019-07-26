@@ -51,9 +51,6 @@ namespace se::graphics {
             /// Resource Cache
             static std::map<uint32_t, GraphicsResource*> resource_cache;
 
-            /// Add dependent resource
-            void add_resource_dependent(GraphicsResource* resource);
-
         protected:
 
             /*!
@@ -86,22 +83,6 @@ namespace se::graphics {
             GraphicsResourceState resource_state = GraphicsResourceState::NOT_LOADED;
 
             /*!
-             *  Resource Dependencies.
-             * 
-             *  Resources that this resource depends on being loaded in order
-             *  to be used.
-             */
-            std::vector<GraphicsResource*> resource_dependencies;
-
-            /*!
-             *  Resource Dependents.
-             * 
-             *  Resources that depend on this resource being loaded in order to
-             *  be used.
-             */
-            std::vector<GraphicsResource*> resource_dependents;
-
-            /*!
              *  Get Resource.
              * 
              *  Returns a pointer to an instance of a given graphics resource,
@@ -122,21 +103,6 @@ namespace se::graphics {
              *  Returns the state of this graphics resource.
              */
             GraphicsResourceState get_resource_state();
-
-            /*!
-             *  Add a Dependency.
-             * 
-             *  Automatically registers this resource as a depdent of the
-             *  specified dependency.
-             */
-            void add_resource_dependency(GraphicsResource* resource);
-
-            /*!
-             *  Unloadable.
-             * 
-             *  Checks if all dependent resources have been unloaded.
-             */
-            bool resource_unloadable();
     };
 
 }
