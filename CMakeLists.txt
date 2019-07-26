@@ -44,6 +44,7 @@ add_library(silhouette SHARED
     src/se/graphics/graphicsResource.cpp
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
+    src/se/graphics/texture.cpp
 )
 # Enable the internal library flag
 #target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)
@@ -55,4 +56,4 @@ add_executable(se_test
     src/test/main.cpp
 )
 # Link to the required libraries
-target_link_libraries(se_test GL GLEW silhouette seutil pthread)
+target_link_libraries(se_test GL GLEW silhouette seutil pthread png)

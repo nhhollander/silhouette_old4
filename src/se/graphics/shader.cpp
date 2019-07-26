@@ -108,7 +108,7 @@ Shader::Shader(se::Engine* engine, const char* name, GLuint type) {
             this->name.c_str(), fname.c_str(), filesize, read_count);
     }
     if(fclose(fp) != 0) {
-        WARN("[%s] Failed to close after reading source file [%s] [%i: %s]",
+        WARN("[%s] Failed to close file handle after reading source file [%s] [%i: %s]",
             this->name.c_str(), fname.c_str(), errno, strerror(errno));
     }
 

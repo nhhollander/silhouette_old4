@@ -9,6 +9,7 @@
 #include "se/graphics/graphicsResource.hpp"
 
 #include "util/hash.hpp"
+#include "util/log.hpp"
 
 using namespace se::graphics;
 
@@ -21,9 +22,8 @@ const char* graphics_resource_state_name(GraphicsResourceState state) {
     switch(state) {
         _GRS_CASE_(NOT_LOADED)
         _GRS_CASE_(LOADING)
-        _GRS_CASE_(ERROR)
-        _GRS_CASE_(CHILD_ERROR)
         _GRS_CASE_(LOADED)
+        _GRS_CASE_(ERROR) // Not `ERROR` from util::log
         default: return "<invalid GraphicsResourceState>";
     }
 }
@@ -51,6 +51,30 @@ GraphicsResourceState GraphicsResource::get_resource_state() {
     return this->resource_state;
 }
 
-// =====================
-// == PRIVATE METHODS ==
-// =====================
+void GraphicsResource::increment_active_users() {
+    if(this->active_users == 0) {
+        this->load_();
+    }
+    this->active_users += 1;
+}
+
+void GraphicsResource::decrement_active_users() {
+    if(this->active_users == 0) {
+        WARN("Attempted to decrement active users on resource with zero users!");
+    } else {
+        this->active_users -= 1;
+        if(this->active_users == 0) {
+            /* TODO: Add logic to determine when it's actually necessary to
+            unload resources to prevent excessive loading and unloading. */
+            this->unload_();
+        }
+    }
+}
+
+// =======================
+// == PROTECTED METHODS ==
+// =======================
+
+GraphicsResource::GraphicsResource(uint32_t unique_id) {
+    this->resource_cache.insert(std::pair(unique_id, this));
+}

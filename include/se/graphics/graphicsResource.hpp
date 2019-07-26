@@ -25,7 +25,6 @@ namespace se::graphics {
         NOT_LOADED,
         LOADING,
         ERROR,
-        CHILD_ERROR,
         LOADED
     };
 
@@ -69,7 +68,7 @@ namespace se::graphics {
              *  This function will be called when the resource is asked to be
              *  loaded.
              */
-            virtual void load_();
+            virtual void load_() = 0;
 
             /*!
              *  Unload the resource (internal).
@@ -77,10 +76,19 @@ namespace se::graphics {
              *  This function will be called when the resource is asked to be
              *  unloaded.
              */
-            virtual void unload_();
+            virtual void unload_() = 0;
 
             /// Resource state
             GraphicsResourceState resource_state = GraphicsResourceState::NOT_LOADED;
+
+            /*!
+             *  Active User Counter.
+             * 
+             *  This value contains the number of entities that are currently
+             *  using this resource.  This does not necessarily reflect the
+             *  number of constructed entities that depend on this resource.
+             */
+            uint16_t active_users = 0;
 
             /*!
              *  Get Resource.
@@ -103,6 +111,29 @@ namespace se::graphics {
              *  Returns the state of this graphics resource.
              */
             GraphicsResourceState get_resource_state();
+
+            /*!
+             *  Increment the active user counter.
+             * 
+             *  If a call to this function causes the active user count to move
+             *  from 0 to 1, the resource will be loaded and made available for
+             *  use as quickly as possible.
+             * 
+             *  **Make sure to decrement the user counter when you're done with
+             *  the resource**
+             */
+            void increment_active_users();
+
+            /*!
+             *  Decrement the active user counter.
+             * 
+             *  If a call to this function causes the active user count to move
+             *  from 1 to 0, the resource may be unloaded.
+             * 
+             *  **Make sure you actually incremented the user counter before**
+             */
+            void decrement_active_users();
+
     };
 
 }
