@@ -151,6 +151,9 @@ void GraphicsController::render() {
 
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Get the VP matrix from the active camera
+    glm::mat4 vp = this->active_camera->get_camera_matrix();
+
     SDL_GL_SwapWindow(this->window);
 
 }
@@ -273,7 +276,7 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     /* Create a default camera to use as the viewpoint until an actual camera is
     loaded.  This eliminates the requirement to check if the current camera is
     null before rendering each frame. */
-    this->active_camera = new se::entity::Camera();
+    this->active_camera = new se::entity::Camera(this->engine);
 
     // Start the graphics thread
     this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
