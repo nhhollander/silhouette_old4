@@ -42,6 +42,37 @@ namespace se {
             /// Scale along the z axis (multiplier)
             float sz = 1.0;
 
+            /*!
+             *  Entity is Renderable.
+             * 
+             *  This method should return true only if this entity is capable of
+             *  being rendered, and implements the `render()` method.
+             */
+            virtual bool is_renderable() = 0;
+
+            /*!
+             *  Render.
+             * 
+             *  This method will only be called for renderable entities as
+             *  determined by `is_renderable()`.
+             */
+            virtual void render();
+
+            /*!
+             *  Entity is Tickable.
+             * 
+             *  This method should return true only if this entity is capable of
+             *  processing logic ticks, and implements the `tick()` method.
+             */
+            virtual bool is_tickable() = 0;
+
+            /*!
+             *  Tick.
+             * 
+             *  This method will only be called for tickable entities as
+             *  determined by `is_tickable()`.
+             */
+            virtual void tick();
     };
 
 }

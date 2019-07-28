@@ -33,7 +33,6 @@ using namespace se::graphics;
 std::map<uint32_t, Shader*> Shader::cache;
 
 Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type) {
-    DEBUG("Retrieving shader [%p:%s:%u]", engine, name, type);
     uint32_t hash = util::hash::ejenkins("%p:%s:%u", engine, name, type);
 
     // Check the cache

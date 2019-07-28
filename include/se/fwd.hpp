@@ -14,13 +14,23 @@
 namespace se {
     
     class Engine;
+    class Entity;
 
     namespace graphics {
 
+        class Geometry;
         class GraphicsController;
+        class GraphicsResource;
         class Shader;
         class ShaderProgram;
         class Texture;
+
+    }
+
+    namespace entity {
+
+        class StaticProp;
+        class Camera;
 
     }
 

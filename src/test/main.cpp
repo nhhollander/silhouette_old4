@@ -10,11 +10,14 @@
 
 #include "se/engine.hpp"
 #include "util/log.hpp"
-#include "se/graphics/geometry.hpp"
+#include "se/entity/staticProp.hpp"
 
 #include <thread>
+#include <cstdlib>
+#include <vector>
 
 using namespace se;
+using namespace se::entity;
 
 int main() {
     util::log::set_thread_name("MAIN");
@@ -22,12 +25,15 @@ int main() {
 
     Engine e;
 
-    se::graphics::Geometry* geom = graphics::Geometry::get_geometry(&e, "suzanne");
-    DEBUG("Incrementing active users to cause test model load");
-    geom->increment_active_users();
-    while(geom->get_resource_state() != se::graphics::GraphicsResourceState::LOADED) {}
-    DEBUG("Decrementing active users to cause test geometry unload");
-    geom->decrement_active_users();
+    std::vector<StaticProp*> props;
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    for(int i = 0; i < 20; i++) {
+        StaticProp* prop = new StaticProp(&e, "suzanne", "test");
+        prop->x = ((float) rand()) / ((float) rand());
+        prop->y = ((float) rand()) / ((float) rand());
+        prop->z = ((float) rand()) / ((float) rand());
+        props.push_back(prop);
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 }

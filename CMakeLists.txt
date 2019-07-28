@@ -40,6 +40,8 @@ add_library(seutil SHARED
 # Add the silhouette library
 add_library(silhouette SHARED
     src/se/engine.cpp
+    src/se/entity.cpp
+    src/se/entity/staticProp.cpp
     src/se/graphics/geometry.cpp
     src/se/graphics/graphicsController.cpp
     src/se/graphics/graphicsResource.cpp

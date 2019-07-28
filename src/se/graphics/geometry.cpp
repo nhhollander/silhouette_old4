@@ -33,8 +33,10 @@ using namespace se::graphics;
 // == PRIVATE MEMBERS ==
 // =====================
 
+#define GEOM_HASH_FORMAT "geometry:%p:%s"
+
 Geometry::Geometry(se::Engine* engine, const char* name) :
-    GraphicsResource(util::hash::ejenkins("%p:%s", engine, name)) {
+    GraphicsResource(util::hash::ejenkins(GEOM_HASH_FORMAT, engine, name)) {
     this->engine = engine;
     this->name = strdup(name);
 }
@@ -203,7 +205,7 @@ void Geometry::unload_() {
 // ====================
 
 Geometry* Geometry::get_geometry(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins("geometry:%p:%s", engine, name);
+    uint32_t hash = util::hash::ejenkins(GEOM_HASH_FORMAT, engine, name);
     GraphicsResource* resource = Geometry::get_resource(hash);
     if(resource == nullptr) {
         DEBUG("Geometry [%s] not in cache :(", name);

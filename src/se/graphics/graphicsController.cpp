@@ -9,34 +9,26 @@
 #include "se/graphics/graphicsController.hpp"
 
 #include "se/engine.hpp"
+#include "se/entity.hpp"
+#include "se/entity/camera.hpp"
 
 #include "util/config.hpp"
 #include "util/log.hpp"
 
 #include <chrono>
 #include <typeinfo>
+#include <math.h>
 
-se::graphics::GraphicsController::GraphicsController(se::Engine* engine) {
-    DEBUG("Initializing new graphics controller");
-    this->engine = engine;
+using namespace se::graphics;
 
-    // Start the graphics thread
-    this->graphics_thread = std::thread(&se::graphics::GraphicsController::graphics_thread_main, this);
-}
+// =====================
+// == PRIVATE MEMBERS ==
+// =====================
 
-se::graphics::GraphicsController::~GraphicsController() {
-    
-    if(this->graphics_thread.joinable()) {
-        DEBUG("Waiting for graphics thread to exit");
-        this->graphics_thread.join();
-    }
-
-}
-
-void se::graphics::GraphicsController::graphics_thread_main() {
+void GraphicsController::graphics_thread_main() {
     util::log::set_thread_name("RENDER");
     INFO("Hello from the render thread!");
-    util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(se::graphics::GraphicsController::recalculate_fps_limit);
+    util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(GraphicsController::recalculate_fps_limit);
     this->engine->config->get("render.fpscap")->add_change_handler(handler);
 
     // Initialize SDL2 in OpenGL mode
@@ -155,7 +147,7 @@ void se::graphics::GraphicsController::graphics_thread_main() {
 
 }
 
-void se::graphics::GraphicsController::render() {
+void GraphicsController::render() {
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -163,13 +155,65 @@ void se::graphics::GraphicsController::render() {
 
 }
 
-void se::graphics::GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
+void GraphicsController::graphics_support_thread_main() {
+    util::log::set_thread_name("RSUPPORT");
+    INFO("Hello from the graphics support thread");
+
+    // Variables for sorting benchmarking
+    uint64_t bm_sort_total_time = 0;
+    uint32_t bm_sort_total_count = 0;
+    uint64_t bm_sort_total_entity_count = 0;
+
+
+    while(this->engine->threads_run) {
+
+        // Debug code for calculating sort time
+        auto bm_sort_start = std::chrono::system_clock::now();
+
+        // Sort renderables
+        this->sort_renderables();
+
+        auto bm_sort_duration = std::chrono::system_clock::now() - bm_sort_start;
+        uint64_t bm_sort_duration_ns = 
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                bm_sort_duration).count();
+        float bm_sort_duration_ms = ((float) bm_sort_duration_ns) / 1000000;
+        DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
+            this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
+        bm_sort_total_time += bm_sort_duration_ns;
+        bm_sort_total_entity_count += this->renderables.size();
+        bm_sort_total_count += 1;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+    }
+
+    // Benchmarking information for entity sorting operation
+    if(bm_sort_total_count == 0 || bm_sort_total_entity_count == 0) {
+        WARN("No entities were sorted - skipping sorting benchmarks");
+    } else {
+        uint64_t average_time = bm_sort_total_time / bm_sort_total_count;
+        uint64_t average_entity_time = bm_sort_total_time / bm_sort_total_entity_count;
+        float total_time_ms = bm_sort_total_time / 1000000.0;
+        float average_time_ms = average_time / 1000000.0;
+        float averate_entity_time_ms = average_entity_time / 1000000.0;
+        INFO("Total sort operations: %u", bm_sort_total_count);
+        INFO("Total entities sorted: %u", bm_sort_total_entity_count);
+        INFO("Total time %.3fms (%uns)", total_time_ms, bm_sort_total_time);
+        INFO("Average time %.3fms (%uns)", average_time_ms, average_time);
+        INFO("Average entity time %.3fms (%uns)", averate_entity_time_ms, average_entity_time);
+    }
+
+    DEBUG("Render support thread terminated");
+}
+
+void GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
     INFO("FPS limit changed to %i", value->int_);
     int fps_cap = value->int_;
     this->target_frame_time = 1000000000 / fps_cap;
 }
 
-void se::graphics::GraphicsController::process_tasks() {
+void GraphicsController::process_tasks() {
     /* Tasks are executed one at a time to allow a frame to render in between.
      * While this could potentially increase the time it takes for all pending
      * tasks to complete, it prevents the graphics thread from becoming
@@ -181,6 +225,104 @@ void se::graphics::GraphicsController::process_tasks() {
     }
 }
 
-void se::graphics::GraphicsController::submit_graphics_task(GraphicsTask task) {
+bool renderable_sort_check(se::Entity* e1, se::Entity* e2, se::entity::Camera* camera) {
+    /* In order to sort renderable entities, we want to calculate their
+    distances to/from the currently active camera. It might be worth revisiting
+    this method in the future with a faster or more suitable algorithm. */
+    float dist_e1 = 0.0;
+    float dist_e2 = 0.0;
+    { // Distance calculation for entity 1
+        float dx = e1->x - camera->x;
+        float dy = e1->y - camera->y;
+        float dz = e1->z - camera->z;
+        dx = dx*dx;
+        dy = dy*dy;
+        dz = dz*dz;
+        dist_e1 = sqrt(dx + dy + dz);
+    }
+    { // Distance calculation for entity 2
+        float dx = e2->x - camera->x;
+        float dy = e2->y - camera->y;
+        float dz = e2->z - camera->z;
+        dx = dx*dx;
+        dy = dy*dy;
+        dz = dz*dz;
+        dist_e2 = sqrt(dx + dy + dz);
+    }
+
+    return dist_e1 < dist_e2;
+}
+
+void GraphicsController::sort_renderables() {
+    // Wrap the sort comparison function in a lambda
+    auto sort_fun = [this](se::Entity* e1, se::Entity* e2){
+        return renderable_sort_check(e1, e2, this->active_camera);
+    };
+
+    std::sort(this->renderables.begin(), this->renderables.end(), sort_fun);
+}
+
+// ====================
+// == PUBLIC MEMBERS ==
+// ====================
+
+GraphicsController::GraphicsController(se::Engine* engine) {
+    DEBUG("Initializing new graphics controller");
+    this->engine = engine;
+
+    /* Create a default camera to use as the viewpoint until an actual camera is
+    loaded.  This eliminates the requirement to check if the current camera is
+    null before rendering each frame. */
+    this->active_camera = new se::entity::Camera();
+
+    // Start the graphics thread
+    this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
+    // Start the graphics support thread
+    this->graphics_support_thread = std::thread(&GraphicsController::graphics_support_thread_main, this);
+}
+
+GraphicsController::~GraphicsController() {
+    
+    if(this->graphics_thread.joinable()) {
+        DEBUG("Waiting for graphics thread to exit");
+        this->graphics_thread.join();
+    }
+
+    if(this->graphics_support_thread.joinable()) {
+        DEBUG("Wating for graphics support thread to exit");
+        this->graphics_support_thread.join();
+    }
+
+}
+
+void GraphicsController::submit_graphics_task(GraphicsTask task) {
     this->tasks.push(task);
+}
+
+void GraphicsController::add_renderable(se::Entity* entity) {
+    if(!entity->is_renderable()) {
+        WARN("Attempted to add non-renderable entity to render list!");
+        return;
+    }
+    for(auto ent : this->renderables) {
+        if(ent == entity) {
+            WARN("Attempted to add duplicate entity to render list!");
+            return;
+        }
+    }
+    // Add the entity to the renderable list
+    this->renderables.push_back(entity);
+}
+
+void GraphicsController::remove_renderable(se::Entity* entity) {
+    int counter = 0;
+    for(auto ent : this->renderables) {
+        if(ent == entity) {
+            this->renderables.erase(this->renderables.begin() + counter);
+            return;
+        }
+        counter++;
+    }
+    // TODO: Add some sort of identifying information
+    WARN("Attempted to remove non-exisent entity from render list!");
 }

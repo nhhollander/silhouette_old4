@@ -62,6 +62,11 @@ namespace se::graphics {
             std::thread graphics_thread;
 
             /*!
+             *  Graphics Support Thread Object.
+             */
+            std::thread graphics_support_thread;
+
+            /*!
              *  Target frame time used for FPS limit.
              * 
              *  Negative values disable FPS cap.
@@ -70,8 +75,22 @@ namespace se::graphics {
 
             /*!
              *  Graphics Tasks.
+             * 
+             *  These tasks are executed in the order they are received, at a
+             *  rate of one task per rendered frame.  While this does have a
+             *  small impact on how quickly all tasks can be processed, it
+             *  ensures that some frames still get rendered, preventing a
+             *  complete output freeze if a lot of tasks land all at once.
              */
             std::queue<GraphicsTask> tasks;
+
+            /*!
+             *  Renderable Entities.
+             */
+            std::vector<se::Entity*> renderables;
+
+            /// Active view point
+            se::entity::Camera* active_camera;
 
             /*!
              *  Graphics Thread.
@@ -93,6 +112,15 @@ namespace se::graphics {
             void render();
 
             /*!
+             *  Graphics Support Thread.
+             * 
+             *  This thread is spawned as the body of the graphics support
+             *  thread.  It does a variety of background tasks to optimize
+             *  engine performance.
+             */
+            void graphics_support_thread_main();
+
+            /*!
              *  Recalculate FPS limit.
              * 
              *  Invoke this method by updating the `render.fpscap` configuration
@@ -104,6 +132,16 @@ namespace se::graphics {
              *  Process pending graphics tasks.
              */
             void process_tasks();
+
+            /*!
+             *  Sort renderable entities.
+             * 
+             *  TODO: I'm not entirely sure how to balance the performance of
+             *  this opeartion.  It does make rendering faster, but at the same
+             *  time it takes a reasonable amount of processing power to
+             *  calculate.
+             */
+            void sort_renderables();
 
         public:
 
@@ -123,6 +161,47 @@ namespace se::graphics {
              *  texture loading.
              */
             void submit_graphics_task(GraphicsTask task);
+
+            /*!
+             *  Add a renderable entity.
+             * 
+             *  Entities in this list will be called upon by the render thread
+             *  every frame.  The more entities in the render queue, the slower
+             *  the engine is going to run.  If an entity is no longer a
+             *  candidate for rendering, please remove it by calling
+             *  `remove_renderable()`.
+             * 
+             *  Only add entities for which `se::Entity::is_renderable()`
+             *  returns `true`.
+             * 
+             *  TODO: Is there a way to make it so that the renderability of
+             *  entities is dynamically calculated?  This would allow entities
+             *  to be removed from this list automatically when they get too
+             *  far away to be considered for rendering.
+             * 
+             *  TODO: Render groups.  Instead of worrying about dynamic 
+             *  visibility, having groups of entities pre-categorized into
+             *  render groups in some kind of tree would be a good way of
+             *  keeping performance high.  I believe this is sort of how other
+             *  engines (like Source) deal with props and entities, so that they
+             *  don't have to worry about excessive calls to nearby but
+             *  invisible entities.
+             */
+            void add_renderable(se::Entity* entity);
+
+            /*!
+             *  Remove a renderable entity.
+             * 
+             *  When an entity is no longer renderable, removing it from the
+             *  list of renderable entities will help keep the engine running
+             *  as quickly as possible.
+             */
+            void remove_renderable(se::Entity* entity);
+
+            /*!
+             *  Set the active camera.
+             */
+            void set_active_camera(se::entity::Camera* camera);
 
     };
 

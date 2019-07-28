@@ -31,8 +31,10 @@ using namespace se::graphics;
 // == PRIVATE MEMBERS ==
 // =====================
 
+#define TEXTURE_HASH_FORMAT "texture:%p:%s"
+
 Texture::Texture(se::Engine* engine, const char* name) : 
-    GraphicsResource(util::hash::ejenkins("%p:%s", engine, name)) {
+    GraphicsResource(util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name)) {
     this->engine = engine;
     this->name = strdup(name);
 }
@@ -177,7 +179,7 @@ void Texture::unload_() {
 // ====================
 
 Texture* Texture::get_texture(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins("texture:%p:%s", engine, name);
+    uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
     GraphicsResource* resource = Texture::get_resource(hash);
     if(resource == nullptr) {
         DEBUG("Texture [%s] not in cache :(", name);
