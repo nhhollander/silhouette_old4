@@ -380,3 +380,7 @@ void GraphicsController::remove_renderable(se::Entity* entity) {
     // TODO: Add some sort of identifying information
     WARN("Attempted to remove non-exisent entity from render list!");
 }
+
+void GraphicsController::set_active_camera(se::entity::Camera* camera) {
+    this->active_camera = camera;
+}

@@ -11,6 +11,8 @@
 #include "se/engine.hpp"
 #include "util/log.hpp"
 #include "se/entity/staticProp.hpp"
+#include "se/entity/camera.hpp"
+#include "se/graphics/graphicsController.hpp"
 
 #include <thread>
 #include <cstdlib>
@@ -25,17 +27,26 @@ int main() {
 
     Engine e;
 
-    std::vector<StaticProp*> props;
+    StaticProp* sp = new StaticProp(&e, "fence", "test");
+    sp->x = 0;
+    sp->y = 0;
+    sp->z = 0;
 
-    for(int i = 0; i < 10; i++) {
-        StaticProp* prop = new StaticProp(&e, "suzanne", "test");
-        prop->x = (rand() % 20) - 10.0;
-        prop->y = (rand() % 20) - 10.0;
-        prop->z = (rand() % 20) - 10.0;
-        props.push_back(prop);
+
+    Camera* cam = new Camera(&e);
+    e.graphics_controller->set_active_camera(cam);
+
+    for(int i = 0; i < 1000; i++) {
+        //sp->z -= 0.01;
+        //cam->rz += 0.01;
+        //sp->ry -= 0.1;
+        //sp->y += 0.01;
+        //cam->rz += 0.01;
+        cam->x += 0.01;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    //std::this_thread::sleep_for(std::chrono::seconds(5));
 
 
 }

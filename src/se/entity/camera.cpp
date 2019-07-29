@@ -11,6 +11,7 @@
 #include "se/engine.hpp"
 
 #include "util/config.hpp"
+#include "util/log.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <math.h>
@@ -20,6 +21,13 @@ using namespace se::entity;
 Camera::Camera(se::Engine* engine) {
     this->width = engine->config->get_intp("window.dimx");
     this->height = engine->config->get_intp("window.dimy");
+}
+
+#define MATRIX(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) { \
+    {a,e,i,m}, \
+    {b,f,j,n}, \
+    {c,g,k,o}, \
+    {d,h,l,p} \
 }
 
 glm::mat4 Camera::get_camera_matrix() {
@@ -54,46 +62,49 @@ glm::mat4 Camera::get_camera_matrix() {
     /* Values are inverted because we're moving the world relative to the camera
     instead of moving the camera realative to the world. */
 
-    glm::mat4 translate = {
-        {1.0, 0.0, 0.0, -this->x},
-        {0.0, 1.0, 0.0, -this->y},
-        {0.0, 0.0, 1.0, -this->z},
-        {0.0, 0.0, 0.0, 1.0     }
-    };
+    glm::mat4 translate = MATRIX(
+        1.0, 0.0, 0.0, -this->x,
+        0.0, 1.0, 0.0, -this->y,
+        0.0, 0.0, 1.0, -this->z,
+        0.0, 0.0, 0.0, 1.0     
+    );
 
-    float xcos = cos(-this->rx);
-    float xsin = sin(-this->rx);
-    glm::mat4 rotate_x = {
-        {1.0,  0.0,   0.0, 0.0},
-        {0.0, xcos, -xsin, 0.0},
-        {0.0, xsin,  xcos, 0.0},
-        {0.0,  0.0,   0.0, 1.0}
-    };
+    /* A 90 degree offset is applied to the angle to shift the world around so
+    that Z is the up direction, and by default the camera is looking directly
+    along the +Y axis */
+    float xcos = cos(-this->rx - 1.5708);
+    float xsin = sin(-this->rx - 1.5708);
+    glm::mat4 rotate_x = MATRIX(
+        1.0,  0.0,   0.0, 0.0,
+        0.0, xcos, -xsin, 0.0,
+        0.0, xsin,  xcos, 0.0,
+        0.0,  0.0,   0.0, 1.0
+    );
 
     float ycos = cos(-this->ry);
     float ysin = sin(-this->ry);
-    glm::mat4 rotate_y = {
-        { ycos, 0.0, ysin, 0.0},
-        {  0.0, 1.0,  0.0, 0.0},
-        {-ysin, 0.0, ycos, 0.0},
-        {  0.0, 0.0,  0.0, 1.0}
-    };
+    glm::mat4 rotate_y = MATRIX(
+         ycos, 0.0, ysin, 0.0,
+          0.0, 1.0,  0.0, 0.0,
+        -ysin, 0.0, ycos, 0.0,
+          0.0, 0.0,  0.0, 1.0
+    );
 
     float zcos = cos(-this->rz);
     float zsin = sin(-this->rz);
-    glm::mat4 rotate_z = {
-        {zcos, -zsin, 0.0, 0.0},
-        {zsin,  zcos, 0.0, 0.0},
-        { 0.0,   0.0, 1.0, 0.0},
-        { 0.0,   0.0, 0.0, 1.0}
-    };
+    glm::mat4 rotate_z = MATRIX(
+        zcos, -zsin, 0.0, 0.0,
+        zsin,  zcos, 0.0, 0.0,
+         0.0,   0.0, 1.0, 0.0,
+         0.0,   0.0, 0.0, 1.0
+    );
 
-    glm::mat4 scale = {
-        {1.0 / this->sx, 0.0, 0.0, 0.0},
-        {0.0, 1.0 / this->sy, 0.0, 0.0},
-        {0.0, 0.0, 1.0 / this->sz, 0.0},
-        {0.0, 0.0, 0.0, 1.0}
-    };
+    glm::mat4 scale = MATRIX(
+        1.0 / this->sx, 0.0, 0.0, 0.0,
+        0.0, 1.0 / this->sy, 0.0, 0.0,
+        0.0, 0.0, 1.0 / this->sz, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
 
     /* I'm using the glm method here because there's basically no
     performance to be saved by hand-calculating the values like there was above.
@@ -101,12 +112,13 @@ glm::mat4 Camera::get_camera_matrix() {
     recalculating values that don't need to be constantly recalculated, but
     that sounds like a problem for the future. */
     float aspect = ((float) *(this->width)) / ((float) *(this->height));
+    DEBUG("Aspect: %f", aspect);
     glm::mat4 projection = glm::perspective(this->fov, aspect, this->near, this->far);
 
     /* Operations are performed from right to left, in the opposite order from
     models.  This means that the models will first be translated into position,
     then rotated about the camera (in x->y->z order), scaled, and finally
     projected into screen space. */
-    return projection * scale * rotate_z * rotate_y * rotate_x * translate;
+    return projection * scale * rotate_x * rotate_y * rotate_z * translate;
 
 }
