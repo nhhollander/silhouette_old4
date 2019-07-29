@@ -49,7 +49,7 @@ namespace se::entity {
             bool is_tickable() { return false; }
 
             /// Field of View (radians)
-            float fov = 1.22173; // 70 degrees (celsius)
+            float fov = 1.22173; // 70 degrees
 
             /// Near render boundary
             float near = 0.01;

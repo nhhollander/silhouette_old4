@@ -42,30 +42,33 @@ Geometry::Geometry(se::Engine* engine, const char* name) :
 }
 
 Geometry::~Geometry() {
+    FATAL("Geometry destroyed");
     delete[] this->name;
 }
 
 void Geometry::bind() {
-    
-    // Not generating all buffers at once because reasons
-    glGenBuffers(1, &this->gl_vertex_buffer_id);
-    glGenBuffers(1, &this->gl_uv_buffer_id);
-    glGenBuffers(1, &this->gl_normal_buffer_id);
 
+    // OpenGL 3.0 binding system (Maybe upgrade at some point?)
+
+    DEBUG("Binding Vertex Data");
+    glGenBuffers(1, &this->gl_vertex_buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, this->gl_vertex_buffer_id);
     glBufferData(GL_ARRAY_BUFFER, this->vertex_data.size() * sizeof(glm::vec3),
         &this->vertex_data[0], GL_STATIC_DRAW);
-    this->vertex_data.clear();
 
+    DEBUG("Binding UV Data");
+    glGenBuffers(1, &this->gl_uv_buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, this->gl_uv_buffer_id);
     glBufferData(GL_ARRAY_BUFFER, this->uv_data.size() * sizeof(glm::vec2),
         &this->uv_data[0], GL_STATIC_DRAW);
-    this->uv_data.clear();
 
+    DEBUG("Binding Normal Data");
+    glGenBuffers(1, &this->gl_normal_buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, this->gl_normal_buffer_id);
     glBufferData(GL_ARRAY_BUFFER, this->normal_data.size() * sizeof(glm::vec3),
         &this->normal_data[0], GL_STATIC_DRAW);
-    this->normal_data.clear();
+
+    // TODO: Clear data
 
     DEBUG("Geometry [%s] bound successfuly!", this->name);
     this->resource_state = GraphicsResourceState::LOADED;
@@ -188,6 +191,8 @@ void Geometry::load_() {
         this->normal_data.push_back(normal);
     }
 
+    this->vertex_array_size = this->vertex_data.size();
+
     DEBUG("Loaded [%s], waiting for bind", this->name);
     std::function job = [this](){this->bind();};
     this->engine->graphics_controller->submit_graphics_task(job);
@@ -213,4 +218,18 @@ Geometry* Geometry::get_geometry(se::Engine* engine, const char* name) {
     }
     DEBUG("Found geometry [%s] in cache!", name);
     return static_cast<Geometry*>(resource);
+}
+
+void Geometry::use_geometry(unsigned int location) {
+    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
+    DEBUG("Binding buffer %u", this->gl_vertex_buffer_id);
+    glBindBuffer(GL_ARRAY_BUFFER, this->gl_vertex_buffer_id);
+    DEBUG("Configuring attribute pointer");
+    glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    DEBUG("Enabling attribute array");
+    glEnableVertexAttribArray(location);
+    DEBUG("Drawing arrays");
+    glDrawArrays(GL_TRIANGLES, 0, this->vertex_array_size);
+
+    // TODO: UVs and normals
 }

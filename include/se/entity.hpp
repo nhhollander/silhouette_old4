@@ -9,6 +9,8 @@
 #ifndef _SE_ENTITY_H_
 #define _SE_ENTITY_H_
 
+#include <glm/mat4x4.hpp>
+
 namespace se {
 
     /*!
@@ -42,6 +44,8 @@ namespace se {
             /// Scale along the z axis (multiplier)
             float sz = 1.0;
 
+            // = VIRTUALS =
+
             /*!
              *  Entity is Renderable.
              * 
@@ -55,8 +59,10 @@ namespace se {
              * 
              *  This method will only be called for renderable entities as
              *  determined by `is_renderable()`.
+             * 
+             *  @param camera_matrix    View and projection matrix
              */
-            virtual void render();
+            virtual void render(glm::mat4 camera_matrix);
 
             /*!
              *  Entity is Tickable.
@@ -73,6 +79,20 @@ namespace se {
              *  determined by `is_tickable()`.
              */
             virtual void tick();
+
+            // = METHODS =
+
+            /*!
+             *  Get the Model Matrix.
+             * 
+             *  The model matrix is one of the 3 primary matrices used for
+             *  translation between model coordinate space and screen coordinate
+             *  space.  The other two, the view and projection matrices, are
+             *  provided by the camera entity.  Although any entity with a
+             *  position in the world can be translated into camera space, this
+             *  function only has real meaning for renderable entities.
+             */
+            glm::mat4 get_model_matrix();
     };
 
 }

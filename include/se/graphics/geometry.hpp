@@ -64,6 +64,9 @@ namespace se::graphics {
              */
             std::vector<glm::vec3> normal_data;
 
+            /// OpenGL array ID
+            unsigned int gl_array_id = 0;
+
             /// OpenGL vertex buffer ID
             unsigned int gl_vertex_buffer_id = 0;
         
@@ -72,6 +75,9 @@ namespace se::graphics {
 
             /// OpenGL normal buffer ID
             unsigned int gl_normal_buffer_id = 0;
+
+            /// Size of the vertex array
+            unsigned int vertex_array_size = 0;
 
             /*!
              *  Bind geometry to the GPU.
@@ -97,7 +103,24 @@ namespace se::graphics {
 
         public:
 
+            /*!
+             *  Get an instance of a model.
+             * 
+             *  Attempts to load the requested geometry from the graphics
+             *  resource cache, and failing that, returns a new object.
+             * 
+             */
             static Geometry* get_geometry(se::Engine* engine, const char* name);
+
+            /*!
+             *  Use this Geometry.
+             * 
+             *  **Warning:** This method must be called from the graphics
+             *  thread.
+             * 
+             *  @param location Vertex shader input location.
+             */
+            void use_geometry(unsigned int location);
 
     };
 

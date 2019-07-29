@@ -11,10 +11,11 @@
 #include "se/engine.hpp"
 #include "se/graphics/graphicsController.hpp"
 
-#include "util/log.hpp"
-#include "util/hash.hpp"
+#include "util/config.hpp"
 #include "util/dirs.hpp"
 #include "util/debugstrings.hpp"
+#include "util/hash.hpp"
+#include "util/log.hpp"
 
 #include <chrono>
 #include <thread>
@@ -30,10 +31,23 @@ using namespace se::graphics;
 // == STATIC METHODS ==
 // ====================
 
+const char* se::graphics::shader_state_name(ShaderState state) {
+    switch(state) {
+        case ShaderState::LOADING: return "LOADING";
+        case ShaderState::READY: return "READY";
+        case ShaderState::ERROR: return "ERROR";
+        default: return "<invalid ShaderState>";
+    }
+}
+
 std::map<uint32_t, Shader*> Shader::cache;
 
-Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type) {
-    uint32_t hash = util::hash::ejenkins("%p:%s:%u", engine, name, type);
+Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type, const char* defines) {
+    /* Hash for defines is calculated separately because there is a somewhat 
+    arbitrary size limit for the ejenkins function, and it's possible that the
+    definitions will overwhelm that limit, potentially poisoning the result. */
+    uint32_t defines_hash = util::hash::jenkins(defines, strlen(defines));
+    uint32_t hash = util::hash::ejenkins("%p:%s:%u:%u", engine, name, type, defines_hash);
 
     // Check the cache
     auto check = Shader::cache.find(hash);
@@ -43,7 +57,7 @@ Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type) {
     }
 
     // Create a new shader
-    Shader* shader = new Shader(engine, name, type);
+    Shader* shader = new Shader(engine, name, type, defines);
     Shader::cache.insert(std::pair(hash, shader));
     return shader;
 }
@@ -52,10 +66,11 @@ Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type) {
 // == PRIVATE METHODS ==
 // =====================
 
-Shader::Shader(se::Engine* engine, const char* name, GLuint type) {
+Shader::Shader(se::Engine* engine, const char* name, GLuint type, const char* defines) {
     this->engine = engine;
     this->name = strdup(name);
     this->type = type;
+    this->defines = strdup(defines);
 
     // Get the shader name
     this->name = std::string();
@@ -111,6 +126,25 @@ Shader::Shader(se::Engine* engine, const char* name, GLuint type) {
             this->name.c_str(), fname.c_str(), errno, strerror(errno));
     }
 
+    // Determine the version string
+    int gl_major = this->engine->config->get_int("render.gl.major");
+    int gl_minor = this->engine->config->get_int("render.gl.minor");
+    this->vstring = new char[1024]; // Extra large for safety
+    if(gl_major == 2 && gl_minor == 0) {
+        strcpy(this->vstring, "#version 110\n");
+    } else if(gl_major == 2 && gl_minor == 1) {
+        strcpy(this->vstring, "#version 120\n");
+    } else if(gl_major == 3 && gl_minor == 0) {
+        strcpy(this->vstring, "#version 130\n");
+    } else if(gl_major == 3 && gl_minor == 1) {
+        strcpy(this->vstring, "#version 140\n");
+    } else if(gl_major == 3 && gl_minor == 2) {
+        strcpy(this->vstring, "#version 150\n");
+    } else {
+        snprintf(this->vstring, 1024, "#version %i%i\n",
+            gl_major, (gl_minor * 10));
+    }
+
     // Submit to the compilation queue
     std::function job = [this](){this->compile();};
     this->engine->graphics_controller->submit_graphics_task(job);
@@ -151,9 +185,11 @@ void Shader::compile() {
         return;
     }
     const GLchar* sources[] = {
-        this->source_code
+        this->vstring, // Generated #version string
+        this->defines, // User supplied defines
+        this->source_code // Loaded source code
     };
-    glShaderSource(this->gl_shader, 1, sources, NULL);
+    glShaderSource(this->gl_shader, 3, sources, NULL);
     delete[] this->source_code; // Source code is copied to gl
 
     // Compile the object and check for errors

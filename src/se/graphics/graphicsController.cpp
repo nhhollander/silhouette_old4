@@ -25,6 +25,47 @@ using namespace se::graphics;
 // == PRIVATE MEMBERS ==
 // =====================
 
+uint64_t gl_error_counter = 0;
+
+#define SE_GL_DEBUG_TYPE(n) case(GL_DEBUG_TYPE_##n): \
+    type_str = #n; break;
+#define SE_GL_DEBUG_SEVERITY(n) case(GL_DEBUG_SEVERITY_##n): \
+    severity_str = #n; break;
+void GLAPIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id,
+    GLenum severity, GLsizei length, const GLchar* message, const void* uparam) {
+
+    if(type == GL_DEBUG_TYPE_ERROR) {
+        gl_error_counter++;
+    }
+
+    const char* type_str;
+    switch(type) {
+        SE_GL_DEBUG_TYPE(DEPRECATED_BEHAVIOR)
+        SE_GL_DEBUG_TYPE(ERROR);
+        SE_GL_DEBUG_TYPE(MARKER)
+        SE_GL_DEBUG_TYPE(OTHER)
+        SE_GL_DEBUG_TYPE(PERFORMANCE)
+        SE_GL_DEBUG_TYPE(POP_GROUP)
+        SE_GL_DEBUG_TYPE(PORTABILITY)
+        SE_GL_DEBUG_TYPE(PUSH_GROUP)
+        SE_GL_DEBUG_TYPE(UNDEFINED_BEHAVIOR)
+        default: type_str = "\033[1;31mINVALID\033[0m";
+    }
+
+    const char* severity_str;
+    switch(severity) {
+        SE_GL_DEBUG_SEVERITY(HIGH)
+        SE_GL_DEBUG_SEVERITY(MEDIUM)
+        SE_GL_DEBUG_SEVERITY(NOTIFICATION)
+        SE_GL_DEBUG_SEVERITY(LOW)
+        default: severity_str = "\033[1;31mINVALID\033[0m";
+    }
+
+    printf("[\033[1;38;5;93mOPENGL\033[0m] Type: [%s] Severity: [%s] ID: %u\n    %s\n",
+        type_str, severity_str, id, message);
+    printf("Gl errors: %u\n", gl_error_counter);
+}
+
 void GraphicsController::graphics_thread_main() {
     util::log::set_thread_name("RENDER");
     INFO("Hello from the render thread!");
@@ -77,6 +118,10 @@ void GraphicsController::graphics_thread_main() {
         FATAL("Failed to initialize GLEW! [%s]", glewGetErrorString(glewError));
         return;
     }
+
+    // Set up the error callback system
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(gl_message_callback, this);
 
     // Configure the OpenGL instance
     bool vsync = this->engine->config->get_bool("render.vsync",false);
@@ -152,7 +197,13 @@ void GraphicsController::render() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Get the VP matrix from the active camera
-    glm::mat4 vp = this->active_camera->get_camera_matrix();
+    glm::mat4 camera_matrix = this->active_camera->get_camera_matrix();
+
+    for(se::Entity* entity : this->renderables) {
+        
+        entity->render(camera_matrix);
+
+    }
 
     SDL_GL_SwapWindow(this->window);
 

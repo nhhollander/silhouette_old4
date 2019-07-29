@@ -67,7 +67,7 @@ namespace se::entity {
             ~StaticProp();
 
             /// Render the prop
-            void render();
+            void render(glm::mat4 camera_matrix);
 
             /// Static props are renderable
             bool is_renderable() { return true; }

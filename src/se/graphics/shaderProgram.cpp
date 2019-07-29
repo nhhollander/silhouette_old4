@@ -30,39 +30,7 @@ using namespace se::graphics;
 // == STATIC METHODS ==
 // ====================
 
-std::map<uint32_t, ShaderProgram*> ShaderProgram::cache;
-
-ShaderProgram* ShaderProgram::get_program(se::Engine* engine, const char* vshader, const char* fshader) {
-    DEBUG("Retrieving shader program [%p:%s:%s]", engine, vshader, fshader);
-    uint32_t hash = util::hash::ejenkins("%p:%s:%s", engine, vshader, fshader);
-
-    // Check the cache
-    auto check = ShaderProgram::cache.find(hash);
-    if(check != ShaderProgram::cache.end()) {
-        DEBUG("Found shader [%p:%s:%s] in cache", engine, vshader, fshader);
-        return check->second;
-    }
-
-    // Create a new program
-    ShaderProgram* program = new ShaderProgram(engine, vshader, fshader);
-    ShaderProgram::cache.insert(std::pair(hash, program));
-    return program;
-}
-
-// =====================
-// == PRIVATE METHODS ==
-// =====================
-
-const char* shader_state_name(ShaderState state) {
-    switch(state) {
-        case ShaderState::LOADING: return "LOADING";
-        case ShaderState::READY: return "READY";
-        case ShaderState::ERROR: return "ERROR";
-        default: return "<invalid ShaderState>";
-    }
-}
-
-const char* shader_program_state_name(ShaderProgramState state) {
+const char* se::graphics::shader_program_state_name(ShaderProgramState state) {
     switch(state) {
         case ShaderProgramState::LOADING: return "LOADING";
         case ShaderProgramState::READY: return "READY";
@@ -72,7 +40,43 @@ const char* shader_program_state_name(ShaderProgramState state) {
     }
 }
 
-ShaderProgram::ShaderProgram(se::Engine* engine, const char* vsname, const char* fsname) {
+std::map<uint32_t, ShaderProgram*> ShaderProgram::cache;
+
+ShaderProgram* ShaderProgram::get_program(se::Engine* engine,
+    const char* vshader, const char* vdefines,
+    const char* fshader, const char* fdefines) {
+
+    uint32_t vdefhash = util::hash::jenkins(vdefines, strlen(vdefines));
+    uint32_t fdefhash = util::hash::jenkins(fdefines, strlen(fdefines));
+
+    DEBUG("Retrieving shader program [%p:%s:%s:%u:%u]", engine, vshader, fshader);
+    uint32_t hash = util::hash::ejenkins("%p:%s:%s:%u:%u",
+        engine, vshader, fshader, vdefhash, fdefhash);
+
+    // Check the cache
+    auto check = ShaderProgram::cache.find(hash);
+    if(check != ShaderProgram::cache.end()) {
+        DEBUG("Found shader [%p:%s:%s] in cache", engine, vshader, fshader);
+        return check->second;
+    }
+
+    // Create a new program
+    ShaderProgram* program = new ShaderProgram(
+                                engine, vshader, vdefines, fshader, fdefines);
+    ShaderProgram::cache.insert(std::pair(hash, program));
+    return program;
+}
+
+thread_local unsigned int ShaderProgram::current_program = 0;
+
+// =====================
+// == PRIVATE METHODS ==
+// =====================
+
+ShaderProgram::ShaderProgram(se::Engine* engine, 
+    const char* vsname, const char* vdefines,
+    const char* fsname, const char* fdefines) {
+
     this->engine = engine;
     this->vsname = strdup(vsname);
     this->fsname = strdup(fsname);
@@ -85,8 +89,8 @@ ShaderProgram::ShaderProgram(se::Engine* engine, const char* vsname, const char*
     this->name += ".frag";
 
     // Get the shaders
-    this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER);
-    this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER);
+    this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER, vdefines);
+    this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER, fdefines);
 
     ShaderState vstate = this->vshader->wait_for_loading();
     ShaderState fstate = this->fshader->wait_for_loading();
@@ -166,4 +170,16 @@ ShaderProgramState ShaderProgram::wait_for_loading() {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     return this->state;
+}
+
+void ShaderProgram::use_program() {
+    if(this->state != ShaderProgramState::READY) { return; }
+    /* Only update the current program if the current program is not already
+    the current program.  I'm not actually sure if this has any performance
+    benefit, but I don't thin it's going to have a significant performance
+    impact so I'm going to leave it in. */
+    if(this->current_program != this->gl_program) {
+        glUseProgram(this->gl_program);
+        this->current_program = this->gl_program;
+    }
 }

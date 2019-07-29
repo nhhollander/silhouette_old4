@@ -26,6 +26,11 @@ namespace se::graphics {
     };
 
     /*!
+     *  Get the name of a shader program state.
+     */
+    const char* shader_program_state_name(ShaderProgramState state);
+
+    /*!
      *  Shader Program Class.
      * 
      *  This class represents a usable shader program.
@@ -41,10 +46,14 @@ namespace se::graphics {
              *  cache instead of creating multiple instances.
              * 
              *  @param parent   The parent `se::Engine` instance.
-             *  @param vshader  Name of the vertex shader
-             *  @param fshader  Name of the fragment shader
+             *  @param vshader  Name of the vertex shader.
+             *  @param vdefines Definititions for the vertex shader.
+             *  @param fshader  Name of the fragment shader.
+             *  @param fdefines Definitions for the fragment shader.
              */
-            ShaderProgram(se::Engine* engine, const char* vshader, const char* fshader);
+            ShaderProgram(se::Engine* engine,
+                const char* vshader, const char* vdefines,
+                const char* fshader, const char* fdefines);
             
             /*!
              *  Destroy this program.
@@ -86,6 +95,13 @@ namespace se::graphics {
              */
             static std::map<uint32_t, ShaderProgram*> cache;
 
+            /*!
+             *  Current Program for this render thread.
+             * 
+             *  I don't know if this has any actual performance benefit.
+             */
+            static thread_local unsigned int current_program;
+
         public:
 
             /*!
@@ -99,9 +115,13 @@ namespace se::graphics {
              * 
              *  @param engine   Parent engine.
              *  @param vsname   Name of the vertex shader.
-             *  @param fsname  Name of the fragment shader.
+             *  @param vdefines Definitions for the vertex shader.
+             *  @param fsname   Name of the fragment shader.
+             *  @param fdefines Definitions for the fragment shader.
              */
-            static ShaderProgram* get_program(se::Engine* engine, const char* vsname, const char* fsname);
+            static ShaderProgram* get_program(se::Engine* engine,
+                const char* vsname, const char* vdefines,
+                const char* fsname, const char* fdefines);
 
             /*!
              *  Get the State.
@@ -124,6 +144,19 @@ namespace se::graphics {
              *  @return The state the program is in after loading.
              */
             ShaderProgramState wait_for_loading();
+
+            /*!
+             *  Use this Program.
+             * 
+             *  **Warning:** This method must only be called from the render
+             *  thread.
+             * 
+             *  Makes this program the active OpenGL shader program.  If
+             *  this program isn't ready or is in an error state, this call does
+             *  nothing and will probably cause some weird rendering glitches
+             *  but oh well that's not my problem.
+             */
+            void use_program();
     };
 
 }

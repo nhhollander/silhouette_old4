@@ -18,7 +18,7 @@ using namespace se::graphics;
 // ============================
 
 #define _GRS_CASE_(n) case(GraphicsResourceState::n): return #n;
-const char* graphics_resource_state_name(GraphicsResourceState state) {
+const char* se::graphics::graphics_resource_state_name(GraphicsResourceState state) {
     switch(state) {
         _GRS_CASE_(NOT_LOADED)
         _GRS_CASE_(LOADING)

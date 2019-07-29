@@ -25,6 +25,11 @@ namespace se::graphics {
     };
 
     /*!
+     *  Get the name of a shader state.
+     */
+    const char* shader_state_name(ShaderState state);
+
+    /*!
      *  Shader Class.
      * 
      *  This class represents a single stage of the rendering process, as
@@ -44,8 +49,10 @@ namespace se::graphics {
              *  @param parent   The parent `se::Engine` instance.
              *  @param name     Name of the shader (including source files).
              *  @param type     OpenGL type of the shader.
+             *  @param defines  Extra definitions to be added and used during
+             *                  compilation.
              */
-            Shader(se::Engine* engine, const char* name, unsigned int type);
+            Shader(se::Engine* engine, const char* name, unsigned int type, const char* defines);
 
             /*!
              *  Destroy this shader.
@@ -69,8 +76,36 @@ namespace se::graphics {
              *  Source Code.
              * 
              *  Uncompiled source code for uncompiled shaders only.
+             * 
+             *  The contents of this variable are cleared during the shader
+             *  compilation process.
              */
             char* source_code = nullptr;
+
+            /*!
+             *  Version String.
+             * 
+             *  To simplify shaders and stuff, the shader version is
+             *  automatically generated and appended to the shader source file.
+             * 
+             *  Before the shader has been compiled, that value will be stored
+             *  here.
+             * 
+             *  The contents of this variable are cleared during the shader
+             *  compilation process.
+             */
+            char* vstring = nullptr;
+
+            /*!
+             *  Defines.
+             * 
+             *  Basically another source file that contains definitions to be
+             *  processed before.
+             * 
+             *  The contents of this variable are cleared during the shader
+             *  compilation process.
+             */
+            char* defines = nullptr;
 
             /*!
              *  Compilation Method.
@@ -98,12 +133,22 @@ namespace se::graphics {
              *  1. Check the shader cache
              *  2. Construct a new shader
              * 
+             *  Defines should be formatted as standard GLSL code:
+             * 
+             *  ```glsl
+             *  #define MVP_LOCATION 3
+             *  #define TEXTURE_LOCATION 7
+             *  #define ALL_CATS_ARE_FLUFFY false
+             *  // etc.
+             *  ```
+             * 
              *  @param enigne   Parent engine.
              *  @param name Name of the shader.  Extension will automatically be
              *              applied based on the value of `type`.
              *  @param type Type of the shader.
+             *  @param defines  Extra defines to use when compiling the shader.
              */
-            static Shader* get_shader(se::Engine* engine, const char* name, unsigned int type);
+            static Shader* get_shader(se::Engine* engine, const char* name, unsigned int type, const char* defines);
 
             /*!
              *  Get the shader name.
