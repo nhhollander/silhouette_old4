@@ -64,8 +64,8 @@ namespace se::graphics {
              */
             std::vector<glm::vec3> normal_data;
 
-            /// OpenGL vertex array ID
-            unsigned int gl_vertex_array_id = 0;
+            /// OpenGL vertex array object ID
+            unsigned int gl_vertex_array_object_id = 0;
 
             /// OpenGL vertex buffer ID
             unsigned int gl_vertex_buffer_id = 0;
