@@ -6,7 +6,7 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-layout(location = LOC_IN_VERTEX) in vec3 vertex_position;
+layout(location = LOC_IN_VERT) in vec3 vertex_position;
 
 layout(location = LOC_IN_MVP) uniform mat4 mvp_matrix;
 

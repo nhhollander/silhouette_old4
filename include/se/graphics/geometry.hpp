@@ -64,12 +64,12 @@ namespace se::graphics {
              */
             std::vector<glm::vec3> normal_data;
 
-            /// OpenGL array ID
-            unsigned int gl_array_id = 0;
+            /// OpenGL vertex array ID
+            unsigned int gl_vertex_array_id = 0;
 
             /// OpenGL vertex buffer ID
             unsigned int gl_vertex_buffer_id = 0;
-        
+
             /// OpenGL uv buffer ID
             unsigned int gl_uv_buffer_id = 0;
 
@@ -117,10 +117,8 @@ namespace se::graphics {
              * 
              *  **Warning:** This method must be called from the graphics
              *  thread.
-             * 
-             *  @param location Vertex shader input location.
              */
-            void use_geometry(unsigned int location);
+            void use_geometry();
 
     };
 

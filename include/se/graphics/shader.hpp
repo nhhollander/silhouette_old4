@@ -9,6 +9,11 @@
 #ifndef _SE_GRAPHICS_SHADER_H_
 #define _SE_GRAPHICS_SHADER_H_
 
+#define SE_SHADER_LOC_IN_MVP    1
+#define SE_SHADER_LOC_IN_VERT   2
+#define SE_SHADER_LOC_IN_UV     3
+#define SE_SHADER_LOC_IN_NORM   4
+
 #include "se/fwd.hpp"
 
 #include <map>

@@ -32,8 +32,13 @@ int main() {
         prop->x = (rand() % 20) - 10.0;
         prop->y = (rand() % 20) - 10.0;
         prop->z = (rand() % 20) - 10.0;
+        prop->x = 0;
+        prop->y = 0;
+        prop->z = 0;
         props.push_back(prop);
     }
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
+
+
 }

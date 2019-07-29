@@ -9,6 +9,7 @@
 #include "se/graphics/geometry.hpp"
 
 #include "se/engine.hpp"
+#include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
 #include "util/dirs.hpp"
@@ -48,7 +49,11 @@ Geometry::~Geometry() {
 
 void Geometry::bind() {
 
-    // OpenGL 3.0 binding system (Maybe upgrade at some point?)
+    // Calculate offsets
+    unsigned int vds = this->vertex_data.size();
+    DEBUG("There are %u vertices", vds);
+    unsigned int uv_offset = vds * sizeof(glm::vec3);
+    unsigned int norm_offset = uv_offset + vds * sizeof(glm::vec2);
 
     DEBUG("Binding Vertex Data");
     glGenBuffers(1, &this->gl_vertex_buffer_id);
@@ -68,10 +73,39 @@ void Geometry::bind() {
     glBufferData(GL_ARRAY_BUFFER, this->normal_data.size() * sizeof(glm::vec3),
         &this->normal_data[0], GL_STATIC_DRAW);
 
+    DEBUG("Creating array");
+    glGenVertexArrays(1, &this->gl_vertex_array_id);
+    glBindVertexArray(this->gl_vertex_array_id);
+
+    DEBUG("Enabling attributes");
+    glEnableVertexAttribArray(SE_SHADER_LOC_IN_VERT);
+    glEnableVertexAttribArray(SE_SHADER_LOC_IN_UV);
+    glEnableVertexAttribArray(SE_SHADER_LOC_IN_NORM);
+
+    DEBUG("Configuring attribute formats [%x %x]", uv_offset, norm_offset);
+    glVertexAttribFormat(SE_SHADER_LOC_IN_VERT, 3, GL_FLOAT, GL_FALSE, 0);
+    //glVertexAttribFormat(SE_SHADER_LOC_IN_UV,   2, GL_FLOAT, GL_FALSE, uv_offset);
+    //glVertexAttribFormat(SE_SHADER_LOC_IN_NORM, 3, GL_FLOAT, GL_FALSE, norm_offset);
+
+    DEBUG("Configuring attribute binding");
+    glVertexAttribBinding(SE_SHADER_LOC_IN_VERT, 0);
+    glVertexAttribBinding(SE_SHADER_LOC_IN_UV,   0);
+    glVertexAttribBinding(SE_SHADER_LOC_IN_NORM, 0);
+
+    DEBUG("Binding vertex buffer to array");
+    glBindVertexBuffer(0, this->gl_vertex_buffer_id, 0, 0);
+
+    DEBUG("Binding uv buffer to array");
+    glBindVertexBuffer(1, this->gl_uv_buffer_id, uv_offset, 0);
+
+    DEBUG("Binding normal buffer to array");
+    glBindVertexBuffer(2, this->gl_normal_buffer_id, norm_offset, 0);
+
     // TODO: Clear data
 
     DEBUG("Geometry [%s] bound successfuly!", this->name);
     this->resource_state = GraphicsResourceState::LOADED;
+
 }
 
 void Geometry::unbind() {
@@ -220,15 +254,9 @@ Geometry* Geometry::get_geometry(se::Engine* engine, const char* name) {
     return static_cast<Geometry*>(resource);
 }
 
-void Geometry::use_geometry(unsigned int location) {
+void Geometry::use_geometry() {
     if(this->resource_state != GraphicsResourceState::LOADED) { return; }
-    DEBUG("Binding buffer %u", this->gl_vertex_buffer_id);
-    glBindBuffer(GL_ARRAY_BUFFER, this->gl_vertex_buffer_id);
-    DEBUG("Configuring attribute pointer");
-    glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    DEBUG("Enabling attribute array");
-    glEnableVertexAttribArray(location);
-    DEBUG("Drawing arrays");
+    glBindVertexArray(this->gl_vertex_array_id);
     glDrawArrays(GL_TRIANGLES, 0, this->vertex_array_size);
 
     // TODO: UVs and normals

@@ -11,6 +11,7 @@
 #include "se/engine.hpp"
 #include "se/graphics/geometry.hpp"
 #include "se/graphics/graphicsController.hpp"
+#include "se/graphics/shader.hpp"
 #include "se/graphics/shaderProgram.hpp"
 #include "se/graphics/texture.hpp"
 
@@ -21,29 +22,13 @@
 using namespace se::entity;
 using namespace se::graphics;
 
-/* C++ preprocessor workaround for converting the value of a passed definition
-into a string representation of the value of the definition passed. */
-#define GLSL_DEF_STR(n) #n
-// Helper macro for GLSL definition
-#define GLSL_DEF(n) "#define " #n " " GLSL_DEF_STR(n) "\n"
-
-// GLSL DEFINES
-
-#define LOC_IN_VERTEX  1
-#define LOC_IN_MVP     2
-
-const char defines[] =
-GLSL_DEF(LOC_IN_VERTEX)
-GLSL_DEF(LOC_IN_MVP)
-;
-
 StaticProp::StaticProp(se::Engine* engine, const char* model, const char* texture) {
     this->geometry = se::graphics::Geometry::get_geometry(engine, model);
     this->texture = se::graphics::Texture::get_texture(engine, texture);
     this->geometry->increment_active_users();
     this->texture->increment_active_users();
     this->shader_program = se::graphics::ShaderProgram::get_program(
-        engine, "static_prop", defines, "static_prop", defines);
+        engine, "static_prop", "", "static_prop", "");
     this->engine = engine;
     this->model_name = strdup(model);
     this->texture_name = strdup(texture);
@@ -76,9 +61,9 @@ void StaticProp::render(glm::mat4 camera_matrix) {
     //    this->model_name, this->texture_name);
 
     this->shader_program->use_program();
-    this->geometry->use_geometry(LOC_IN_VERTEX);
+    this->geometry->use_geometry();
 
     glm::mat4 mvp_matrix = camera_matrix * this->get_model_matrix();
-    glUniformMatrix4fv(LOC_IN_MVP, 1, GL_FALSE, &mvp_matrix[0][0]);
+    glUniformMatrix4fv(SE_SHADER_LOC_IN_MVP, 1, GL_FALSE, &mvp_matrix[0][0]);
 
 }

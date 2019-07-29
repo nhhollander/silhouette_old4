@@ -27,6 +27,22 @@
 
 using namespace se::graphics;
 
+// ============================
+// == DEFAULT SHADER DEFINES ==
+// ============================
+
+#define GLSL_DEF_STR_B(n) #n
+#define GLSL_DEF_STR_A(n) GLSL_DEF_STR_B(n)
+#define GLSL_DEF(n) "#define " #n " " GLSL_DEF_STR_A(SE_SHADER_##n) "\n"
+
+/*! Default Shader Defines.  Generated from values provided in shader.hpp */
+const char default_shader_defines[] =
+    GLSL_DEF(LOC_IN_MVP)
+    GLSL_DEF(LOC_IN_VERT)
+    GLSL_DEF(LOC_IN_UV)
+    GLSL_DEF(LOC_IN_NORM)
+;
+
 // ====================
 // == STATIC METHODS ==
 // ====================
@@ -186,10 +202,11 @@ void Shader::compile() {
     }
     const GLchar* sources[] = {
         this->vstring, // Generated #version string
+        default_shader_defines, // Defaults and globals
         this->defines, // User supplied defines
         this->source_code // Loaded source code
     };
-    glShaderSource(this->gl_shader, 3, sources, NULL);
+    glShaderSource(this->gl_shader, 4, sources, NULL);
     delete[] this->source_code; // Source code is copied to gl
 
     // Compile the object and check for errors
