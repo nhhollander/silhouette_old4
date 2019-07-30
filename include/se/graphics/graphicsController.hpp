@@ -93,6 +93,17 @@ namespace se::graphics {
             se::entity::Camera* active_camera;
 
             /*!
+             *  Default camera object.
+             * 
+             *  When instantiated, the engine uses this as the value of
+             *  `active_camera`.  It's kept around in case a scene is unloading
+             *  and needs to get rid of a camera before the engine knows what
+             *  the next camera is going to be, or during engine cleanup if the
+             *  active camera is being destroyed.
+             */
+            se::entity::Camera* default_camera;
+
+            /*!
              *  Graphics Thread.
              * 
              *  This method is spawned as the body of the graphics thread.  It
@@ -174,11 +185,6 @@ namespace se::graphics {
              *  Only add entities for which `se::Entity::is_renderable()`
              *  returns `true`.
              * 
-             *  TODO: Is there a way to make it so that the renderability of
-             *  entities is dynamically calculated?  This would allow entities
-             *  to be removed from this list automatically when they get too
-             *  far away to be considered for rendering.
-             * 
              *  TODO: Render groups.  Instead of worrying about dynamic 
              *  visibility, having groups of entities pre-categorized into
              *  render groups in some kind of tree would be a good way of
@@ -200,9 +206,19 @@ namespace se::graphics {
 
             /*!
              *  Set the active camera.
+             * 
+             *  Don't delete the camera passed here until you call
+             *  `use_default_camera()`.
              */
             void set_active_camera(se::entity::Camera* camera);
 
+            /*!
+             *  Revert to the default camera.
+             * 
+             *  Call this method before deleting cameras to prevent segmentation
+             *  faults.
+             */
+            void use_default_camera();
     };
 
 }

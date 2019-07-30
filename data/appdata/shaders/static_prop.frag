@@ -8,6 +8,8 @@
 
 out vec3 color;
 
+in vec3 fragment_color;
+
 void main() {
-    color = vec3(1.0, 0.0, 0.0);
+    color = fragment_color;
 }

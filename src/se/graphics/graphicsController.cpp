@@ -25,18 +25,12 @@ using namespace se::graphics;
 // == PRIVATE MEMBERS ==
 // =====================
 
-uint64_t gl_error_counter = 0;
-
 #define SE_GL_DEBUG_TYPE(n) case(GL_DEBUG_TYPE_##n): \
     type_str = #n; break;
 #define SE_GL_DEBUG_SEVERITY(n) case(GL_DEBUG_SEVERITY_##n): \
     severity_str = #n; break;
 void GLAPIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id,
     GLenum severity, GLsizei length, const GLchar* message, const void* uparam) {
-
-    if(type == GL_DEBUG_TYPE_ERROR) {
-        gl_error_counter++;
-    }
 
     const char* type_str;
     switch(type) {
@@ -63,7 +57,6 @@ void GLAPIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id,
 
     printf("[\033[1;38;5;93mOPENGL\033[0m] Type: [%s] Severity: [%s] ID: %u\n    %s\n",
         type_str, severity_str, id, message);
-    printf("Gl errors: %u\n", gl_error_counter);
 }
 
 void GraphicsController::graphics_thread_main() {
@@ -131,6 +124,9 @@ void GraphicsController::graphics_thread_main() {
     // 58 111 166
     glClearColor(0.227, 0.434, 0.648, 1.0);
     
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
     INFO("Graphics initialization complete");
 
     // Set up the FPS cap
@@ -194,7 +190,7 @@ void GraphicsController::graphics_thread_main() {
 
 void GraphicsController::render() {
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Get the VP matrix from the active camera
     glm::mat4 camera_matrix = this->active_camera->get_camera_matrix();
@@ -232,8 +228,8 @@ void GraphicsController::graphics_support_thread_main() {
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 bm_sort_duration).count();
         float bm_sort_duration_ms = ((float) bm_sort_duration_ns) / 1000000;
-        DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
-            this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
+        //DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
+        //    this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
         bm_sort_total_time += bm_sort_duration_ns;
         bm_sort_total_entity_count += this->renderables.size();
         bm_sort_total_count += 1;
@@ -328,6 +324,7 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     loaded.  This eliminates the requirement to check if the current camera is
     null before rendering each frame. */
     this->active_camera = new se::entity::Camera(this->engine);
+    this->default_camera = this->active_camera;
 
     // Start the graphics thread
     this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
@@ -346,6 +343,9 @@ GraphicsController::~GraphicsController() {
         DEBUG("Wating for graphics support thread to exit");
         this->graphics_support_thread.join();
     }
+
+    /* Probably should deal with at some point maybe?  I dunno. */
+    //delete this->default_camera;
 
 }
 
@@ -383,4 +383,8 @@ void GraphicsController::remove_renderable(se::Entity* entity) {
 
 void GraphicsController::set_active_camera(se::entity::Camera* camera) {
     this->active_camera = camera;
+}
+
+void GraphicsController::use_default_camera() {
+    this->active_camera = this->default_camera;
 }

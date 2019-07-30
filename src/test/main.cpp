@@ -27,22 +27,22 @@ int main() {
 
     Engine e;
 
-    StaticProp* sp = new StaticProp(&e, "fence", "test");
+    StaticProp* sp = new StaticProp(&e, "suzanne", "fence");
     sp->x = 0;
-    sp->y = 0;
+    sp->y = 3;
     sp->z = 0;
-
 
     Camera* cam = new Camera(&e);
     e.graphics_controller->set_active_camera(cam);
 
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 3000; i++) {
         //sp->z -= 0.01;
         //cam->rz += 0.01;
         //sp->ry -= 0.1;
         //sp->y += 0.01;
-        //cam->rz += 0.01;
-        cam->x += 0.01;
+        //cam->rz += 0.05;
+        //cam->x += 0.01;
+        sp->rz += 0.005;
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 

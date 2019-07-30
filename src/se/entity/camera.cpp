@@ -112,7 +112,6 @@ glm::mat4 Camera::get_camera_matrix() {
     recalculating values that don't need to be constantly recalculated, but
     that sounds like a problem for the future. */
     float aspect = ((float) *(this->width)) / ((float) *(this->height));
-    DEBUG("Aspect: %f", aspect);
     glm::mat4 projection = glm::perspective(this->fov, aspect, this->near, this->far);
 
     /* Operations are performed from right to left, in the opposite order from
