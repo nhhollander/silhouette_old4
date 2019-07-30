@@ -9,6 +9,7 @@
 #include "se/graphics/texture.hpp"
 
 #include "se/engine.hpp"
+#include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
 #include "util/dirs.hpp"
@@ -54,6 +55,10 @@ void Texture::bind() {
     // TODO: Configure Sampling
     // TODO: Configure Wrapping
     // TODO: Configure MipMapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
     delete[] this->raw_texture;
 
     GLenum err = glGetError();
@@ -64,7 +69,7 @@ void Texture::bind() {
         return;
     }
     
-    DEBUG("Texture [%s] bound successfuly!", this->name);
+    DEBUG("Texture [%s] bound successfuly as!", this->name);
     this->resource_state = GraphicsResourceState::LOADED;
 }
 
@@ -156,8 +161,9 @@ void Texture::load_() {
     that it can be bound by opengl */
     this->raw_texture = new char[this->height * row_bytes];
     for(int y = 0; y < this->height; y++) {
-        memcpy(this->raw_texture + (y * row_bytes), rows[y], row_bytes);
-        delete[] rows[y];
+        unsigned int index = (this->height - y) - 1;
+        memcpy(this->raw_texture + (y * row_bytes), rows[index], row_bytes);
+        delete[] rows[index];
     }
 
     // Submit to binding queue
@@ -187,4 +193,12 @@ Texture* Texture::get_texture(se::Engine* engine, const char* name) {
     }
     DEBUG("Found texture [%s] in cache!", name);
     return static_cast<Texture*>(resource);
+}
+
+void Texture::use_texture(unsigned int tex_unit) {
+    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
+    int unit_num = GL_TEXTURE0 - tex_unit;
+    glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
+    glActiveTexture(tex_unit);
+    glBindTexture(GL_TEXTURE_2D, this->gl_texture);
 }

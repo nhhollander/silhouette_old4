@@ -27,7 +27,7 @@ int main() {
 
     Engine e;
 
-    StaticProp* sp = new StaticProp(&e, "suzanne", "fence");
+    StaticProp* sp = new StaticProp(&e, "suzanne", "suzanne");
     sp->x = 0;
     sp->y = 3;
     sp->z = 0;
@@ -35,7 +35,7 @@ int main() {
     Camera* cam = new Camera(&e);
     e.graphics_controller->set_active_camera(cam);
 
-    for(int i = 0; i < 3000; i++) {
+    for(int i = 0; i < 500; i++) {
         //sp->z -= 0.01;
         //cam->rz += 0.01;
         //sp->ry -= 0.1;

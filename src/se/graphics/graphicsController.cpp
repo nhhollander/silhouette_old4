@@ -123,7 +123,7 @@ void GraphicsController::graphics_thread_main() {
     }
     // 58 111 166
     glClearColor(0.227, 0.434, 0.648, 1.0);
-    
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 

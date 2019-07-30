@@ -81,6 +81,16 @@ namespace se::graphics {
 
             static Texture* get_texture(se::Engine* engine, const char* name);
 
+            /*!
+             *  Make this the active texture.
+             * 
+             *  **Warning:** This method must only be called from the graphics
+             *  thread.
+             *  
+             *  @param tex_unit Texture unit to bind the texture to.
+             */
+            void use_texture(unsigned int tex_unit);
+
     };
 
 }
