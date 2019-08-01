@@ -37,8 +37,9 @@ using namespace se::graphics;
 
 /*! Default Shader Defines.  Generated from values provided in shader.hpp */
 const char default_shader_defines[] =
-    "#extension ARB_enhanced_layouts : require\n"
+    "#extension GL_ARB_enhanced_layouts : require\n"
     GLSL_DEF(LOC_IN_MVP)
+    GLSL_DEF(LOC_IN_MODEL_MAT)
     GLSL_DEF(LOC_IN_VERT)
     GLSL_DEF(LOC_IN_UV)
     GLSL_DEF(LOC_IN_NORM)

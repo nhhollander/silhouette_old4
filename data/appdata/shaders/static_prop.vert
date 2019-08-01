@@ -6,21 +6,27 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-layout(location = LOC_IN_VERT) in vec3 vertex_position;
-layout(location = LOC_IN_UV)   in vec2 vert_uv;
-layout(location = LOC_IN_NORM) in vec3 normal;
+// Model parameter inputs
+layout(location = LOC_IN_VERT) in vec3 vert_in;
+layout(location = LOC_IN_UV)   in vec2 uv_in;
+layout(location = LOC_IN_NORM) in vec3 normal_in;
 
-layout(location = LOC_IN_MVP) uniform mat4 mvp_matrix;
+// Render parameter inputs
+layout(location = LOC_IN_MVP) uniform mat4 mvp_in;
+layout(location = LOC_IN_MODEL_MAT) uniform mat4 model_in;
 
-out vec3 fragment_color;
+// Misc. Outputs
 out vec2 uv;
+out vec3 frag_pos;
+out vec3 normal;
 
 void main() {
-    
-    gl_Position = mvp_matrix * vec4(vertex_position, 1.0);
 
-    fragment_color = normal;
+    vec4 pos = vec4(vert_in, 1.0);
+    gl_Position = mvp_in * pos;
+    frag_pos = (model_in * pos).xyz;
 
-    uv = vert_uv;
+    uv = uv_in;
+    normal = mat3(model_in) * normal_in;
 
 }

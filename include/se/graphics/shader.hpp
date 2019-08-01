@@ -9,11 +9,12 @@
 #ifndef _SE_GRAPHICS_SHADER_H_
 #define _SE_GRAPHICS_SHADER_H_
 
-#define SE_SHADER_LOC_IN_MVP    1
-#define SE_SHADER_LOC_IN_VERT   2
-#define SE_SHADER_LOC_IN_UV     3
-#define SE_SHADER_LOC_IN_NORM   4
-#define SE_SHADER_LOC_TEX_0     50 /* Reserves up through location 20 */
+#define SE_SHADER_LOC_IN_MVP        1
+#define SE_SHADER_LOC_IN_MODEL_MAT  2
+#define SE_SHADER_LOC_IN_VERT       3
+#define SE_SHADER_LOC_IN_UV         4
+#define SE_SHADER_LOC_IN_NORM       5
+#define SE_SHADER_LOC_TEX_0         50 /* Reserves up through location 20 */
 
 #include "se/fwd.hpp"
 
