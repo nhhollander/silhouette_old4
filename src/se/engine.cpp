@@ -9,6 +9,7 @@
 #include "se/engine.hpp"
 
 #include "se/graphics/graphicsController.hpp"
+#include "se/input/inputController.hpp"
 
 #include "util/log.hpp"
 #include "util/config.hpp"
@@ -24,6 +25,8 @@ se::Engine::Engine() {
 
     // Initialize graphics
     this->graphics_controller = new se::graphics::GraphicsController(this);
+    // Initialize inputs
+    this->input_controller = new se::input::InputController(this);
 
     INFO("Engine construction complete");
 }
@@ -33,5 +36,7 @@ se::Engine::~Engine() {
     this->threads_run = false;
 
     delete this->graphics_controller;
+    delete this->input_controller;
+    
     INFO("Engine destruction complete");
 }

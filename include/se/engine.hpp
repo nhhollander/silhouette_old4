@@ -49,6 +49,11 @@ namespace se {
              */
             se::graphics::GraphicsController* graphics_controller = nullptr;
 
+            /*!
+             *  Input Controller Instance.
+             */
+            se::input::InputController* input_controller = nullptr;
+
             /*
              *  Create a new Engine Instance.
              */

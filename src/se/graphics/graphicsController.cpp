@@ -142,46 +142,45 @@ void GraphicsController::graphics_thread_main() {
     // Main render loop
     while(this->engine->threads_run) {
 
-        frame_start = std::chrono::system_clock::now();
-
         this->process_tasks();
 
         this->render();
 
-        auto duration_std = std::chrono::system_clock::now() - frame_start;
-        int duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_std).count();
+        auto frame_end = std::chrono::system_clock::now();
+        auto duration_std = frame_end - frame_start;
+        uint64_t duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration_std).count();
         bm_total_frame_time_ns += duration_ns;
         bm_total_frame_count++;
-        if(this->target_frame_time > 0) {  // Negative fps caps mean disabled
-            auto wait_time = (target_frame_time - duration_ns);
-            if(wait_time > 0) {
-                std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
-            } else {
-                WARN("Dropping frames!");
-                bm_late_frames++;
-            }
+        if(this->target_frame_time < 0) { continue; }
+        auto wait_time = (target_frame_time - duration_ns);
+        if(wait_time > 0) {
+            std::this_thread::sleep_for(std::chrono::nanoseconds(wait_time));
+        } else {
+            WARN("Dropping frames!");
+            bm_late_frames++;
         }
+        frame_start = frame_end + std::chrono::nanoseconds(wait_time);
     }
 
     // Calculate and print benchmarking values
     if(bm_total_frame_count == 0) {
-        WARN("No frames rendered! Benchmarking results are INVALID!");
-        bm_total_frame_count++;
+        WARN("No frames rendered! Skipping benchmarking");
+    } else {
+        float bm_total_frame_time_ms = bm_total_frame_time_ns / 1000000.0;
+        uint64_t bm_total_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - bm_render_start_time).count();
+        double bm_total_time_ms = bm_total_time_ns / 1000000.0;
+        uint64_t bm_average_frame_time_ns = bm_total_frame_time_ns / bm_total_frame_count;
+        double bm_average_frame_time_ms = bm_average_frame_time_ns / 1000000.0;
+        float bm_average_render_load = (((float) bm_total_frame_time_ns) / (bm_total_time_ns) * 100);
+        float bm_average_fps = bm_total_frame_count / (bm_total_time_ms / 1000.0);
+        INFO("Total Frames Rendered: %u", bm_total_frame_count);
+        INFO("Time spent rendering: %uns (%.3fms)", bm_total_frame_time_ns, bm_total_frame_time_ms);
+        INFO("Total time elapsed: %uns (%.3fms)", bm_total_time_ns, bm_total_time_ms);
+        INFO("Average frame time: %uns (%.3fms)", bm_average_frame_time_ns, bm_average_frame_time_ms);
+        INFO("Average render load: %.2f%%", bm_average_render_load);
+        INFO("Late Frames: %u", bm_late_frames);
+        INFO("Average FPS: %.3f", bm_average_fps);
     }
-    float bm_total_frame_time_ms = bm_total_frame_time_ns / 1000000.0;
-    uint64_t bm_total_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now() - bm_render_start_time).count();
-    double bm_total_time_ms = bm_total_time_ns / 1000000.0;
-    uint64_t bm_average_frame_time_ns = bm_total_frame_time_ns / bm_total_frame_count;
-    double bm_average_frame_time_ms = bm_average_frame_time_ns / 1000000.0;
-    float bm_average_render_load = (((float) bm_total_frame_time_ns) / (bm_total_time_ns) * 100);
-    float bm_average_fps = bm_total_frame_count / (bm_total_time_ms / 1000.0);
-    INFO("Total Frames Rendered: %u", bm_total_frame_count);
-    INFO("Time spent rendering: %uns (%.3fms)", bm_total_frame_time_ns, bm_total_frame_time_ms);
-    INFO("Total time elapsed: %uns (%.3fms)", bm_total_time_ns, bm_total_time_ms);
-    INFO("Average frame time: %uns (%.3fms)", bm_average_frame_time_ns, bm_average_frame_time_ms);
-    INFO("Average render load: %.2f%%", bm_average_render_load);
-    INFO("Late Frames: %u", bm_late_frames);
-    INFO("Average FPS: %.3f", bm_average_fps);
 
 
     DEBUG("Render thread terminated");
@@ -227,7 +226,7 @@ void GraphicsController::graphics_support_thread_main() {
         uint64_t bm_sort_duration_ns = 
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 bm_sort_duration).count();
-        float bm_sort_duration_ms = ((float) bm_sort_duration_ns) / 1000000;
+        //float bm_sort_duration_ms = ((float) bm_sort_duration_ns) / 1000000;
         //DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
         //    this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
         bm_sort_total_time += bm_sort_duration_ns;

@@ -71,7 +71,7 @@ namespace se::graphics {
              * 
              *  Negative values disable FPS cap.
              */
-            int target_frame_time = -1;
+            int64_t target_frame_time = -1;
 
             /*!
              *  Graphics Tasks.

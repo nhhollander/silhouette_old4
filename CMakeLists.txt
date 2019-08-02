@@ -49,6 +49,7 @@ add_library(silhouette SHARED
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
     src/se/graphics/texture.cpp
+    src/se/input/inputController.cpp
 )
 # Enable the internal library flag
 #target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)

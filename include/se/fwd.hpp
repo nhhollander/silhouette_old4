@@ -16,6 +16,13 @@ namespace se {
     class Engine;
     class Entity;
 
+    namespace entity {
+
+        class StaticProp;
+        class Camera;
+
+    }
+
     namespace graphics {
 
         class Geometry;
@@ -27,10 +34,9 @@ namespace se {
 
     }
 
-    namespace entity {
+    namespace input {
 
-        class StaticProp;
-        class Camera;
+        class InputController;
 
     }
 
