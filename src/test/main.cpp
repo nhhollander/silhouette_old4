@@ -11,7 +11,7 @@
 #include "se/engine.hpp"
 #include "util/log.hpp"
 #include "se/entity/staticProp.hpp"
-#include "se/entity/camera.hpp"
+#include "se/entity/fpCamera.hpp"
 #include "se/graphics/graphicsController.hpp"
 
 #include <thread>
@@ -32,10 +32,10 @@ int main() {
     sp->y = 3;
     sp->z = 0;
 
-    Camera* cam = new Camera(&e);
+    Camera* cam = new FPCamera(&e);
     e.graphics_controller->set_active_camera(cam);
 
-    for(int i = 0; i < 500; i++) {
+    for(int i = 0; i < 1000; i++) {
         //sp->z -= 0.01;
         //cam->rz += 0.01;
         //sp->ry -= 0.1;

@@ -14,6 +14,7 @@
 #include "util/log.hpp"
 
 #include <chrono>
+#include <SDL2/SDL.h>
 
 using namespace se::input;
 
@@ -24,6 +25,9 @@ using namespace se::input;
 void InputController::input_thread_main() {
     util::log::set_thread_name("INPUT");
     INFO("Hello from the input thread!");
+
+    // Capture mouse
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     // Set up the ips cap
     int initial_ips_cap = this->engine->config->get_int("input.ips");
@@ -83,10 +87,10 @@ void InputController::input_thread_main() {
 
 void InputController::process_input() {
     SDL_Event input_event;
-    SDL_PollEvent(&input_event);
-    
-    for(auto handler : this->handlers) {
-        handler(input_event);
+    if(SDL_PollEvent(&input_event)) {    
+        for(auto handler : this->handlers) {
+            handler(input_event);
+        }
     }
 }
 
