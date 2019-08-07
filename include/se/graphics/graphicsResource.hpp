@@ -25,6 +25,7 @@ namespace se::graphics {
         NOT_LOADED,
         LOADING,
         ERROR,
+        CHILD_ERROR,
         LOADED
     };
 

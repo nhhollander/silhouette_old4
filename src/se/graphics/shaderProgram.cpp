@@ -30,41 +30,25 @@ using namespace se::graphics;
 // == STATIC METHODS ==
 // ====================
 
-const char* se::graphics::shader_program_state_name(ShaderProgramState state) {
-    switch(state) {
-        case ShaderProgramState::LOADING: return "LOADING";
-        case ShaderProgramState::READY: return "READY";
-        case ShaderProgramState::CHILD_ERROR: return "CHILD_ERROR";
-        case ShaderProgramState::ERROR: return "ERROR";
-        default: return "<invalid ShaderProgramState>";
-    }
+uint32_t get_shader_program_hash(
+    const char* vshader, const char* vdefines,
+    const char* fshader, const char* fdefines) {
+    return util::hash::ejenkins("shaderprogram:%s:%s:%s:%s",
+        vshader, vdefines, fshader, fdefines);
 }
-
-std::map<uint32_t, ShaderProgram*> ShaderProgram::cache;
 
 ShaderProgram* ShaderProgram::get_program(se::Engine* engine,
     const char* vshader, const char* vdefines,
     const char* fshader, const char* fdefines) {
-
-    uint32_t vdefhash = util::hash::jenkins(vdefines, strlen(vdefines));
-    uint32_t fdefhash = util::hash::jenkins(fdefines, strlen(fdefines));
-
-    DEBUG("Retrieving shader program [%p:%s:%s:%u:%u]", engine, vshader, fshader);
-    uint32_t hash = util::hash::ejenkins("%p:%s:%s:%u:%u",
-        engine, vshader, fshader, vdefhash, fdefhash);
-
-    // Check the cache
-    auto check = ShaderProgram::cache.find(hash);
-    if(check != ShaderProgram::cache.end()) {
-        DEBUG("Found shader [%p:%s:%s] in cache", engine, vshader, fshader);
-        return check->second;
+    uint32_t hash = get_shader_program_hash(vshader, vdefines, fshader, fdefines);
+    GraphicsResource* resource = ShaderProgram::get_resource(hash);
+    if(resource == nullptr) {
+        DEBUG("Shader Program [%s:%s] not in cache :(", vshader, fshader);
+        return new ShaderProgram(engine,
+            vshader, vdefines, fshader, fdefines);
     }
-
-    // Create a new program
-    ShaderProgram* program = new ShaderProgram(
-                                engine, vshader, vdefines, fshader, fdefines);
-    ShaderProgram::cache.insert(std::pair(hash, program));
-    return program;
+    DEBUG("Found shader program [%s:%s] in cache!", vshader, fshader);
+    return static_cast<ShaderProgram*>(resource);
 }
 
 thread_local unsigned int ShaderProgram::current_program = 0;
@@ -75,7 +59,8 @@ thread_local unsigned int ShaderProgram::current_program = 0;
 
 ShaderProgram::ShaderProgram(se::Engine* engine, 
     const char* vsname, const char* vdefines,
-    const char* fsname, const char* fdefines) {
+    const char* fsname, const char* fdefines) :
+    GraphicsResource(get_shader_program_hash(vsname, vdefines, fsname, fdefines)) {
 
     this->engine = engine;
     this->vsname = strdup(vsname);
@@ -88,25 +73,9 @@ ShaderProgram::ShaderProgram(se::Engine* engine,
     this->name += fsname;
     this->name += ".frag";
 
-    // Get the shaders
-    this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER, vdefines);
-    this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER, fdefines);
-
-    ShaderState vstate = this->vshader->wait_for_loading();
-    ShaderState fstate = this->fshader->wait_for_loading();
-
-    if(vstate == ShaderState::ERROR || fstate == ShaderState::ERROR) {
-        ERROR("[%s] Child shader is in error state! [vert: %s frag: %s]",
-            this->name.c_str(),
-            shader_state_name(vstate),
-            shader_state_name(fstate));
-        this->state = ShaderProgramState::CHILD_ERROR;
-        return;
-    }
-
-    // Submit to the linking queue
-    std::function job = [this](){this->link();};
-    this->engine->graphics_controller->submit_graphics_task(job);
+    // Save defines
+    this->vdefines = strdup(vdefines);
+    this->fdefines = strdup(fdefines);
 }
 
 void ShaderProgram::link() {
@@ -122,7 +91,7 @@ void ShaderProgram::link() {
             this->name.c_str(),
             util::string::gl_error_name(error),
             util::string::gl_error_desc(error));
-        this->state = ShaderProgramState::ERROR;
+        this->resource_state = GraphicsResourceState::ERROR;
         return;
     }
 
@@ -142,12 +111,12 @@ void ShaderProgram::link() {
         glGetProgramInfoLog(this->gl_program, max_length, &length, log);
         ERROR("[%s] Failed to link program:\n%s", this->name.c_str(), log);
         delete[] log;
-        this->state = ShaderProgramState::ERROR;
+        this->resource_state = GraphicsResourceState::ERROR;
         return;
     }
 
     // Success
-    this->state = ShaderProgramState::READY;
+    this->resource_state = GraphicsResourceState::LOADED;
 
     auto end_time = std::chrono::system_clock::now();
     auto duration = end_time - start_time;
@@ -157,23 +126,23 @@ void ShaderProgram::link() {
         this->name.c_str(), milliseconds);
 }
 
+void ShaderProgram::unlink() {
+    glDeleteProgram(this->gl_program);
+}
+
 // ====================
 // == PUBLIC METHODS ==
 // ====================
 
-ShaderProgramState ShaderProgram::get_state() {
-    return this->state;
-}
-
-ShaderProgramState ShaderProgram::wait_for_loading() {
-    while(this->state == ShaderProgramState::LOADING) {
+GraphicsResourceState ShaderProgram::wait_for_loading() {
+    while(this->resource_state == GraphicsResourceState::LOADING) {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-    return this->state;
+    return this->resource_state;
 }
 
 void ShaderProgram::use_program() {
-    if(this->state != ShaderProgramState::READY) { return; }
+    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
     /* Only update the current program if the current program is not already
     the current program.  I'm not actually sure if this has any performance
     benefit, but I don't thin it's going to have a significant performance
@@ -182,4 +151,44 @@ void ShaderProgram::use_program() {
         glUseProgram(this->gl_program);
         this->current_program = this->gl_program;
     }
+}
+
+// =======================
+// == PROTECTED MEMBERS ==
+// =======================
+
+void ShaderProgram::load_() {
+
+    this->resource_state = GraphicsResourceState::LOADING;
+
+    // Get the shaders
+    this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER, vdefines);
+    this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER, fdefines);
+
+    ShaderState vstate = this->vshader->wait_for_loading();
+    ShaderState fstate = this->fshader->wait_for_loading();
+
+    if(vstate == ShaderState::ERROR || fstate == ShaderState::ERROR) {
+        ERROR("[%s] Child shader is in error state! [vert: %s frag: %s]",
+            this->name.c_str(),
+            shader_state_name(vstate),
+            shader_state_name(fstate));
+        this->resource_state = GraphicsResourceState::CHILD_ERROR;
+        return;
+    }
+
+    // Submit to the linking queue
+    std::function job = [this](){this->link();};
+    this->engine->graphics_controller->submit_graphics_task(job);
+
+}
+
+void ShaderProgram::unload_() {
+
+    this->resource_state = GraphicsResourceState::NOT_LOADED;
+
+    // Submit to the unlinking queue
+    std::function job = [this](){this->unlink();};
+    this->engine->graphics_controller->submit_graphics_task(job);
+
 }

@@ -24,6 +24,7 @@ const char* se::graphics::graphics_resource_state_name(GraphicsResourceState sta
         _GRS_CASE_(LOADING)
         _GRS_CASE_(LOADED)
         _GRS_CASE_(ERROR) // Not `ERROR` from util::log
+        _GRS_CASE_(CHILD_ERROR)
         default: return "<invalid GraphicsResourceState>";
     }
 }

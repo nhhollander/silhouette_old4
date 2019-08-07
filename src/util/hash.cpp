@@ -36,15 +36,19 @@ uint32_t util::hash::ejenkins(const char* format, ...) {
     // Prepare the variable arguments
     va_list args;
     va_start(args, format);
+    // Get the message buffer size
+    int message_length = vsnprintf(nullptr, 0, format, args);
+    // Rewind the variable arguments
+    va_start(args, format);
     // Create the message buffer
-    char buf[LINE_BUFFER_SIZE];
+    char buf[message_length + 1];
     // Generate the digestable string
-    int message_length = vsnprintf(buf, LINE_BUFFER_SIZE, format, args);
+    int actual_message_length = vsnprintf(buf, message_length, format, args);
     // Check for truncation
-    if(message_length > LINE_BUFFER_SIZE) {
+    if(actual_message_length > message_length) {
         // Potentially incomplete hash
         WARN("Extended hash calculation truncated!  Input data of length [%i] exceeds limit of [%i]",
-            message_length, LINE_BUFFER_SIZE);
+            actual_message_length, message_length);
     }
     // Get the length
     int input_len = strlen(buf);

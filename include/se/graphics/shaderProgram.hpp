@@ -10,32 +10,18 @@
 #define _SE_GRAPHICS_SHADERPROGRAM_H_
 
 #include "se/fwd.hpp"
+#include "se/graphics/graphicsResource.hpp"
 
 #include <map>
 
 namespace se::graphics {
-    
-    /*!
-     *  Program State.
-     */
-    enum class ShaderProgramState {
-        LOADING,
-        READY,
-        CHILD_ERROR,
-        ERROR
-    };
-
-    /*!
-     *  Get the name of a shader program state.
-     */
-    const char* shader_program_state_name(ShaderProgramState state);
 
     /*!
      *  Shader Program Class.
      * 
      *  This class represents a usable shader program.
      */
-    class ShaderProgram {
+    class ShaderProgram : public GraphicsResource {
 
         private:
 
@@ -68,6 +54,11 @@ namespace se::graphics {
             const char* fsname;
             /// Shader Name
             std::string name;
+
+            /// Vertex shader defines
+            const char* vdefines;
+            /// Fragment shader defines
+            const char* fdefines;
             
             /// OpenGL program ID
             unsigned int gl_program = -1;
@@ -76,9 +67,6 @@ namespace se::graphics {
             Shader* vshader = nullptr;
             /// Fragment Shader
             Shader* fshader = nullptr;
-
-            /// Shader Object State
-            volatile ShaderProgramState state = ShaderProgramState::LOADING;
 
             /*!
              *  Linking Method.
@@ -89,18 +77,46 @@ namespace se::graphics {
             void link();
 
             /*!
-             *  Static Program Cache.
+             *  Unlinking Method.
              * 
-             *  Linked programs live here.
+             *  **Warning:** This method must only be called from the graphics
+             *  thread.
              */
-            static std::map<uint32_t, ShaderProgram*> cache;
+            void unlink();
 
             /*!
              *  Current Program for this render thread.
              * 
-             *  I don't know if this has any actual performance benefit.
+             *  This contains the OpenGL ID of the most recently activated
+             *  program.  Theoretically, this will prevent the engine from
+             *  performing a number of unnecessary program context switches when
+             *  multiple consecutive entities are rendered using the same
+             *  program, however it's entirely possible that this situation is
+             *  handled by the graphics driver and therefore provides no
+             *  performance benefit here.  Either way, I'm including it in the
+             *  event that the target system does not optimize command
+             *  executions, and it only adds like two or three CPU cycles per
+             *  entity so what the heck.
              */
             static thread_local unsigned int current_program;
+
+        protected:
+
+            /*!
+             *  Load Method.
+             * 
+             *  Graphics resource override.  Submits linking method for
+             *  execution on the graphics thread.
+             */
+            void load_();
+
+            /*!
+             *  Unload Method.
+             * 
+             *  Graphics resource override.  Submits unlinking method for
+             *  execution on the graphics thread.
+             */
+            void unload_();
 
         public:
 
@@ -124,13 +140,6 @@ namespace se::graphics {
                 const char* fsname, const char* fdefines);
 
             /*!
-             *  Get the State.
-             * 
-             *  Returne the current state of the program object.
-             */
-            ShaderProgramState get_state();
-
-            /*!
              *  Wait for loading to complete.
              * 
              *  **Warning:** Make sure to check the state after loading is
@@ -143,7 +152,7 @@ namespace se::graphics {
              * 
              *  @return The state the program is in after loading.
              */
-            ShaderProgramState wait_for_loading();
+            se::graphics::GraphicsResourceState wait_for_loading();
 
             /*!
              *  Use this Program.

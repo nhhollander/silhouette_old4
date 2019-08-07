@@ -23,15 +23,16 @@ using namespace se::entity;
 using namespace se::graphics;
 
 StaticProp::StaticProp(se::Engine* engine, const char* model, const char* texture) {
-    this->geometry = se::graphics::Geometry::get_geometry(engine, model);
-    this->texture = se::graphics::Texture::get_texture(engine, texture);
-    this->geometry->increment_active_users();
-    this->texture->increment_active_users();
-    this->shader_program = se::graphics::ShaderProgram::get_program(
-        engine, "static_prop", "", "static_prop", "");
     this->engine = engine;
     this->model_name = strdup(model);
     this->texture_name = strdup(texture);
+    this->geometry = se::graphics::Geometry::get_geometry(engine, model);
+    this->texture = se::graphics::Texture::get_texture(engine, texture);
+    this->shader_program = se::graphics::ShaderProgram::get_program(
+        engine, "static_prop", "", "static_prop", "");
+    this->geometry->increment_active_users();
+    this->texture->increment_active_users();
+    this->shader_program->increment_active_users();
     this->engine->graphics_controller->add_renderable(this);
 }
 
@@ -39,6 +40,7 @@ StaticProp::~StaticProp() {
     this->engine->graphics_controller->remove_renderable(this);
     this->geometry->decrement_active_users();
     this->texture->decrement_active_users();
+    this->shader_program->decrement_active_users();
     delete[] this->model_name;
     delete[] this->texture_name;
 }
@@ -47,13 +49,13 @@ void StaticProp::render(glm::mat4 camera_matrix) {
 
     if(this->geometry->get_resource_state() != GraphicsResourceState::LOADED ||
         this->texture->get_resource_state() != GraphicsResourceState::LOADED ||
-        this->shader_program->get_state() != ShaderProgramState::READY){
+        this->shader_program->get_resource_state() != GraphicsResourceState::LOADED){
         // Not ready to render
         DEBUG("Static prop [m: %s t: %s] not ready [m: %s t: %s s: %s]",
             this->model_name, this->texture_name,
             graphics_resource_state_name(this->geometry->get_resource_state()),
             graphics_resource_state_name(this->texture->get_resource_state()),
-            shader_program_state_name(this->shader_program->get_state()));
+            graphics_resource_state_name(this->shader_program->get_resource_state()));
         return;
     }
 
