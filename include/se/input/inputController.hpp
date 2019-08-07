@@ -76,9 +76,12 @@ namespace se::input {
             void input_thread_main();
 
             /*!
-             *  Process Input Events.
+             *  Quit Game.
+             * 
+             *  This is a debug handler that should be removed once a better
+             *  system is put in place.\
              */
-            void process_input();
+            void quit_handler(SDL_Event event);
     
         public:
 

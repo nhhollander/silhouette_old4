@@ -35,7 +35,7 @@ int main() {
     Camera* cam = new FPCamera(&e);
     e.graphics_controller->set_active_camera(cam);
 
-    for(int i = 0; i < 1000; i++) {
+    while(e.threads_run) {
         //sp->z -= 0.01;
         //cam->rz += 0.01;
         //sp->ry -= 0.1;
@@ -45,8 +45,6 @@ int main() {
         sp->rz += 0.005;
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
-
-    //std::this_thread::sleep_for(std::chrono::seconds(5));
 
 
 }

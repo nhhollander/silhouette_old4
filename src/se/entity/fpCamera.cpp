@@ -26,9 +26,8 @@ void FPCamera::sdl_event_handler(SDL_Event event) {
     } else if(event.type == SDL_MOUSEMOTION) {
         int x = event.motion.xrel;
         int y = event.motion.yrel;
-        //DEBUG("x: %i, y: %i", x, y);
-        this->rz += (x / 300.0);
-        this->rx += (y / 300.0);
+        this->rz += (x / 600.0);
+        this->rx += (y / 600.0);
     }
 }
 
