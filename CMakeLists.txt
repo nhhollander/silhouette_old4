@@ -44,6 +44,7 @@ add_library(silhouette SHARED
     src/se/entity/camera.cpp
     src/se/entity/fpCamera.cpp
     src/se/entity/staticProp.cpp
+    src/se/graphics/framebuffer.cpp
     src/se/graphics/geometry.cpp
     src/se/graphics/graphicsController.cpp
     src/se/graphics/graphicsEventHandler.cpp
