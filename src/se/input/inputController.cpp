@@ -53,6 +53,8 @@ void InputController::quit_handler(SDL_Event event) {
         if(event.key.keysym.sym == SDLK_ESCAPE) {
             this->engine->threads_run = false;
         }
+    } else if(event.type == SDL_QUIT) {
+        this->engine->threads_run = false;
     }
 }
 
