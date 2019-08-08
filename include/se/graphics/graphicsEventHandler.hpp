@@ -6,8 +6,8 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _SE_GRAPHICS_EVENTHANDLERS_H_
-#define _SE_GRAPHICS_EVENTHANDLERS_H_
+#ifndef _SE_GRAPHICS_GRAPHICSEVENTHANDLER_H_
+#define _SE_GRAPHICS_GRAPHICSEVENTHANDLER_H_
 
 #include "se/fwd.hpp"
 
