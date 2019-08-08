@@ -91,7 +91,7 @@ void GraphicsController::graphics_thread_main() {
         FATAL("Window properties missing! [%s:%i:%i]", title, dimx, dimy);
         return;
     }
-    this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimx, dimy, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimx, dimy, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if(this->window == nullptr) {
         FATAL("Failed to create SDL2 window [%s]", SDL_GetError());
         return;
@@ -329,6 +329,8 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
     // Start the graphics support thread
     this->graphics_support_thread = std::thread(&GraphicsController::graphics_support_thread_main, this);
+
+    this->event_handler = new GraphicsEventHandler(this);
 }
 
 GraphicsController::~GraphicsController() {

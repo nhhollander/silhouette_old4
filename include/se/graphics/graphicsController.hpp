@@ -12,6 +12,8 @@
 #define _SE_GRAPHICS_GRAPHICSCONTROLLER_H_
 
 #include "se/fwd.hpp"
+#include "se/graphics/graphicsEventHandler.hpp"
+
 #include "util/fwd.hpp"
 
 #include <SDL2/SDL.h>
@@ -38,6 +40,13 @@ namespace se::graphics {
     *  managing the render pipeline.
     */
     class GraphicsController {
+
+        /*!
+         *  Allow the graphics event management class to take care of all of our
+         *  internal stuff from a separate class.  That should help keep this
+         *  class a bit neater.
+         */
+        friend class GraphicsEventHandler;
 
         private:
 
@@ -83,6 +92,15 @@ namespace se::graphics {
              *  complete output freeze if a lot of tasks land all at once.
              */
             std::queue<GraphicsTask> tasks;
+
+            /*!
+             *  Graphics Event Handler.
+             * 
+             *  This takes care of graphics events so that this class doesn't
+             *  have to.  TOOD: Maybe this is a stupid idea and it should be
+             *  merged into this class?  Time shall tell.
+             */
+            GraphicsEventHandler* event_handler;
 
             /*!
              *  Renderable Entities.

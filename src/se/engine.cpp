@@ -23,10 +23,10 @@ se::Engine::Engine() {
     cfgfile += "/config.cfg";
     this->config->load(cfgfile.c_str());
 
-    // Initialize graphics
-    this->graphics_controller = new se::graphics::GraphicsController(this);
     // Initialize inputs
     this->input_controller = new se::input::InputController(this);
+    // Initialize graphics
+    this->graphics_controller = new se::graphics::GraphicsController(this);
 
     INFO("Engine construction complete");
 }

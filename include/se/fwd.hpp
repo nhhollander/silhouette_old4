@@ -27,6 +27,7 @@ namespace se {
 
         class Geometry;
         class GraphicsController;
+        class GraphicsEventHandler;
         class GraphicsResource;
         class Shader;
         class ShaderProgram;
