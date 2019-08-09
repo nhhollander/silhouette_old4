@@ -13,6 +13,7 @@
 #include "se/entity/staticProp.hpp"
 #include "se/entity/fpCamera.hpp"
 #include "se/graphics/graphicsController.hpp"
+#include "se/graphics/simpleRenderManager.hpp"
 
 #include <thread>
 #include <cstdlib>
@@ -20,6 +21,7 @@
 
 using namespace se;
 using namespace se::entity;
+using namespace se::graphics;
 
 int main() {
     util::log::set_thread_name("MAIN");
@@ -27,13 +29,17 @@ int main() {
 
     Engine e;
 
-    StaticProp* sp = new StaticProp(&e, "suzanne", "suzanne");
-    sp->x = 0;
-    sp->y = 3;
-    sp->z = 0;
+    SimpleRenderManager srm(&e);
+    e.graphics_controller->set_render_manager(&srm);
 
-    Camera* cam = new FPCamera(&e);
-    e.graphics_controller->set_active_camera(cam);
+    StaticProp sp(&e, "suzanne", "suzanne");
+    sp.x = 0;
+    sp.y = 3;
+    sp.z = 0;
+    srm.add_renderable(&sp);
+
+    FPCamera cam(&e);
+    srm.set_active_camera(&cam);
 
     while(e.threads_run) {
         //sp->z -= 0.01;
@@ -42,7 +48,7 @@ int main() {
         //sp->y += 0.01;
         //cam->rz += 0.05;
         //cam->x += 0.01;
-        sp->rz += 0.005;
+        sp.rz += 0.005;
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 

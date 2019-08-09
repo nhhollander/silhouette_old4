@@ -11,6 +11,7 @@
 #include "se/engine.hpp"
 #include "se/graphics/geometry.hpp"
 #include "se/graphics/graphicsController.hpp"
+#include "se/graphics/renderManager.hpp"
 #include "se/graphics/shader.hpp"
 #include "se/graphics/shaderProgram.hpp"
 #include "se/graphics/texture.hpp"
@@ -33,11 +34,9 @@ StaticProp::StaticProp(se::Engine* engine, const char* model, const char* textur
     this->geometry->increment_active_users();
     this->texture->increment_active_users();
     this->shader_program->increment_active_users();
-    this->engine->graphics_controller->add_renderable(this);
 }
 
 StaticProp::~StaticProp() {
-    this->engine->graphics_controller->remove_renderable(this);
     this->geometry->decrement_active_users();
     this->texture->decrement_active_users();
     this->shader_program->decrement_active_users();

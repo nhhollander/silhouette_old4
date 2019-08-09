@@ -52,6 +52,7 @@ add_library(silhouette SHARED
     src/se/graphics/screen.cpp
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
+    src/se/graphics/simpleRenderManager.cpp
     src/se/graphics/texture.cpp
     src/se/input/inputController.cpp
 )

@@ -9,9 +9,7 @@
 #include "se/graphics/graphicsController.hpp"
 
 #include "se/engine.hpp"
-#include "se/entity.hpp"
-#include "se/entity/camera.hpp"
-#include "se/graphics/screen.hpp"
+#include "se/graphics/renderManager.hpp"
 
 #include "util/config.hpp"
 #include "util/log.hpp"
@@ -145,7 +143,14 @@ void GraphicsController::graphics_thread_main() {
 
         this->process_tasks();
 
-        this->render();
+        if(this->render_manager != nullptr) {
+            this->render_manager->render_frame();
+        }
+
+        /* Window swapping is handled by the controller instead of the render
+        manager because I could not figure out an elegant way to pass a
+        reference to this->window to the render manger */
+        SDL_GL_SwapWindow(this->window);
 
         auto frame_end = std::chrono::system_clock::now();
         auto duration_std = frame_end - frame_start;
@@ -188,76 +193,6 @@ void GraphicsController::graphics_thread_main() {
 
 }
 
-void GraphicsController::render() {
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Get the VP matrix from the active camera
-    glm::mat4 camera_matrix = this->active_camera->get_camera_matrix();
-
-    this->screen->activate_framebuffer();
-    
-    for(se::Entity* entity : this->renderables) {
-        entity->render(camera_matrix);
-    }
-
-    this->screen->render();
-
-    SDL_GL_SwapWindow(this->window);
-
-}
-
-void GraphicsController::graphics_support_thread_main() {
-    util::log::set_thread_name("RSUPPORT");
-    INFO("Hello from the graphics support thread");
-
-    // Variables for sorting benchmarking
-    uint64_t bm_sort_total_time = 0;
-    uint32_t bm_sort_total_count = 0;
-    uint64_t bm_sort_total_entity_count = 0;
-
-
-    while(this->engine->threads_run) {
-
-        // Debug code for calculating sort time
-        auto bm_sort_start = std::chrono::system_clock::now();
-
-        // Sort renderables
-        this->sort_renderables();
-
-        auto bm_sort_duration = std::chrono::system_clock::now() - bm_sort_start;
-        uint64_t bm_sort_duration_ns = 
-            std::chrono::duration_cast<std::chrono::nanoseconds>(
-                bm_sort_duration).count();
-        //float bm_sort_duration_ms = ((float) bm_sort_duration_ns) / 1000000;
-        //DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
-        //    this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
-        bm_sort_total_time += bm_sort_duration_ns;
-        bm_sort_total_entity_count += this->renderables.size();
-        bm_sort_total_count += 1;
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-    }
-
-    // Benchmarking information for entity sorting operation
-    if(bm_sort_total_count == 0 || bm_sort_total_entity_count == 0) {
-        WARN("No entities were sorted - skipping sorting benchmarks");
-    } else {
-        uint64_t average_time = bm_sort_total_time / bm_sort_total_count;
-        uint64_t average_entity_time = bm_sort_total_time / bm_sort_total_entity_count;
-        float total_time_ms = bm_sort_total_time / 1000000.0;
-        float average_time_ms = average_time / 1000000.0;
-        float averate_entity_time_ms = average_entity_time / 1000000.0;
-        INFO("Total sort operations: %u", bm_sort_total_count);
-        INFO("Total entities sorted: %u", bm_sort_total_entity_count);
-        INFO("Total time %.3fms (%uns)", total_time_ms, bm_sort_total_time);
-        INFO("Average time %.3fms (%uns)", average_time_ms, average_time);
-        INFO("Average entity time %.3fms (%uns)", averate_entity_time_ms, average_entity_time);
-    }
-
-    DEBUG("Render support thread terminated");
-}
 
 void GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
     INFO("FPS limit changed to %i", value->int_);
@@ -277,43 +212,6 @@ void GraphicsController::process_tasks() {
     }
 }
 
-bool renderable_sort_check(se::Entity* e1, se::Entity* e2, se::entity::Camera* camera) {
-    /* In order to sort renderable entities, we want to calculate their
-    distances to/from the currently active camera. It might be worth revisiting
-    this method in the future with a faster or more suitable algorithm. */
-    float dist_e1 = 0.0;
-    float dist_e2 = 0.0;
-    { // Distance calculation for entity 1
-        float dx = e1->x - camera->x;
-        float dy = e1->y - camera->y;
-        float dz = e1->z - camera->z;
-        dx = dx*dx;
-        dy = dy*dy;
-        dz = dz*dz;
-        dist_e1 = sqrt(dx + dy + dz);
-    }
-    { // Distance calculation for entity 2
-        float dx = e2->x - camera->x;
-        float dy = e2->y - camera->y;
-        float dz = e2->z - camera->z;
-        dx = dx*dx;
-        dy = dy*dy;
-        dz = dz*dz;
-        dist_e2 = sqrt(dx + dy + dz);
-    }
-
-    return dist_e1 < dist_e2;
-}
-
-void GraphicsController::sort_renderables() {
-    // Wrap the sort comparison function in a lambda
-    auto sort_fun = [this](se::Entity* e1, se::Entity* e2){
-        return renderable_sort_check(e1, e2, this->active_camera);
-    };
-
-    std::sort(this->renderables.begin(), this->renderables.end(), sort_fun);
-}
-
 // ====================
 // == PUBLIC MEMBERS ==
 // ====================
@@ -322,20 +220,10 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     DEBUG("Initializing new graphics controller");
     this->engine = engine;
 
-    /* Create a default camera to use as the viewpoint until an actual camera is
-    loaded.  This eliminates the requirement to check if the current camera is
-    null before rendering each frame. */
-    this->active_camera = new se::entity::Camera(this->engine);
-    this->default_camera = this->active_camera;
-
     // Start the graphics thread
     this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
-    // Start the graphics support thread
-    this->graphics_support_thread = std::thread(&GraphicsController::graphics_support_thread_main, this);
 
     this->event_handler = new GraphicsEventHandler(this);
-
-    this->screen = new Screen(this->engine);
 }
 
 GraphicsController::~GraphicsController() {
@@ -345,52 +233,16 @@ GraphicsController::~GraphicsController() {
         this->graphics_thread.join();
     }
 
-    if(this->graphics_support_thread.joinable()) {
-        DEBUG("Wating for graphics support thread to exit");
-        this->graphics_support_thread.join();
-    }
-
-    /* Probably should deal with at some point maybe?  I dunno. */
-    //delete this->default_camera;
-
 }
 
 void GraphicsController::submit_graphics_task(GraphicsTask task) {
     this->tasks.push(task);
 }
 
-void GraphicsController::add_renderable(se::Entity* entity) {
-    if(!entity->is_renderable()) {
-        WARN("Attempted to add non-renderable entity to render list!");
-        return;
-    }
-    for(auto ent : this->renderables) {
-        if(ent == entity) {
-            WARN("Attempted to add duplicate entity to render list!");
-            return;
-        }
-    }
-    // Add the entity to the renderable list
-    this->renderables.push_back(entity);
+void GraphicsController::set_render_manager(RenderManager* manager) {
+    this->render_manager = manager;
 }
 
-void GraphicsController::remove_renderable(se::Entity* entity) {
-    int counter = 0;
-    for(auto ent : this->renderables) {
-        if(ent == entity) {
-            this->renderables.erase(this->renderables.begin() + counter);
-            return;
-        }
-        counter++;
-    }
-    // TODO: Add some sort of identifying information
-    WARN("Attempted to remove non-exisent entity from render list!");
-}
-
-void GraphicsController::set_active_camera(se::entity::Camera* camera) {
-    this->active_camera = camera;
-}
-
-void GraphicsController::use_default_camera() {
-    this->active_camera = this->default_camera;
+RenderManager* GraphicsController::get_render_manager() {
+    return this->render_manager;
 }

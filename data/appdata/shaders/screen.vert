@@ -14,6 +14,6 @@ layout(location = LOC_IN_VERT) in vec3 vert;
 out vec2 uv;
 
 void main() {
-    gl_position = vert;
+    gl_Position = vec4(vert, 1.0);
     uv = vert.xy;
 }

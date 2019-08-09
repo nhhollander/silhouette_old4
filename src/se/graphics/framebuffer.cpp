@@ -55,7 +55,7 @@ void Framebuffer::init() {
     GLenum buffers[1] = {GL_COLOR_ATTACHMENT0 + this->location};
     glDrawBuffers(1, buffers);
 
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER), GL_FRAMEBUFFER_COMPLETE) {
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         ERROR("Failed to generate framebuffer!");
         this->state = FramebufferState::ERROR;
     } else {
@@ -98,7 +98,7 @@ Framebuffer::~Framebuffer() {
 }
 
 void Framebuffer::use_as_target() {
-
+    glBindFramebuffer(GL_FRAMEBUFFER, this->gl_framebuffer_id);
 }
 
 void Framebuffer::use_as_texture(unsigned int unit) {

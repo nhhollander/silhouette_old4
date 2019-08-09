@@ -12,6 +12,7 @@
 #include "se/graphics/framebuffer.hpp"
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/shaderProgram.hpp"
+#include "se/graphics/shader.hpp"
 
 #include "util/log.hpp"
 
@@ -29,13 +30,15 @@ void Screen::init() {
         -1.0,  1.0, 0.0,
         -1.0,  1.0, 0.0,
          1.0, -1.0, 0.0,
-         1.0,  1.0, 0.0
+         1.0,  1.0, 0.0, 
     };
     glGenVertexArrays(1, &this->gl_screen_vert_array_id);
     glBindVertexArray(this->gl_screen_vert_array_id);
     glGenBuffers(1, &this->gl_screen_vert_buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, this->gl_screen_vert_buffer_id);
     glBufferData(GL_ARRAY_BUFFER, sizeof(screen_vertex_data), screen_vertex_data, GL_STATIC_DRAW);
+    glVertexAttribPointer(SE_SHADER_LOC_IN_VERT, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(SE_SHADER_LOC_IN_VERT);
     this->ready = true;
 }
 
@@ -53,6 +56,7 @@ Screen::Screen(se::Engine* engine) {
     this->engine = engine;
     this->screen_program = ShaderProgram::get_program(
         engine, "screen", "", "screen", "");
+    this->screen_program->increment_active_users();
     this->engine->graphics_controller->submit_graphics_task([this](){
         this->init();
     });
@@ -60,6 +64,7 @@ Screen::Screen(se::Engine* engine) {
 }
 
 Screen::~Screen() {
+    this->screen_program->decrement_active_users();
     delete this->framebuffer;
 }
 
@@ -76,7 +81,4 @@ void Screen::render() {
     glDisable(GL_DEPTH_TEST);
     this->framebuffer->use_as_texture(GL_TEXTURE0);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    /* This is a bad system for managing depth testing.  It needs to be replaced
-    with something that isn't stupid at some point in the future. */
-    glEnable(GL_DEPTH_TEST);
 }

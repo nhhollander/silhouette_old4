@@ -30,6 +30,8 @@ namespace se {
         class GraphicsController;
         class GraphicsEventHandler;
         class GraphicsResource;
+        class RenderManager;
+        class SimpleRenderManager;
         class Screen;
         class Shader;
         class ShaderProgram;
