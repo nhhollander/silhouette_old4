@@ -21,4 +21,4 @@ if [ ! -z "$SE_DEBUG_TEMPDATA" ]; then
 fi
 
 # Launch the program
-./bin/se_test
+gdb -q ./bin/se_test

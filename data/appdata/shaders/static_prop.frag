@@ -6,7 +6,7 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-out vec3 color;
+layout(location = 0) out vec3 color;
 
 in vec2 uv;
 in vec3 frag_pos;

@@ -11,6 +11,7 @@
 #include "se/engine.hpp"
 #include "se/entity.hpp"
 #include "se/entity/camera.hpp"
+#include "se/graphics/screen.hpp"
 
 #include "util/config.hpp"
 #include "util/log.hpp"
@@ -194,11 +195,13 @@ void GraphicsController::render() {
     // Get the VP matrix from the active camera
     glm::mat4 camera_matrix = this->active_camera->get_camera_matrix();
 
+    this->screen->activate_framebuffer();
+    
     for(se::Entity* entity : this->renderables) {
-        
         entity->render(camera_matrix);
-
     }
+
+    this->screen->render();
 
     SDL_GL_SwapWindow(this->window);
 
@@ -331,6 +334,8 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     this->graphics_support_thread = std::thread(&GraphicsController::graphics_support_thread_main, this);
 
     this->event_handler = new GraphicsEventHandler(this);
+
+    this->screen = new Screen(this->engine);
 }
 
 GraphicsController::~GraphicsController() {

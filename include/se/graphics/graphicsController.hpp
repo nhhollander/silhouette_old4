@@ -65,6 +65,9 @@ namespace se::graphics {
              */
             SDL_GLContext glcontext;
 
+            /// Screen used for output rendering
+            Screen* screen;
+
             /*!
              *  Graphics Thread Object.
              */

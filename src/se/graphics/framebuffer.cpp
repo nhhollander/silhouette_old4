@@ -9,6 +9,7 @@
 #include "se/graphics/framebuffer.hpp"
 
 #include "se/engine.hpp"
+#include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
 #include "util/config.hpp"
@@ -76,7 +77,7 @@ void Framebuffer::deinit() {
 // == PUBLIC MEMBERS ==
 // ====================
 
-Framebuffer::Framebuffer(se::Engine* engine, int location) {
+Framebuffer::Framebuffer(se::Engine* engine, unsigned int location) {
     this->engine = engine;
     this->location = location;
     this->dimx = this->engine->config->get_int("window.dimx");
@@ -96,6 +97,13 @@ Framebuffer::~Framebuffer() {
     });
 }
 
-void Framebuffer::use() {
+void Framebuffer::use_as_target() {
 
+}
+
+void Framebuffer::use_as_texture(unsigned int unit) {
+    int unit_num = GL_TEXTURE0 - unit;
+    glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
+    glActiveTexture(unit);
+    glBindTexture(GL_TEXTURE_2D, this->gl_texture_id);
 }

@@ -25,10 +25,12 @@ namespace se {
 
     namespace graphics {
 
+        class Framebuffer;
         class Geometry;
         class GraphicsController;
         class GraphicsEventHandler;
         class GraphicsResource;
+        class Screen;
         class Shader;
         class ShaderProgram;
         class Texture;
