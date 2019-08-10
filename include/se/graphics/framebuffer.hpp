@@ -57,11 +57,14 @@ namespace se::graphics {
             /// Buffer Height.
             int dimy = 0;
 
+            /// MSAA level
+            int msaa_level = 0;
+
             /// Status.
             FramebufferState state = FramebufferState::NOT_INITIALIZED;
 
-            /// Window resize event handler.
-            void window_resize_handler();
+            /// Re-initialize
+            void re_init();
 
             /*!
              *  Framebuffer initialization method.

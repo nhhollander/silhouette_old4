@@ -43,6 +43,9 @@ const char default_shader_defines[] =
     GLSL_DEF(LOC_IN_VERT)
     GLSL_DEF(LOC_IN_UV)
     GLSL_DEF(LOC_IN_NORM)
+    GLSL_DEF(LOC_DIMX)
+    GLSL_DEF(LOC_DIMY)
+    GLSL_DEF(LOC_MSAA_LEVEL)
     GLSL_DEF(LOC_TEX_0)
     "#define LOC_TEX_(n) LOC_TEX_0 + n\n"
 ;

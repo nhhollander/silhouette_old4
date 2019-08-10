@@ -14,7 +14,10 @@
 #define SE_SHADER_LOC_IN_VERT       3
 #define SE_SHADER_LOC_IN_UV         4
 #define SE_SHADER_LOC_IN_NORM       5
-#define SE_SHADER_LOC_TEX_0         50 /* Reserves up through location 20 */
+#define SE_SHADER_LOC_DIMX          6
+#define SE_SHADER_LOC_DIMY          7
+#define SE_SHADER_LOC_MSAA_LEVEL    8
+#define SE_SHADER_LOC_TEX_0         50
 
 #include "se/fwd.hpp"
 
