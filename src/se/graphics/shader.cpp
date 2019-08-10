@@ -91,7 +91,6 @@ Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type, co
 
 Shader::Shader(se::Engine* engine, const char* name, GLuint type, const char* defines) {
     this->engine = engine;
-    this->name = strdup(name);
     this->type = type;
     this->defines = strdup(defines);
 
@@ -180,6 +179,7 @@ Shader::~Shader() {
     } else {
         glDeleteShader(this->gl_shader);
     }
+    free((void*) this->defines);
 }
 
 void Shader::compile() {

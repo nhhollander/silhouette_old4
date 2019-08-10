@@ -40,8 +40,8 @@ StaticProp::~StaticProp() {
     this->geometry->decrement_active_users();
     this->texture->decrement_active_users();
     this->shader_program->decrement_active_users();
-    delete[] this->model_name;
-    delete[] this->texture_name;
+    free((void*)this->model_name);
+    free((void*)this->texture_name);
 }
 
 void StaticProp::render(glm::mat4 camera_matrix) {

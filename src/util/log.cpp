@@ -131,6 +131,6 @@ void util::log::set_thread_name(const char* name) {
     }
     // Set the pthread name (for reference on POSIX systems)
     pthread_setname_np(pthread_self(), ptname);
-    delete[] ptname;
+    free((void*)ptname);
 
 }

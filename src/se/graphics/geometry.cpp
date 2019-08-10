@@ -44,7 +44,7 @@ Geometry::Geometry(se::Engine* engine, const char* name) :
 
 Geometry::~Geometry() {
     FATAL("Geometry destroyed");
-    delete[] this->name;
+    free((void*)this->name);
 }
 
 void Geometry::bind() {

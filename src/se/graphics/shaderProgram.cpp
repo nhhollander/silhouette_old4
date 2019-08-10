@@ -78,6 +78,13 @@ ShaderProgram::ShaderProgram(se::Engine* engine,
     this->fdefines = strdup(fdefines);
 }
 
+ShaderProgram::~ShaderProgram() {
+    free((void*)this->vsname);
+    free((void*)this->fsname);
+    free((void*)this->vdefines);
+    free((void*)this->fdefines);
+}
+
 void ShaderProgram::link() {
 
     auto start_time = std::chrono::system_clock::now();

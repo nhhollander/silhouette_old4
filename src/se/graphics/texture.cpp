@@ -41,7 +41,7 @@ Texture::Texture(se::Engine* engine, const char* name) :
 }
 
 Texture::~Texture() {
-    delete[] this->name;
+    free((void*)this->name);
 }
 
 void Texture::bind() {
