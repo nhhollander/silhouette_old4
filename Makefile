@@ -35,3 +35,7 @@ debug: all
 
 rebuild: clean all
 	@printf "\033[33mRebuilt Project\033[0m\n"
+
+cloc:
+	@printf "\033[33mCounting lines of code\033[0m\n"
+	@cloc src/ include/ data/appdata/shaders/ docs/misc/ README.md 2> /dev/null
