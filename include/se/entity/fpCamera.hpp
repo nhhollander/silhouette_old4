@@ -29,6 +29,12 @@ namespace se::entity {
 
             FPCamera(se::Engine* engine);
 
+            /// Lock the mouse to the center of the window
+            void lock_mouse();
+
+            /// Release the mouse
+            void release_mouse();
+
     };
 
 }

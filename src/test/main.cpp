@@ -46,20 +46,13 @@ int main() {
 
     FPCamera cam(&e);
     cam.z = 1.524;
+    cam.lock_mouse();
     srm.set_active_camera(&cam);
 
     while(e.threads_run) {
-        //sp->z -= 0.01;
-        //cam->rz += 0.01;
-        //sp->ry -= 0.1;
-        //sp->y += 0.01;
-        //cam->rz += 0.05;
-        //cam->x += 0.01;
         sp.rz += 0.005;
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
 
 }
-
-// Test Commit Please Ignore

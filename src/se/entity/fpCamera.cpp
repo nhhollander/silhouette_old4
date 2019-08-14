@@ -14,6 +14,8 @@
 #include "util/log.hpp"
 #include "util/debugstrings.hpp"
 
+#include <SDL2/SDL.h>
+
 using namespace se::entity;
 
 // =====================
@@ -28,6 +30,16 @@ void FPCamera::sdl_event_handler(SDL_Event event) {
         int y = event.motion.yrel;
         this->rz += (x / 600.0);
         this->rx += (y / 600.0);
+        if(this->rx > 1.5707) {
+            this->rx = 1.5707;
+        } else if(this->rx < -1.5707) {
+            this->rx = -1.5707;
+        }
+        if(this->rz > 6.2831) {
+            this->rz -= 6.2831;
+        } else if(this->rz < 0) {
+            this->rz += 6.2831;
+        }
     }
 }
 
@@ -38,4 +50,12 @@ void FPCamera::sdl_event_handler(SDL_Event event) {
 FPCamera::FPCamera(se::Engine* engine) : Camera(engine) {
     std::function handler = [this](SDL_Event event){this->sdl_event_handler(event);};
     engine->input_controller->register_handler(handler);
+}
+
+void FPCamera::lock_mouse() {
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void FPCamera::release_mouse() {
+    SDL_SetRelativeMouseMode(SDL_FALSE);
 }
