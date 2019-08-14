@@ -38,4 +38,4 @@ rebuild: clean all
 
 cloc:
 	@printf "\033[33mCounting lines of code\033[0m\n"
-	@cloc src/ include/ data/appdata/shaders/ docs/misc/ README.md 2> /dev/null
+	@cloc src/ include/ data/appdata/shaders/ docs/misc/ README.md blender/ 2> /dev/null

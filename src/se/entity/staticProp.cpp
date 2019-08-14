@@ -63,11 +63,12 @@ void StaticProp::render(glm::mat4 camera_matrix) {
 
     this->shader_program->use_program();
     this->texture->use_texture(GL_TEXTURE0);
-    this->geometry->use_geometry();
 
     glm::mat4 model_matrix = this->get_model_matrix();
     glm::mat4 mvp_matrix = camera_matrix * model_matrix;
     glUniformMatrix4fv(SE_SHADER_LOC_IN_MVP, 1, GL_FALSE, &mvp_matrix[0][0]);
     glUniformMatrix4fv(SE_SHADER_LOC_IN_MODEL_MAT, 1, GL_FALSE, &model_matrix[0][0]);
+
+    this->geometry->use_geometry();
 
 }

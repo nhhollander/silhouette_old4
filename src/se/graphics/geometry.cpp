@@ -77,7 +77,8 @@ void Geometry::bind() {
     this->uv_data.clear();
     this->normal_data.clear();
 
-    DEBUG("Geometry [%s] bound successfuly!", this->name);
+    DEBUG("Geometry [%s] bound successfuly as [%u]!", this->name,
+        this->gl_vertex_array_object_id);
     this->resource_state = GraphicsResourceState::LOADED;
 
 }
