@@ -26,10 +26,6 @@ void InputController::input_thread_main() {
     util::log::set_thread_name("INPUT");
     INFO("Hello from the input thread!");
 
-    // Capture mouse
-    int res = SDL_SetRelativeMouseMode(SDL_TRUE);
-    DEBUG("Relative Mouse Mode %i", res);
-
     // Main input loop
     while(this->engine->threads_run) {
 

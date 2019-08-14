@@ -54,6 +54,11 @@ namespace se {
              */
             se::input::InputController* input_controller = nullptr;
 
+            /*!
+             *  Logic Controller Instance.
+             */
+            se::logic::LogicController* logic_controller = nullptr;
+
             /*
              *  Create a new Engine Instance.
              */

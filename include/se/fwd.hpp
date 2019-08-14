@@ -45,6 +45,13 @@ namespace se {
 
     }
 
+    namespace logic {
+
+        class LogicController;
+        class Tickable;
+        
+    }
+
 }
 
 #endif

@@ -46,19 +46,6 @@ namespace se::input {
             std::thread input_thread;
 
             /*!
-             *  Target IPS time.
-             * 
-             *  IPS determines the number of times the engine will check for
-             *  availble inputs per second.
-             * 
-             *  This variable determines the number of nanoseconds each input
-             *  processing event should last.
-             * 
-             *  Negative values set infinite IPS, which might be a bad idea.
-             */
-            int64_t target_ips_time = -1;
-
-            /*!
              *  Input Handlers.
              * 
              *  For the time being all input handlers are lumped in to one giant
@@ -79,7 +66,7 @@ namespace se::input {
              *  Quit Game.
              * 
              *  This is a debug handler that should be removed once a better
-             *  system is put in place.\
+             *  system is put in place.
              */
             void quit_handler(SDL_Event event);
     

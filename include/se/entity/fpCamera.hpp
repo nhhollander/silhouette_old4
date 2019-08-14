@@ -11,6 +11,7 @@
 
 #include "se/entity/camera.hpp"
 #include "se/fwd.hpp"
+#include "se/logic/logicController.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -19,15 +20,22 @@ namespace se::entity {
     /*!
      *  First Person Camera.
      */
-    class FPCamera : public Camera {
+    class FPCamera : public Camera, se::logic::Tickable {
 
         private:
 
             void sdl_event_handler(SDL_Event event);
 
+            bool key_w = false;
+            bool key_s = false;
+            bool key_a = false;
+            bool key_d = false;
+
         public:
 
             FPCamera(se::Engine* engine);
+
+            void tick(uint64_t clock, uint32_t cdelta);
 
             /// Lock the mouse to the center of the window
             void lock_mouse();

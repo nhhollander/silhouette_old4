@@ -58,7 +58,14 @@
 			"forward_list": "cpp",
 			"iomanip": "cpp",
 			"numeric": "cpp",
-			"valarray": "cpp"
+			"valarray": "cpp",
+			"algorithm": "cpp",
+			"iterator": "cpp",
+			"map": "cpp",
+			"memory_resource": "cpp",
+			"random": "cpp",
+			"regex": "cpp",
+			"string": "cpp"
 		},
 		"editor.rulers": [
 			80

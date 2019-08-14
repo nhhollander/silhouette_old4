@@ -15,6 +15,7 @@
 #include "util/debugstrings.hpp"
 
 #include <SDL2/SDL.h>
+#include <math.h>
 
 using namespace se::entity;
 
@@ -23,13 +24,21 @@ using namespace se::entity;
 // =====================
 
 void FPCamera::sdl_event_handler(SDL_Event event) {
-    if(event.type == SDL_KEYDOWN) {
-        // TODO
+    if(event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+        if(event.key.keysym.sym == SDLK_w) {
+            this->key_w = event.type == SDL_KEYDOWN;
+        } else if(event.key.keysym.sym == SDLK_s) {
+            this->key_s = event.type == SDL_KEYDOWN;
+        } else if(event.key.keysym.sym == SDLK_a) {
+            this->key_a = event.type == SDL_KEYDOWN;
+        } else if(event.key.keysym.sym == SDLK_d) {
+            this->key_d = event.type == SDL_KEYDOWN;
+        }
     } else if(event.type == SDL_MOUSEMOTION) {
         int x = event.motion.xrel;
         int y = event.motion.yrel;
-        this->rz += (x / 600.0);
-        this->rx += (y / 600.0);
+        this->rz -= (x / 600.0);
+        this->rx -= (y / 600.0);
         if(this->rx > 1.5707) {
             this->rx = 1.5707;
         } else if(this->rx < -1.5707) {
@@ -50,6 +59,7 @@ void FPCamera::sdl_event_handler(SDL_Event event) {
 FPCamera::FPCamera(se::Engine* engine) : Camera(engine) {
     std::function handler = [this](SDL_Event event){this->sdl_event_handler(event);};
     engine->input_controller->register_handler(handler);
+    engine->logic_controller->register_tickable(this);
 }
 
 void FPCamera::lock_mouse() {
@@ -58,4 +68,42 @@ void FPCamera::lock_mouse() {
 
 void FPCamera::release_mouse() {
     SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
+void FPCamera::tick(uint64_t clock, uint32_t cdelta) {
+    /* THIS IS A REALLY HACKY SOLUTION THAT SHOULD NOT BE DONE THIS WAY!  IT
+    COMPLETELY IGNORES ENGINE TIME SCALING, WHICH IS LIKE SUPER ULTRA MEGA BAD. */
+    float move_angle = this->rz;
+    //if((this->key_a && !this->key_d && this->key_w) || (!this->key_a && this->key_d && this->key_s)) {
+    //    move_angle += 3.14159 / 4;
+    //} else if((!this->key_a && this->key_d && this->key_w) || (this->key_a && !this->key_d && this->key_s)) {
+    //    move_angle -= 3.14159 / 4;
+    //}
+
+    if(this->key_w) {
+        if(this->key_a) {
+            move_angle += 3.14159 / 4;
+        } else if(this->key_d) {
+            move_angle -= 3.14159 / 4;
+        }
+    } else if(this->key_s) {
+        if(this->key_a) {
+            move_angle += (3.14159 / 4) * 3;
+        } else if(this->key_d) {
+            move_angle -= (3.14159 / 4) * 3;
+        } else {
+            move_angle += 3.14159;
+        }
+    } else if(this->key_a && !this->key_d) {
+        move_angle += 3.14159 / 2;
+    } else if(this->key_d && !this->key_a) {
+        move_angle -= 3.14159 / 2;
+    } else {
+        return;
+    }
+
+    float dx = sin(move_angle) * .05;
+    float dy = cos(move_angle) * .05;
+    this->x -= dx;
+    this->y += dy;
 }

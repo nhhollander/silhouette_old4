@@ -55,6 +55,7 @@ add_library(silhouette SHARED
     src/se/graphics/simpleRenderManager.cpp
     src/se/graphics/texture.cpp
     src/se/input/inputController.cpp
+    src/se/logic/logicController.cpp
 )
 # Enable the internal library flag
 #target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)
