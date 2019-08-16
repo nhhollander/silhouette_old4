@@ -122,6 +122,8 @@ namespace util {
             volatile char* cstring_ = nullptr;
             /// Value as an integer
             volatile int int_;
+            /// Value as a float
+            volatile float float_;
             /// Value as a double
             volatile double double_;
             /// Value as a boolean
@@ -163,6 +165,17 @@ namespace util {
              *  @return `true` on success, `false` on failure.
              */
             bool set(int src);
+            /*!
+             *  Update the configuration value from a float.
+             * 
+             *  If this value is locked, a warning will be generated and this
+             *  method will return `false`.
+             * 
+             *  @param src  Input double
+             * 
+             *  @return `true` on success, `false` on failure.
+             */
+            bool set(float src);
             /*!
              *  Update the configuration value from a double.
              * 
@@ -326,6 +339,21 @@ namespace util {
             const volatile int* get_intp(const char* key, int* default_ = nullptr);
 
             /*!
+             *  Get a float pointer.
+             * 
+             *  This method returns a pointer to the requested configuration
+             *  value as a float.
+             * 
+             *  In the event that no value can be located for the given key, the
+             *  optional `default_` parameter will be returned.
+             * 
+             *  @param key  Lookup key
+             * 
+             *  @return Pointer to the value, or `default_`
+             */
+            const volatile float* get_floatp(const char* key, float* default_ = nullptr);
+
+            /*!
              *  Get a double pointer.
              * 
              *  This method returns a pointer to the requested configuration
@@ -418,6 +446,21 @@ namespace util {
              *  @return The requested value, or `default_`
              */
             int get_int(const char* key, int default_ = 0);
+
+            /*!
+             *  Get a float.
+             * 
+             *  This method returns the requested configuration value as a
+             *  float.
+             * 
+             *  In the event that no value can be located for the given key, the
+             *  optional `default_` parameter will be returned.
+             * 
+             *  @param key  Lookup key
+             * 
+             *  @return The requested value, or `default_`
+             */
+            float get_float(const char* key, float default_ = 0.0);
 
             /*!
              *  Get a double.

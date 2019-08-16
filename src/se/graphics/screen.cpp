@@ -79,6 +79,6 @@ void Screen::render() {
     this->screen_program->use_program();
     glBindVertexArray(this->gl_screen_vert_array_id);
     glDisable(GL_DEPTH_TEST);
-    this->framebuffer->use_as_texture(GL_TEXTURE0);
+    this->framebuffer->use_as_texture();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

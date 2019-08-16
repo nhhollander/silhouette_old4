@@ -23,9 +23,6 @@ using namespace se::graphics;
 // =====================
 
 void Framebuffer::re_init() {
-    this->dimx = this->engine->config->get_int("window.dimx");
-    this->dimy = this->engine->config->get_int("window.dimy");
-    this->msaa_level = this->engine->config->get_int("render.msaa");
     // TODO: Sanity check the values
     this->engine->graphics_controller->submit_graphics_task([this](){
         this->deinit();
@@ -37,29 +34,35 @@ void Framebuffer::init() {
     this->state = FramebufferState::INITIALIZING;
 
     DEBUG("Initializing Framebuffer");
-    // Step 1 - Generate and bind texture
-    DEBUG("Generating Texture");
+    // Generate and bind primary texture
     glGenTextures(1, &this->gl_texture_id);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->msaa_level,
-        GL_RGBA8, this->dimx, this->dimy, true);
-    // Step 2 - Generate and bind framebuffer
-    DEBUG("Generating Framebuffer");
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, *this->msaa_level,
+        GL_RGBA8, *this->dimx, *this->dimy, true);
+    // Generate and bind depth texture
+    glGenTextures(1, &this->gl_depth_texture_id);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, *this->msaa_level,
+        GL_DEPTH_COMPONENT24, *this->dimx, *this->dimy, true);
+    // Generate and bind framebuffer
     glGenFramebuffers(1, &this->gl_framebuffer_id);
     glBindFramebuffer(GL_FRAMEBUFFER, this->gl_framebuffer_id);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+this->location,
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
         GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id, 0);
-    // Step 3 - Generate depth buffer
-    DEBUG("Generating depth buffer");
-    glGenRenderbuffers(1, &this->gl_depthbuffer_id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+        GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id, 0);
+    // Generate depth buffer
+    /*glGenRenderbuffers(1, &this->gl_depthbuffer_id);
     glBindRenderbuffer(GL_RENDERBUFFER, this->gl_depthbuffer_id);
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, this->msaa_level, GL_DEPTH24_STENCIL8, this->dimx, this->dimy);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
         GL_RENDERBUFFER, this->gl_depthbuffer_id);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, this->gl_depthbuffer_id);
-    // Step 4 - Configure draw buffers
-    GLenum buffers[1] = {GL_COLOR_ATTACHMENT0};
+        GL_RENDERBUFFER, this->gl_depthbuffer_id); */
+    // Configure draw buffers
+    GLenum buffers[1] = {
+        GL_COLOR_ATTACHMENT0
+    };
     glDrawBuffers(1, buffers);
     
     // TODO: Is htis required?
@@ -82,6 +85,7 @@ void Framebuffer::deinit() {
 
     glDeleteFramebuffers(1, &this->gl_framebuffer_id);
     glDeleteTextures(1, &this->gl_texture_id);
+    glDeleteTextures(1, &this->gl_depth_texture_id);
     glDeleteRenderbuffers(1, &this->gl_depthbuffer_id);
 
     this->state = FramebufferState::NOT_INITIALIZED;
@@ -94,9 +98,11 @@ void Framebuffer::deinit() {
 Framebuffer::Framebuffer(se::Engine* engine, unsigned int location) {
     this->engine = engine;
     this->location = location;
-    this->dimx = this->engine->config->get_int("window.dimx");
-    this->dimy = this->engine->config->get_int("window.dimy");
-    this->msaa_level = this->engine->config->get_int("render.msaa");
+    this->dimx = this->engine->config->get_intp("window.dimx");
+    this->dimy = this->engine->config->get_intp("window.dimy");
+    this->msaa_level = this->engine->config->get_intp("render.msaa");
+    this->cam_near = this->engine->config->get_floatp("render.cam_near");
+    this->cam_far = this->engine->config->get_floatp("render.cam_far");
 
     auto handler = [this](util::ConfigurationValue* a,util::Configuration* b){
         this->re_init();};
@@ -119,12 +125,16 @@ void Framebuffer::use_as_target() {
     glBindFramebuffer(GL_FRAMEBUFFER, this->gl_framebuffer_id);
 }
 
-void Framebuffer::use_as_texture(unsigned int unit) {
-    int unit_num = GL_TEXTURE0 - unit;
-    glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
-    glUniform1i(SE_SHADER_LOC_DIMX, this->dimx);
-    glUniform1i(SE_SHADER_LOC_DIMY, this->dimy);
-    glUniform1i(SE_SHADER_LOC_MSAA_LEVEL, this->msaa_level);
-    glActiveTexture(unit);
+void Framebuffer::use_as_texture() {
+    glUniform1i(SE_SHADER_LOC_TEX_SCR_COLOR, 0);
+    glUniform1i(SE_SHADER_LOC_TEX_SCR_DEPTH, 1);
+    glUniform1i(SE_SHADER_LOC_DIMX, *this->dimx);
+    glUniform1i(SE_SHADER_LOC_DIMY, *this->dimy);
+    glUniform1i(SE_SHADER_LOC_MSAA_LEVEL, *this->msaa_level);
+    glUniform1f(SE_SHADER_LOC_CAM_NEAR, *this->cam_near);
+    glUniform1f(SE_SHADER_LOC_CAM_FAR, *this->cam_far);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id);
 }

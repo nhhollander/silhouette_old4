@@ -181,6 +181,15 @@ const volatile int* util::Configuration::get_intp(const char* key, int* default_
     return (const volatile int*) &cv->int_;
 }
 
+const volatile float* util::Configuration::get_floatp(const char* key, float* default_) {
+    // Get the value
+    const util::ConfigurationValue* cv = this->get(key);
+    if(cv == nullptr) {
+        return (const volatile float*) default_;
+    }
+    // Return the double
+    return (const volatile float*) &cv->float_;}
+
 const volatile double* util::Configuration::get_doublep(const char* key, double* default_) {
     // Get the value
     const util::ConfigurationValue* cv = this->get(key);
@@ -240,6 +249,16 @@ int util::Configuration::get_int(const char* key, int default_) {
     }
     // Return the integer
     return (const volatile int) cv->int_;
+}
+
+float util::Configuration::get_float(const char* key, float default_) {
+    // Get the value
+    const util::ConfigurationValue* cv = this->get(key);
+    if(cv == nullptr) {
+        return default_;
+    }
+    // Return the double
+    return (float) cv->float_;
 }
 
 double util::Configuration::get_double(const char* key, double default_) {

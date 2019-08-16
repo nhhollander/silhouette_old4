@@ -14,9 +14,13 @@
 #define SE_SHADER_LOC_IN_VERT       3
 #define SE_SHADER_LOC_IN_UV         4
 #define SE_SHADER_LOC_IN_NORM       5
-#define SE_SHADER_LOC_DIMX          6
-#define SE_SHADER_LOC_DIMY          7
-#define SE_SHADER_LOC_MSAA_LEVEL    8
+#define SE_SHADER_LOC_CAM_NEAR      7
+#define SE_SHADER_LOC_CAM_FAR       8
+#define SE_SHADER_LOC_DIMX          9
+#define SE_SHADER_LOC_DIMY          10
+#define SE_SHADER_LOC_MSAA_LEVEL    11
+#define SE_SHADER_LOC_TEX_SCR_COLOR 12
+#define SE_SHADER_LOC_TEX_SCR_DEPTH 13
 #define SE_SHADER_LOC_TEX_0         50
 
 #include "se/fwd.hpp"

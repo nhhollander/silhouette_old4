@@ -49,13 +49,13 @@ namespace se::entity {
             bool is_tickable() { return false; }
 
             /// Field of View (radians)
-            float fov = 1.22173; // 70 degrees
+            const volatile float* fov;
 
             /// Near render boundary
-            float near = 0.01;
+            const volatile float* near;
 
             /// Far render boundary
-            float far = 500.0;
+            const volatile float* far;
 
             /*!
              *  Get Camera Matrix.

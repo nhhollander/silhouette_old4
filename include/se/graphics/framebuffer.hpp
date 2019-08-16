@@ -51,14 +51,23 @@ namespace se::graphics {
             /// OpenGL id for the depth buffer.
             unsigned int gl_depthbuffer_id = 0;
 
+            /// OpenGL id for the depth texture.
+            unsigned int gl_depth_texture_id = 0;
+
             /// Buffer Width.
-            int dimx = 0;
+            const volatile int* dimx;
 
             /// Buffer Height.
-            int dimy = 0;
+            const volatile int* dimy;
 
             /// MSAA level
-            int msaa_level = 0;
+            const volatile int* msaa_level;
+
+            /// Camera far
+            const volatile float* cam_far;
+
+            /// Camera near
+            const volatile float* cam_near;
 
             /// Status.
             FramebufferState state = FramebufferState::NOT_INITIALIZED;
@@ -118,10 +127,8 @@ namespace se::graphics {
              * 
              *  **Warning:** This method must only be called from the graphics
              *  thread.
-             * 
-             *  @param unit Texture unit to bind the buffer texture to
              */
-            void use_as_texture(unsigned int unit);
+            void use_as_texture();
 
     };
 

@@ -49,6 +49,8 @@ bool util::ConfigurationValue::set(const char* src) {
     strcpy((char*) this->cstring_, src);
     // Interpret as an integer
     this->int_ = atoi(src);
+    // Interpret as a float
+    this->float_ = (float) atof(src);
     // Interpret as a double
     this->double_ = atof(src);
     // Interpret as boolean
@@ -114,6 +116,8 @@ bool util::ConfigurationValue::set(int src) {
     snprintf((char*) this->cstring_, 32, "%i", src);
     // Interpret as integer
     this->int_ = src;
+    // Interpret as float
+    this->float_ = (float) src;
     // Interpret as double
     this->double_ = (double) src;
     // Interpret as boolean
@@ -127,7 +131,9 @@ bool util::ConfigurationValue::set(int src) {
     }
     return true;
 }
-
+bool util::ConfigurationValue::set(float src) {
+    return this->set((double) src);
+}
 bool util::ConfigurationValue::set(double src) {
     // Check for lock
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
@@ -140,6 +146,8 @@ bool util::ConfigurationValue::set(double src) {
     snprintf((char*) this->cstring_, 32, "%f", src);
     // Interpret as integer
     this->int_ = (int) src;
+    // Interpret as a float
+    this->float_ = (float) src;
     // Interpret as double
     this->double_ = src;
     // Interpret as boolean
@@ -178,7 +186,9 @@ bool util::ConfigurationValue::set(bool src) {
     }
     // Interpret as integer
     this->int_ = (int) src;
-    //  Interpret as double
+    // Interpret as float
+    this->float_ = (float) src;
+    // Interpret as double
     this->double_ = (double) src;
     // Interpret as boolean
     this->bool_ = src;

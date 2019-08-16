@@ -21,6 +21,9 @@ using namespace se::entity;
 Camera::Camera(se::Engine* engine) {
     this->width = engine->config->get_intp("window.dimx");
     this->height = engine->config->get_intp("window.dimy");
+    this->near = engine->config->get_floatp("render.cam_near");
+    this->far = engine->config->get_floatp("render.cam_far");
+    this->fov = engine->config->get_floatp("render.fov");
 }
 
 #define MATRIX(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) { \
@@ -112,7 +115,7 @@ glm::mat4 Camera::get_camera_matrix() {
     recalculating values that don't need to be constantly recalculated, but
     that sounds like a problem for the future. */
     float aspect = ((float) *(this->width)) / ((float) *(this->height));
-    glm::mat4 projection = glm::perspective(this->fov, aspect, this->near, this->far);
+    glm::mat4 projection = glm::perspective(*this->fov, aspect, *this->near, *this->far);
 
     /* Operations are performed from right to left, in the opposite order from
     models.  This means that the models will first be translated into position,
