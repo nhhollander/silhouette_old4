@@ -30,21 +30,19 @@ void main() {
     ivec2 coord = ivec2(x,y);
     vec3 accum = vec3(0,0,0);
     for(int i = 0; i < msaa_lev; i++) {
-        // Resolve depth
-        float raw_depth = texelFetch(input_depth, coord, i).r;
-        //float depth = linearDepth(raw_depth);
-        float depth = pow(raw_depth, 200);
-        //depth = -1.0;
-        accum += vec3(depth, depth, depth);
-        //accum += texelFetch(input_color, coord, i).xyz;
-    }
-    color = accum / msaa_lev;
-    //color = color * color * color * color * color;
-}
+        /* Calculate fog density.  This should involve depth buffer
+        linearization, but I have been completely unable to figure out how to
+        do that.  It turns out that raising the base value to the power of
+        twenty-thousand happens to produce a good visual effect, even if it
+        isn't technically "correct" */
+        float fog_val = pow(texelFetch(input_depth, coord, i).r, 10000);
+        vec3 fog_color = vec3(fog_val, fog_val, fog_val);
 
-float linearDepth(float depthSample)
-{
-    depthSample = 2.0 * depthSample - 1.0;
-    float zLinear = 2.0 * cam_near * cam_far / (cam_far + cam_near - depthSample * (cam_far - cam_near));
-    return zLinear;
+        vec3 raw_color = texelFetch(input_color, coord, i).rgb;
+
+        accum += fog_color;
+        accum += raw_color;
+    }
+
+    color = accum / msaa_lev;
 }
