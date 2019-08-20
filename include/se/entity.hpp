@@ -46,6 +46,8 @@ namespace se {
 
             // = VIRTUALS =
 
+            virtual ~Entity();
+
             /*!
              *  Entity is Renderable.
              * 

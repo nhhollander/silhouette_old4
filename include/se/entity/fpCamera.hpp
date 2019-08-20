@@ -34,6 +34,7 @@ namespace se::entity {
         public:
 
             FPCamera(se::Engine* engine);
+            ~FPCamera();
 
             void tick(uint64_t clock, uint32_t cdelta);
 

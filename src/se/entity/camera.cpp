@@ -26,6 +26,8 @@ Camera::Camera(se::Engine* engine) {
     this->fov = engine->config->get_floatp("render.fov");
 }
 
+Camera::~Camera() {}
+
 #define MATRIX(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) { \
     {a,e,i,m}, \
     {b,f,j,n}, \

@@ -9,6 +9,7 @@
  */
 
 #include "se/engine.hpp"
+#include "se/scene.hpp"
 #include "util/log.hpp"
 #include "se/entity/staticProp.hpp"
 #include "se/entity/fpCamera.hpp"
@@ -32,17 +33,20 @@ int main() {
     SimpleRenderManager srm(&e);
     e.graphics_controller->set_render_manager(&srm);
 
+    Scene scene(&e);
+    srm.set_active_scene(&scene);
+
     StaticProp floor(&e, "floor", "floor");
     floor.x = 0;
     floor.y = 0;
     floor.z = 0;
-    srm.add_renderable(&floor);
+    scene.register_entity(&floor);
 
     StaticProp sp(&e, "suzanne", "suzanne");
     sp.x = 0;
     sp.y = 3;
     sp.z = 1;
-    srm.add_renderable(&sp);
+    scene.register_entity(&sp);
 
     FPCamera cam(&e);
     cam.z = 1.524;

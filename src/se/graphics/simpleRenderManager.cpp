@@ -9,6 +9,7 @@
 #include "se/graphics/simpleRenderManager.hpp"
 
 #include "se/entity/camera.hpp"
+#include "se/scene.hpp"
 #include "se/graphics/screen.hpp"
 
 #include "util/log.hpp"
@@ -51,7 +52,7 @@ void SimpleRenderManager::support_thread_main() {
         //DEBUG("Sorted %i renderable entities in %.3fms (%uns)",
         //    this->renderables.size(), bm_sort_duration_ms, bm_sort_duration_ns);
         bm_sort_total_time += bm_sort_duration_ns;
-        bm_sort_total_entity_count += this->renderables.size();
+        bm_sort_total_entity_count += (*this->active_scene->get_renderables()).size();
         bm_sort_total_count += 1;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -105,11 +106,14 @@ bool renderable_sort_check(se::Entity* e1, se::Entity* e2, se::entity::Camera* c
 }
 
 void SimpleRenderManager::sort_renderables() {
-    auto sort_fun = [this](se::Entity* e1, se::Entity* e2){
+    auto sort_function = [this](se::Entity* e1, se::Entity* e2){
         return renderable_sort_check(e1, e2, this->active_camera);
     };
 
-    std::sort(this->renderables.begin(), this->renderables.end(), sort_fun);
+    std::sort(
+        (*this->active_scene->get_renderables()).begin(),
+        (*this->active_scene->get_renderables()).end(),
+        sort_function);
 }
 
 // ====================
@@ -121,6 +125,8 @@ SimpleRenderManager::SimpleRenderManager(se::Engine* engine) {
     this->engine = engine;
     this->active_camera = new se::entity::Camera(this->engine);
     this->default_camera = this->active_camera;
+    this->active_scene = new se::Scene(this->engine);
+    this->default_scene = this->active_scene;
 
     this->support_thread = std::thread(&SimpleRenderManager::support_thread_main, this);
 
@@ -134,7 +140,8 @@ SimpleRenderManager::~SimpleRenderManager() {
         this->support_thread.join();
     }
 
-    //delete this->active_camera;
+    delete this->default_camera;
+    delete this->default_scene;
     delete this->screen;
 }
 
@@ -148,7 +155,7 @@ void SimpleRenderManager::render_frame() {
 
     glEnable(GL_DEPTH_TEST);
 
-    for(auto entity : this->renderables) {
+    for(auto entity : *this->active_scene->get_renderables()) {
         entity->render(camera_matrix);
     }
 
@@ -157,38 +164,18 @@ void SimpleRenderManager::render_frame() {
 
 }
 
-void SimpleRenderManager::add_renderable(se::Entity* entity) {
-    if(!entity->is_renderable()) {
-        WARN("Attempted to add non-renderable entity to render list!");
-        return;
-    }
-    for(auto ent : this->renderables) {
-        if(ent == entity) {
-            WARN("Attempted to add duplicate entity to render list!");
-            return;
-        }
-    }
-    // Add the entity to the renderable list
-    this->renderables.push_back(entity);
-}
-
-void SimpleRenderManager::remove_renderable(se::Entity* entity) {
-    int counter = 0;
-    for(auto ent : this->renderables) {
-        if(ent == entity) {
-            this->renderables.erase(this->renderables.begin() + counter);
-            return;
-        }
-        counter++;
-    }
-    // TODO: Add some sort of identifying information
-    WARN("Attempted to remove non-exisent entity from render list!");
-}
-
 void SimpleRenderManager::set_active_camera(se::entity::Camera* camera) {
     this->active_camera = camera;
 }
 
 void SimpleRenderManager::use_default_camera() {
     this->active_camera = this->default_camera;
+}
+
+void SimpleRenderManager::set_active_scene(se::Scene* scene) {
+    this->active_scene = scene;
+}
+
+void SimpleRenderManager::use_default_scene() {
+    this->active_scene = this->default_scene;
 }

@@ -34,20 +34,23 @@ namespace se::graphics {
             /// Parent Engine
             se::Engine* engine;
 
-            /// Renderable entities.
-            std::vector<se::Entity*> renderables;
+            /// Current Scene
+            se::Scene* active_scene;
+
+            /// Default scene
+            se::Scene* default_scene;
 
             /// Active view point
             se::entity::Camera* active_camera;
+
+            /// Default camera
+            se::entity::Camera* default_camera;
 
             /// Screen used for output rendering
             se::graphics::Screen* screen;
 
             /// Support thread.
             std::thread support_thread;
-
-            /// Default camera
-            se::entity::Camera* default_camera;
 
             /// Threads run flag
             bool run = true;
@@ -79,37 +82,6 @@ namespace se::graphics {
             void render_frame();
 
             /*!
-             *  Add a renderable entity.
-             * 
-             *  Entities in this list will be called upon by the render thread
-             *  every frame.  The more entities in the render queue, the slower
-             *  the engine is going to run.  If an entity is no longer a
-             *  candidate for rendering, please remove it by calling
-             *  `remove_renderable()`.
-             * 
-             *  Only add entities for which `se::Entity::is_renderable()`
-             *  returns `true`.
-             * 
-             *  TODO: Render groups.  Instead of worrying about dynamic 
-             *  visibility, having groups of entities pre-categorized into
-             *  render groups in some kind of tree would be a good way of
-             *  keeping performance high.  I believe this is sort of how other
-             *  engines (like Source) deal with props and entities, so that they
-             *  don't have to worry about excessive calls to nearby but
-             *  invisible entities.
-             */
-            void add_renderable(se::Entity* entity);
-
-            /*!
-             *  Remove a renderable entity.
-             * 
-             *  When an entity is no longer renderable, removing it from the
-             *  list of renderable entities will help keep the engine running
-             *  as quickly as possible.
-             */
-            void remove_renderable(se::Entity* entity);
-
-            /*!
              *  Set the active camera.
              * 
              *  Don't delete the camera passed here until you call
@@ -124,6 +96,22 @@ namespace se::graphics {
              *  faults.
              */
             void use_default_camera();
+
+            /*!
+             *  Set the active scene.
+             * 
+             *  Don't delete the scene passed here until you call
+             *  `use_default_scene()`.
+             */
+            void set_active_scene(se::Scene* scene);
+
+            /*!
+             *  Revert to the default scene.
+             * 
+             *  Call this method before deleting scenes to prevent segmentation
+             *  faults.
+             */
+            void use_default_scene();
 
     };
 

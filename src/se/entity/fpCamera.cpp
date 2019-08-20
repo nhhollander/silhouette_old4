@@ -62,6 +62,8 @@ FPCamera::FPCamera(se::Engine* engine) : Camera(engine) {
     engine->logic_controller->register_tickable(this);
 }
 
+FPCamera::~FPCamera() {}
+
 void FPCamera::lock_mouse() {
     SDL_SetRelativeMouseMode(SDL_TRUE);
 }

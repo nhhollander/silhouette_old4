@@ -44,6 +44,7 @@ namespace se::entity {
 
             /// Camera Constructor
             Camera(se::Engine* engine);
+            ~Camera();
 
             bool is_renderable() { return false; }
             bool is_tickable() { return false; }

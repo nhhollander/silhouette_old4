@@ -15,6 +15,7 @@ namespace se {
     
     class Engine;
     class Entity;
+    class Scene;
 
     namespace entity {
 

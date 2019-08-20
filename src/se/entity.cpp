@@ -75,3 +75,5 @@ glm::mat4 se::Entity::get_model_matrix() {
     return translate * rotate_z * rotate_y * rotate_x * scale;
 
 }
+
+se::Entity::~Entity() {}
