@@ -34,9 +34,10 @@ int main() {
     e.graphics_controller->set_render_manager(&srm);
 
     Scene scene(&e);
+    scene.load_scene("test");
     srm.set_active_scene(&scene);
 
-    StaticProp floor(&e, "floor", "floor");
+    /*StaticProp floor(&e, "floor", "floor");
     floor.x = 0;
     floor.y = 0;
     floor.z = 0;
@@ -46,7 +47,7 @@ int main() {
     sp.x = 0;
     sp.y = 3;
     sp.z = 1;
-    scene.register_entity(&sp);
+    scene.register_entity(&sp); */
 
     FPCamera cam(&e);
     cam.z = 1.524;
@@ -54,7 +55,7 @@ int main() {
     srm.set_active_camera(&cam);
 
     while(e.threads_run) {
-        sp.rz += 0.005;
+        //sp.rz += 0.005;
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 

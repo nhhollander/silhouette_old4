@@ -161,7 +161,6 @@ void SimpleRenderManager::render_frame() {
 
     this->screen->render();
     
-
 }
 
 void SimpleRenderManager::set_active_camera(se::entity::Camera* camera) {

@@ -11,9 +11,30 @@
 
 #include "se/fwd.hpp"
 
+#include <nlohmann/json.hpp>
 #include <vector>
 
 namespace se {
+
+    /*!
+     *  Wrapped Entity Constructor Type.
+     * 
+     *  The wrapped entity constructor is responsible for creating and returning
+     *  new instances of an arbitrary entity type.  When loading a scene file,
+     *  the the scene loader will call this function for any matching registered
+     *  type.
+     * 
+     *  This function should return a pointer to a completely constructed entity
+     *  if possible, however in the event of a failure it should return
+     *  `nullptr`.
+     */
+    typedef std::function<
+        se::Entity*(
+            se::Engine* engine,
+            se::Scene* scene,
+            nlohmann::json::value_type attribs
+        )
+    > WrappedEntityConstructor;
 
     /*!
      *  Scene.
@@ -38,6 +59,9 @@ namespace se {
             /// Tickable entities
             std::vector<Entity*> tickable_entities;
 
+            /// Construction functiosn
+            std::map<uint32_t, WrappedEntityConstructor> constructors;
+
             /*!
              *  Internally Loaded Entities.
              * 
@@ -45,6 +69,9 @@ namespace se {
              *  must be destroyed with the scene.
              */
             std::vector<Entity*> internally_loaded;
+
+            /// Generate default wrapped entity constructors.
+            void generate_default_wrapped_entity_constructors();
 
         public:
 
@@ -92,6 +119,19 @@ namespace se {
              *  Deregister an entity.
              */
             void deregister_entity(se::Entity* entity);
+
+            /*!
+             *  Register a constructor.
+             * 
+             *  Adds a constructor to the map for the registered type.  If there
+             *  is a type collision, a warning will be generated and the new
+             *  constructor will *not* be registered.
+             * 
+             *  @param type Name of the type to register the constructor for.
+             *  @param constructor  Constructor to register.
+             */
+            void register_constructor(
+                const char* type, WrappedEntityConstructor constructor);
 
     };
 

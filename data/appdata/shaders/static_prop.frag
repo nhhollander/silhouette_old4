@@ -19,7 +19,7 @@ void main() {
     color = texture(texture_sampler, uv).rgb;
 
     // Calculate scene light position
-    float light = dot(normal, normalize(vec3(-1,0,1)));
+    float light = dot(normal, normalize(vec3(-1,1,1)));
     if(light < 0) light = 0;
     color = color * light;
 

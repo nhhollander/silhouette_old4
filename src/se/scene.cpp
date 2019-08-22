@@ -11,9 +11,9 @@
 #include "se/entity/staticProp.hpp"
 
 #include "util/dirs.hpp"
+#include "util/hash.hpp"
 #include "util/log.hpp"
 
-#include <nlohmann/json.hpp>
 #include <fstream>
 
 using namespace se;
@@ -24,12 +24,29 @@ using namespace nlohmann;
 // == PRIVATE MEMBERS ==
 // =====================
 
+void Scene::generate_default_wrapped_entity_constructors() {
+    WrappedEntityConstructor static_prop = [](se::Engine* engine,
+        se::Scene* scene, nlohmann::json::value_type attribs){
+            std::string geom_name = attribs.value<std::string>("geometry","<missing>");
+            std::string text_name = attribs.value<std::string>("texture","<missing>");
+            if(geom_name == "<missing>" || text_name == "<missing>") {
+                ERROR("Unable to construct Static Prop! A required attribute "
+                    "is missing! [geometry: %s] [texture: %s]",
+                    geom_name.c_str(), text_name.c_str());
+                return (StaticProp*) nullptr;
+            }
+            return new StaticProp(engine, geom_name.c_str(), text_name.c_str());
+        };
+    this->register_constructor("staticprop", static_prop);
+}
+
 // ====================
 // == PUBLIC MEMBERS ==
 // ====================
 
 Scene::Scene(se::Engine* engine) {
     this->engine = engine;
+    this->generate_default_wrapped_entity_constructors();
 }
 
 Scene::~Scene() {
@@ -63,29 +80,49 @@ void Scene::load_scene(const char* fname) {
     // Load entities
     DEBUG("Scene contains %i entities", scene_data["entities"].size());
     for(auto entity : scene_data["entities"]) {
-        std::string geometry = entity.value<std::string>("geometry", "");
-        std::string texture  = entity.value<std::string>("texture", "");
-        if(geometry == "" || texture == "") {
-            WARN("Malformed entity entry! [geom: %s, text: %s]",
-                (geometry == "") ? "INVALID" : "OK",
-                (texture == "")  ? "INVALID" : "OK");
+        // Get entity name
+        std::string ename = entity.value<std::string>("name","<invalid>");
+        std::string type = entity.value<std::string>("type","<invalid>");
+        if(type == "<invalid>") {
+            WARN("Missing entity type for entity [%s]", ename.c_str());
             continue;
         }
-        /* Right now scenes only support static props.  This will need to be
-        expanded in the future to also include useful things. */
-        StaticProp* sp = new StaticProp(this->engine, geometry.c_str(), texture.c_str());
-        sp->x =  entity.value<float>("pos.x", 0.0);
-        sp->y =  entity.value<float>("pos.y", 0.0);
-        sp->z =  entity.value<float>("pos.z", 0.0);
-        sp->rx = entity.value<float>("rot.x", 0.0);
-        sp->ry = entity.value<float>("rot.y", 0.0);
-        sp->rz = entity.value<float>("rot.z", 0.0);
-        sp->sx = entity.value<float>("scale.x", 0.0);
-        sp->sy = entity.value<float>("scale.y", 0.0);
-        sp->sz = entity.value<float>("scale.z", 0.0);
+        uint32_t type_hash = util::hash::ejenkins("%s", type.c_str());
+        auto find = this->constructors.find(type_hash);
+        if(find == this->constructors.end()) {
+            WARN("[%s] has unknown entity type [%s]", ename.c_str(), type.c_str());
+            continue;
+        }
+        Entity* new_ent = find->second(this->engine, this, entity);
+        if(new_ent == nullptr) {
+            WARN("Failed to construct [%s] of type [%s]", ename.c_str(), type.c_str());
+            continue;
+        }
+        try {
+            /* Apply global options to entity */
+            if(entity.find("pos") != entity.end()) {
+                new_ent->x = entity["pos"].value("x", 0.0);
+                new_ent->y = entity["pos"].value("y", 0.0);
+                new_ent->z = entity["pos"].value("z", 0.0);
+            }
+            if(entity.find("rot") != entity.end()) {
+                new_ent->rx = entity["rot"].value("x", 0.0);
+                new_ent->ry = entity["rot"].value("y", 0.0);
+                new_ent->rz = entity["rot"].value("z", 0.0);
+            }
+            if(entity.find("scale") != entity.end()) {
+                new_ent->sx = entity["scale"].value("x", 1.0);
+                new_ent->sy = entity["scale"].value("y", 1.0);
+                new_ent->sz = entity["scale"].value("z", 1.0);
+            }
+        }
+        catch(std::exception& e) {
+            WARN("Failed to process position/rotation/scale information for "
+                "entity [%s], got error [%s]", ename.c_str(), e.what());
+        }
         // Add to the entity lists
-        this->internally_loaded.push_back(sp);
-        this->register_entity(sp);
+        this->internally_loaded.push_back(new_ent);
+        this->register_entity(new_ent);
     }
     
 }
@@ -116,4 +153,38 @@ void Scene::register_entity(se::Entity* entity) {
     if(entity->is_tickable()) {
         this->tickable_entities.push_back(entity);
     }
+}
+
+void Scene::deregister_entity(se::Entity* entity) {
+    for(auto i : this->internally_loaded) {
+        if(i == entity) {
+            WARN("Attempted to deregister an internally managed entity");
+            return;
+        }
+    }
+    for(size_t i = 0; i < this->all_entities.size(); i++) {
+        if(this->all_entities[i] == entity) {
+            this->all_entities.erase(this->all_entities.begin() + i);
+        }
+    }
+    for(size_t i = 0; i < this->renderable_entities.size(); i++) {
+        if(this->renderable_entities[i] == entity) {
+            this->renderable_entities.erase(this->renderable_entities.begin() + i);
+        }
+    }
+    for(size_t i = 0; i < this->tickable_entities.size(); i++) {
+        if(this->tickable_entities[i] == entity) {
+            this->tickable_entities.erase(this->tickable_entities.begin() + i);
+        }
+    }
+}
+
+void Scene::register_constructor(const char* type, WrappedEntityConstructor constructor) {
+    uint32_t hash = util::hash::ejenkins("%s", type);
+    auto search = this->constructors.find(hash);
+    if(search != this->constructors.end()) {
+        WARN("Attempted to register duplicate constructor for type [%s]", type);
+        return;
+    }
+    this->constructors.insert(std::pair(hash, constructor));
 }
