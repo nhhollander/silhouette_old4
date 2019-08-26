@@ -54,19 +54,19 @@ namespace se::graphics {
             /// OpenGL id for the depth texture.
             unsigned int gl_depth_texture_id = 0;
 
-            /// Buffer Width.
+            /// Pointer to the screen width.
             const volatile int* dimx;
 
-            /// Buffer Height.
+            /// Pointer to the screen height.
             const volatile int* dimy;
 
-            /// MSAA level
+            /// Pointer to the MSAA level.
             const volatile int* msaa_level;
 
-            /// Camera far
+            /// Pointer to the camera far distance
             const volatile float* cam_far;
 
-            /// Camera near
+            /// Pointer to the camera near distance
             const volatile float* cam_near;
 
             /// Status.
