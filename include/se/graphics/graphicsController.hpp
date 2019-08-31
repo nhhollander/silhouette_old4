@@ -190,6 +190,13 @@ namespace se::graphics {
 
             /// Get the active render manager
             se::graphics::RenderManager* get_render_manager();
+
+            /*!
+             *  Pending Graphics Tasks.
+             * 
+             *  Returns the number of pending graphics tasks.
+             */
+            int pending_task_count();
     };
 
 }

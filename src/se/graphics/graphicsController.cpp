@@ -265,3 +265,7 @@ void GraphicsController::set_render_manager(RenderManager* manager) {
 RenderManager* GraphicsController::get_render_manager() {
     return this->render_manager;
 }
+
+int GraphicsController::pending_task_count() {
+    return this->tasks.size();
+}

@@ -16,7 +16,6 @@ QTSilhouetteWidget::QTSilhouetteWidget(QWidget* qparent) :
 }
 
 QTSilhouetteWidget::~QTSilhouetteWidget() {
-    DEBUG("Destroyed");
 }
 
 void QTSilhouetteWidget::configure(se::Engine* engine) {
@@ -45,10 +44,14 @@ void QTSilhouetteWidget::initializeGL() {
 }
 
 void QTSilhouetteWidget::paintGL() {
-    FATAL("Painting");
     this->engine->config->set("internal.gl.outputfbid", (int) this->defaultFramebufferObject());
     DEBUG("Using default framebuffer %u", this->defaultFramebufferObject());
     this->engine->graphics_controller->do_frame();
+
+    // Check for pending tasks and initiate refresh
+    if(this->engine->graphics_controller->pending_task_count() > 0) {
+        this->update();
+    }
 }
 
 void QTSilhouetteWidget::resizeGL(int width, int height) {

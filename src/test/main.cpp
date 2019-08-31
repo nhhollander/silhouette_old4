@@ -10,11 +10,13 @@
 
 #include "se/engine.hpp"
 #include "se/scene.hpp"
-#include "util/log.hpp"
 #include "se/entity/staticProp.hpp"
 #include "se/entity/fpCamera.hpp"
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/simpleRenderManager.hpp"
+
+#include "util/config.hpp"
+#include "util/log.hpp"
 
 #include <thread>
 #include <cstdlib>
@@ -45,12 +47,21 @@ int main(int argc, char** argv) {
     cam.lock_mouse();
     srm.set_active_camera(&cam);
 
-    QApplication qapp(argc, argv);
+    if(e.config->get_bool("render.use_sdl")) {
+        while(e.threads_run) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        }
+    } else {
 
-    MainWindow w(&e);
-    w.show();
+        QApplication qapp(argc, argv);
 
-    DEBUG("Starting application");
-    return qapp.exec();
+        MainWindow w(&e);
+        w.show();
+
+        DEBUG("Starting application");
+        return qapp.exec();
+    }
+
+
 
 }
