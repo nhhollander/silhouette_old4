@@ -31,7 +31,7 @@ run: all
 
 debug: all
 	@printf "\033[33mDebugging Project...\033[0m\n"
-	@gdb ./bin/se_test
+	@SE_USE_GDB=true ./scripts/debug_launch.sh
 
 rebuild: clean all
 	@printf "\033[33mRebuilt Project\033[0m\n"

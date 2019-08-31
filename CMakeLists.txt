@@ -23,9 +23,16 @@ include_directories(include)
 # Use c++ 17
 set(CMAKE_CXX_STANDARD 17)
 
+# Enable QT
+set(CMAKE_AUTOUIC_SEARCH_PATHS ./forms)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
+
 # Calculate the log text offset (workaround for absolute paths in cmake)
 string(LENGTH ${CMAKE_SOURCE_DIR}/src/ UTIL_LOG_PATH_OFFSET)
 add_compile_options(-DUTIL_LOG_PATH_OFFSET=${UTIL_LOG_PATH_OFFSET})
+add_compile_options(-DSE_ENABLE_QT_WIDGET_SUPPORT)
 
 # Add the utility library
 add_library(seutil SHARED
@@ -38,6 +45,7 @@ add_library(seutil SHARED
 )
 
 # Add the silhouette library
+# QT Headers have to be added to the sources list because... uh... reasons.
 add_library(silhouette SHARED
     src/se/engine.cpp
     src/se/entity.cpp
@@ -54,18 +62,19 @@ add_library(silhouette SHARED
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
     src/se/graphics/simpleRenderManager.cpp
+    include/se/graphics/qtSilhouetteWidget.hpp
+    src/se/graphics/qtSilhouetteWidget.cpp
     src/se/graphics/texture.cpp
     src/se/input/inputController.cpp
     src/se/logic/logicController.cpp
 )
-# Enable the internal library flag
-#target_compile_options(silhouette PUBLIC -DSE_INTERNAL_BUILD)
 # Link to required libraries
-target_link_libraries(silhouette GL SDL2 seutil GLEW)
+target_link_libraries(silhouette GL SDL2 seutil GLEW Qt5::OpenGL)
 
 # Add the test implementation
 add_executable(se_test
     src/test/main.cpp
+    src/test/mainwindow.cpp
 )
 # Link to the required libraries
-target_link_libraries(se_test GL GLEW silhouette seutil pthread png)
+target_link_libraries(se_test GL GLEW silhouette seutil pthread png Qt5::Widgets)

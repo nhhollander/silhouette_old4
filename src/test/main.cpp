@@ -20,11 +20,14 @@
 #include <cstdlib>
 #include <vector>
 
+#include "mainwindow.h"
+#include <QApplication>
+
 using namespace se;
 using namespace se::entity;
 using namespace se::graphics;
 
-int main() {
+int main(int argc, char** argv) {
     util::log::set_thread_name("MAIN");
     INFO("Hello World!");
 
@@ -37,27 +40,17 @@ int main() {
     scene.load_scene("test");
     srm.set_active_scene(&scene);
 
-    /*StaticProp floor(&e, "floor", "floor");
-    floor.x = 0;
-    floor.y = 0;
-    floor.z = 0;
-    scene.register_entity(&floor);
-
-    StaticProp sp(&e, "suzanne", "suzanne");
-    sp.x = 0;
-    sp.y = 3;
-    sp.z = 1;
-    scene.register_entity(&sp); */
-
     FPCamera cam(&e);
     cam.z = 1.524;
     cam.lock_mouse();
     srm.set_active_camera(&cam);
 
-    while(e.threads_run) {
-        //sp.rz += 0.005;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    }
+    QApplication qapp(argc, argv);
 
+    MainWindow w(&e);
+    w.show();
+
+    DEBUG("Starting application");
+    return qapp.exec();
 
 }

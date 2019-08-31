@@ -87,6 +87,18 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::link() {
 
+    ShaderState vstate = this->vshader->wait_for_loading();
+    ShaderState fstate = this->fshader->wait_for_loading();
+
+    if(vstate == ShaderState::ERROR || fstate == ShaderState::ERROR) {
+        ERROR("[%s] Child shader is in error state! [vert: %s frag: %s]",
+            this->name.c_str(),
+            shader_state_name(vstate),
+            shader_state_name(fstate));
+        this->resource_state = GraphicsResourceState::CHILD_ERROR;
+        return;
+    }
+
     auto start_time = std::chrono::system_clock::now();
 
     DEBUG("Linking Shader Program [%s]", this->name.c_str());
@@ -171,18 +183,6 @@ void ShaderProgram::load_() {
     // Get the shaders
     this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER, vdefines);
     this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER, fdefines);
-
-    ShaderState vstate = this->vshader->wait_for_loading();
-    ShaderState fstate = this->fshader->wait_for_loading();
-
-    if(vstate == ShaderState::ERROR || fstate == ShaderState::ERROR) {
-        ERROR("[%s] Child shader is in error state! [vert: %s frag: %s]",
-            this->name.c_str(),
-            shader_state_name(vstate),
-            shader_state_name(fstate));
-        this->resource_state = GraphicsResourceState::CHILD_ERROR;
-        return;
-    }
 
     // Submit to the linking queue
     std::function job = [this](){this->link();};

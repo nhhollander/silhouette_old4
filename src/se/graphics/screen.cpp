@@ -15,6 +15,7 @@
 #include "se/graphics/shader.hpp"
 
 #include "util/log.hpp"
+#include "util/config.hpp"
 
 using namespace se::graphics;
 
@@ -54,6 +55,7 @@ void Screen::deinit() {
 
 Screen::Screen(se::Engine* engine) {
     this->engine = engine;
+    this->output_fbid = engine->config->get_intp("internal.gl.outputfbid");
     this->screen_program = ShaderProgram::get_program(
         engine, "screen", "", "screen", "");
     this->screen_program->increment_active_users();
@@ -75,7 +77,7 @@ void Screen::activate_framebuffer() {
 
 void Screen::render() {
     if(!this->ready) { return; }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0); // 0 is the display device
+    glBindFramebuffer(GL_FRAMEBUFFER, *this->output_fbid);
     this->screen_program->use_program();
     glBindVertexArray(this->gl_screen_vert_array_id);
     glDisable(GL_DEPTH_TEST);

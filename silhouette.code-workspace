@@ -65,7 +65,10 @@
 			"memory_resource": "cpp",
 			"random": "cpp",
 			"regex": "cpp",
-			"string": "cpp"
+			"string": "cpp",
+			"qglwidget": "cpp",
+			"qapplication": "cpp",
+			"qopenglwidget": "cpp"
 		},
 		"editor.rulers": [
 			80

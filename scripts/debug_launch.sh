@@ -20,5 +20,11 @@ if [ ! -z "$SE_DEBUG_TEMPDATA" ]; then
     rm -rdf $SE_DEBUG_TEMPDATA/*
 fi
 
-# Launch the program
-./bin/se_test
+if [ -z "$SE_USE_GDB" ]
+then
+    # Launch the program normally
+    ./bin/se_test
+else
+    # Launch the program with gdb
+    gdb -q ./bin/se_test
+fi

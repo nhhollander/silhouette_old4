@@ -48,6 +48,13 @@ namespace se::graphics {
          */
         friend class GraphicsEventHandler;
 
+        #ifdef SE_ENABLE_QT_WIDGET_SUPPORT
+        /*!
+         *  Allow the QT Silhouette Widget to administer the render loop.
+         */
+        friend class QTSilhouetteWidget;
+        #endif
+
         private:
 
             /*!
@@ -115,6 +122,16 @@ namespace se::graphics {
             void graphics_thread_main();
 
             /*!
+             *  Do Frame.
+             * 
+             *  This method exists to decouple the frame rendering process from
+             *  the default control loop.  It was implemented to allow the use
+             *  of an embedded OpenGL widget in a QT application, which
+             *  overrides the render loop handling.
+             */
+            void do_frame();
+
+            /*!
              *  Recalculate FPS limit.
              * 
              *  Invoke this method by updating the `render.fpscap` configuration
@@ -126,6 +143,28 @@ namespace se::graphics {
              *  Process pending graphics tasks.
              */
             void process_tasks();
+
+            /*!
+             *  SDL Initialization Method.
+             * 
+             *  **Warning:** This method must only be called from the graphics
+             *  thread.
+             * 
+             *  This method handles the initialization process for SDL,
+             *  including window creation and OpenGL context creation.
+             */
+            void init_sdl();
+
+            /*!
+             *  OpenGL Initialization Method.
+             * 
+             *  **Warning:** This method must only be called from the grpahics
+             *  thread.
+             * 
+             *  This method handles the initialization/setup process for OpenGL
+             *  once a context has been provided (by SDL or otherwise).
+             */
+            void init_gl();
 
         public:
 

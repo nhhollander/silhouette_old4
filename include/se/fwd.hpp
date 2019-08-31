@@ -38,6 +38,10 @@ namespace se {
         class ShaderProgram;
         class Texture;
 
+        #ifdef SE_ENABLE_QT_WIDGET_SUPPORT
+        class QTSilhouetteWidget;
+        #endif
+
     }
 
     namespace input {

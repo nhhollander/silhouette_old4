@@ -42,6 +42,9 @@ namespace se::graphics {
             /// Ready to rumble flag
             bool ready = false;
 
+            /// Pointer to the output framebuffer ID
+            const volatile int* output_fbid = nullptr;
+
             /*!
              *  Initialize the screen.
              * 

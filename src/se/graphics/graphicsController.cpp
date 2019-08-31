@@ -64,67 +64,8 @@ void GraphicsController::graphics_thread_main() {
     util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(GraphicsController::recalculate_fps_limit);
     this->engine->config->get("render.fpscap")->add_change_handler(handler);
 
-    // Initialize SDL2 in OpenGL mode
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        FATAL("Failed to initialize SDL2 [%s]", SDL_GetError());
-        return;
-    }
-
-    // Configure the OpenGL version
-    int gl_major = this->engine->config->get_int("render.gl.major", -1);
-    int gl_minor = this->engine->config->get_int("render.gl.minor", -1);
-    if(gl_major == -1 || gl_minor == -1) {
-        FATAL("Opengl version missing! [%i.%i]", gl_major, gl_minor);
-        return;
-    }
-    DEBUG("Using OpenGL %i.%i", gl_major, gl_minor);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    // Create the window
-    const char* title = this->engine->config->get_cstring("window.title");
-    int dimx = this->engine->config->get_int("window.dimx", -1);
-    int dimy = this->engine->config->get_int("window.dimy", -1);
-    if(title == nullptr || dimx == -1 || dimy == -1) {
-        FATAL("Window properties missing! [%s:%i:%i]", title, dimx, dimy);
-        return;
-    }
-    this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimx, dimy, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    if(this->window == nullptr) {
-        FATAL("Failed to create SDL2 window [%s]", SDL_GetError());
-        return;
-    }
-
-    // Create the OpenGL context
-    this->glcontext = SDL_GL_CreateContext(this->window);
-    if(this->glcontext == nullptr) {
-        FATAL("Failed to create OpenGL context [%s]", SDL_GetError());
-        return;
-    }
-
-    // Initialize GLEW
-    glewExperimental = GL_TRUE;
-    GLenum glewError = glewInit();
-    if(glewError != GLEW_OK) {
-        FATAL("Failed to initialize GLEW! [%s]", glewGetErrorString(glewError));
-        return;
-    }
-
-    // Set up the error callback system
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(gl_message_callback, this);
-
-    // Configure the OpenGL instance
-    bool vsync = this->engine->config->get_bool("render.vsync",false);
-    if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
-        ERROR("Failed to configure vsync [%s]", SDL_GetError());
-    }
-    // 58 111 166
-    glClearColor(0.227, 0.434, 0.648, 1.0);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    this->init_sdl();
+    this->init_gl();
 
     INFO("Graphics initialization complete");
 
@@ -141,11 +82,7 @@ void GraphicsController::graphics_thread_main() {
     // Main render loop
     while(this->engine->threads_run) {
 
-        this->process_tasks();
-
-        if(this->render_manager != nullptr) {
-            this->render_manager->render_frame();
-        }
+        this->do_frame();
 
         /* Window swapping is handled by the controller instead of the render
         manager because I could not figure out an elegant way to pass a
@@ -193,6 +130,14 @@ void GraphicsController::graphics_thread_main() {
 
 }
 
+void GraphicsController::do_frame() {
+    this->process_tasks();
+
+    if(this->render_manager != nullptr) {
+        this->render_manager->render_frame();
+    }
+}
+
 
 void GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
     INFO("FPS limit changed to %i", value->int_);
@@ -212,6 +157,76 @@ void GraphicsController::process_tasks() {
     }
 }
 
+void GraphicsController::init_sdl() {
+    DEBUG("Initializing SDL2");
+
+    // Initialize SDL2 in OpenGL mode
+    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+        FATAL("Failed to initialize SDL2 [%s]", SDL_GetError());
+        return;
+    }
+
+    // Configure the OpenGL version
+    int gl_major = this->engine->config->get_int("render.gl.major", -1);
+    int gl_minor = this->engine->config->get_int("render.gl.minor", -1);
+    if(gl_major == -1 || gl_minor == -1) {
+        FATAL("Opengl version missing! [%i.%i]", gl_major, gl_minor);
+        return;
+    }
+    DEBUG("Using OpenGL %i.%i", gl_major, gl_minor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, gl_major);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, gl_minor);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    // Create the window
+    const char* title = this->engine->config->get_cstring("window.title");
+    int dimx = this->engine->config->get_int("window.dimx", -1);
+    int dimy = this->engine->config->get_int("window.dimy", -1);
+    if(title == nullptr || dimx == -1 || dimy == -1) {
+        FATAL("Window properties missing! [%s:%i:%i]", title, dimx, dimy);
+        return;
+    }
+    this->window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimx, dimy, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    if(this->window == nullptr) {
+        FATAL("Failed to create SDL2 window [%s]", SDL_GetError());
+        return;
+    }
+
+    // Create the OpenGL context
+    this->glcontext = SDL_GL_CreateContext(this->window);
+    if(this->glcontext == nullptr) {
+        FATAL("Failed to create OpenGL context [%s]", SDL_GetError());
+        return;
+    }
+
+    bool vsync = this->engine->config->get_bool("render.vsync",false);
+    if(SDL_GL_SetSwapInterval(vsync ? 1 : 0) < 0) {
+        ERROR("Failed to configure vsync [%s]", SDL_GetError());
+    }
+}
+
+void GraphicsController::init_gl() {
+    DEBUG("Initializing OpenGL");
+
+    // Initialize GLEW
+    glewExperimental = GL_TRUE;
+    GLenum glewError = glewInit();
+    if(glewError != GLEW_OK) {
+        FATAL("Failed to initialize GLEW! [%s]", glewGetErrorString(glewError));
+        return;
+    }
+
+    // Set up the error callback system
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(gl_message_callback, this);
+
+    // 58 111 166
+    glClearColor(0.227, 0.434, 0.648, 1.0);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+}
+
 // ====================
 // == PUBLIC MEMBERS ==
 // ====================
@@ -221,7 +236,11 @@ GraphicsController::GraphicsController(se::Engine* engine) {
     this->engine = engine;
 
     // Start the graphics thread
-    this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
+    if(this->engine->config->get_bool("render.use_sdl")) {
+        this->graphics_thread = std::thread(&GraphicsController::graphics_thread_main, this);
+    } else {
+        INFO("SDL has been disabled - relying on external render controller.");
+    }
 
     this->event_handler = new GraphicsEventHandler(this);
 }

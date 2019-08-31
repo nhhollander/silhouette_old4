@@ -71,4 +71,6 @@ void StaticProp::render(glm::mat4 camera_matrix) {
 
     this->geometry->use_geometry();
 
+    DEBUG("Rendered a sataic prop!");
+
 }
