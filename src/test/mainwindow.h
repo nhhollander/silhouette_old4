@@ -15,13 +15,18 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
     public:
-        explicit MainWindow(se::Engine* engine, QWidget *parent = nullptr);
+        explicit MainWindow(se::Engine* engine, se::Entity* target, QWidget *parent = nullptr);
         ~MainWindow();
+
+    private slots:
+        void on_rotation_sliderMoved(int position);
 
     private:
         Ui::MainWindow *ui;
 
         se::Engine* engine;
+
+        se::Entity* target;
 };
 
 #endif // MAINWINDOW_H

@@ -27,13 +27,6 @@
        <string>This is a box of things! </string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Foobar:</string>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QRadioButton" name="radioButton_3">
          <property name="text">
@@ -41,10 +34,54 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QRadioButton" name="radioButton">
+         <property name="text">
+          <string>Thing</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Here's a Button!</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
           <string>Enable This</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Foobar:</string>
          </property>
         </widget>
        </item>
@@ -62,40 +99,13 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QRadioButton" name="radioButton">
-         <property name="text">
-          <string>Thing</string>
+       <item row="5" column="0" colspan="2">
+        <widget class="QSlider" name="rotation">
+         <property name="maximum">
+          <number>6283</number>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>Here's a Button!</string>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>

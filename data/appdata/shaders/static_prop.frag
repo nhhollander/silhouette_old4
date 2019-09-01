@@ -21,6 +21,10 @@ void main() {
     // Calculate scene light position
     float light = dot(normal, normalize(vec3(-1,1,1)));
     if(light < 0) light = 0;
-    color = color * light;
+
+    // Ensure minimum lighting is available
+    float brightness = (light * .8) + .2;
+
+    color = color * brightness;
 
 }

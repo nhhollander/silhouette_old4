@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 
         QApplication qapp(argc, argv);
 
-        MainWindow w(&e);
+        MainWindow w(&e, &cam);
         w.show();
 
         DEBUG("Starting application");

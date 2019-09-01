@@ -45,7 +45,6 @@ void QTSilhouetteWidget::initializeGL() {
 
 void QTSilhouetteWidget::paintGL() {
     this->engine->config->set("internal.gl.outputfbid", (int) this->defaultFramebufferObject());
-    DEBUG("Using default framebuffer %u", this->defaultFramebufferObject());
     this->engine->graphics_controller->do_frame();
 
     // Check for pending tasks and initiate refresh

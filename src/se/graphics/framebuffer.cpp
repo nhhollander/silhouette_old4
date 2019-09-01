@@ -33,7 +33,6 @@ void Framebuffer::re_init() {
 void Framebuffer::init() {
     this->state = FramebufferState::INITIALIZING;
 
-    DEBUG("Initializing Framebuffer");
     // Generate and bind primary texture
     glGenTextures(1, &this->gl_texture_id);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id);
@@ -51,14 +50,6 @@ void Framebuffer::init() {
         GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
         GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id, 0);
-    // Generate depth buffer
-    /*glGenRenderbuffers(1, &this->gl_depthbuffer_id);
-    glBindRenderbuffer(GL_RENDERBUFFER, this->gl_depthbuffer_id);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, this->msaa_level, GL_DEPTH24_STENCIL8, this->dimx, this->dimy);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-        GL_RENDERBUFFER, this->gl_depthbuffer_id);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-        GL_RENDERBUFFER, this->gl_depthbuffer_id); */
     // Configure draw buffers
     GLenum buffers[1] = {
         GL_COLOR_ATTACHMENT0
@@ -77,7 +68,6 @@ void Framebuffer::init() {
         this->state = FramebufferState::INITIALIZED;
     }
 
-    DEBUG("Framebuffer initialization complete");
 }
 
 void Framebuffer::deinit() {
