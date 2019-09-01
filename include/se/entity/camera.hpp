@@ -69,6 +69,12 @@ namespace se::entity {
              *  buy me some alcohol first.
              */
             glm::mat4 get_camera_matrix();
+
+            /*!
+             *  Get Skybox Matrix.
+             * 
+             *  The skybox transformation matrix is a special matrix that does
+             *  not include the translation phase. */
     };
 
 }

@@ -21,7 +21,9 @@ class MainWindow : public QMainWindow {
     private slots:
         void on_rotation_sliderMoved(int position);
 
-    private:
+        void on_msaa_level_valueChanged(int arg1);
+
+private:
         Ui::MainWindow *ui;
 
         se::Engine* engine;
