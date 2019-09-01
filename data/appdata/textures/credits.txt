@@ -1,0 +1,6 @@
+#####################
+## TEXTURE CREDITS ##
+#####################
+
+skybox.png:
+Created by Techx <techx@digitalarenas.com>
