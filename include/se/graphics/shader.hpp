@@ -21,7 +21,12 @@
 #define SE_SHADER_LOC_MSAA_LEVEL    11
 #define SE_SHADER_LOC_TEX_SCR_COLOR 12
 #define SE_SHADER_LOC_TEX_SCR_DEPTH 13
+#define SE_SHADER_LOC_TEX_SCR_BG    14
 #define SE_SHADER_LOC_TEX_0         50
+
+#define SE_SHADER_LOC_OUT_COLOR     0
+#define SE_SHADER_LOC_OUT_BG        1
+#define SE_SHADER_LOC_OUT_DEPTH     2
 
 #include "se/fwd.hpp"
 

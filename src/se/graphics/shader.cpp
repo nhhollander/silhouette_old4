@@ -50,8 +50,13 @@ const char default_shader_defines[] =
     GLSL_DEF(LOC_MSAA_LEVEL)
     GLSL_DEF(LOC_TEX_SCR_COLOR)
     GLSL_DEF(LOC_TEX_SCR_DEPTH)
+    GLSL_DEF(LOC_TEX_SCR_BG)
     GLSL_DEF(LOC_TEX_0)
     "#define LOC_TEX_(n) LOC_TEX_0 + n\n"
+
+    GLSL_DEF(LOC_OUT_COLOR)
+    GLSL_DEF(LOC_OUT_BG)
+    GLSL_DEF(LOC_OUT_DEPTH)
 ;
 
 // ====================

@@ -48,6 +48,9 @@ namespace se::graphics {
             /// OpenGL id for the target texture.
             unsigned int gl_texture_id = 0;
 
+            /// OpenGL id for the background target texture.
+            unsigned int gl_bg_texture_id = 0;
+
             /// OpenGL id for the depth buffer.
             unsigned int gl_depthbuffer_id = 0;
 

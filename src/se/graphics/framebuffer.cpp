@@ -38,6 +38,11 @@ void Framebuffer::init() {
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id);
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, *this->msaa_level,
         GL_RGBA8, *this->dimx, *this->dimy, true);
+    // Generate and bind background texture
+    glGenTextures(1, &this->gl_bg_texture_id);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_bg_texture_id);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, *this->msaa_level,
+        GL_RGBA8, *this->dimx, *this->dimy, true);
     // Generate and bind depth texture
     glGenTextures(1, &this->gl_depth_texture_id);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id);
@@ -48,13 +53,16 @@ void Framebuffer::init() {
     glBindFramebuffer(GL_FRAMEBUFFER, this->gl_framebuffer_id);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
         GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
+        GL_TEXTURE_2D_MULTISAMPLE, this->gl_bg_texture_id, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
         GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id, 0);
     // Configure draw buffers
-    GLenum buffers[1] = {
-        GL_COLOR_ATTACHMENT0
+    GLenum buffers[] = {
+        GL_COLOR_ATTACHMENT0,
+        GL_COLOR_ATTACHMENT1
     };
-    glDrawBuffers(1, buffers);
+    glDrawBuffers(2, buffers);
     
     // TODO: Is htis required?
     glEnable(GL_MULTISAMPLE);
@@ -74,6 +82,7 @@ void Framebuffer::deinit() {
     this->state = FramebufferState::DE_INITIALIZING;
 
     glDeleteFramebuffers(1, &this->gl_framebuffer_id);
+    glDeleteTextures(1, &this->gl_texture_id);
     glDeleteTextures(1, &this->gl_texture_id);
     glDeleteTextures(1, &this->gl_depth_texture_id);
     glDeleteRenderbuffers(1, &this->gl_depthbuffer_id);
@@ -117,7 +126,8 @@ void Framebuffer::use_as_target() {
 
 void Framebuffer::use_as_texture() {
     glUniform1i(SE_SHADER_LOC_TEX_SCR_COLOR, 0);
-    glUniform1i(SE_SHADER_LOC_TEX_SCR_DEPTH, 1);
+    glUniform1i(SE_SHADER_LOC_TEX_SCR_BG, 1);
+    glUniform1i(SE_SHADER_LOC_TEX_SCR_DEPTH, 2);
     glUniform1i(SE_SHADER_LOC_DIMX, *this->dimx);
     glUniform1i(SE_SHADER_LOC_DIMY, *this->dimy);
     glUniform1i(SE_SHADER_LOC_MSAA_LEVEL, *this->msaa_level);
@@ -126,5 +136,7 @@ void Framebuffer::use_as_texture() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_texture_id);
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_bg_texture_id);
+    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, this->gl_depth_texture_id);
 }

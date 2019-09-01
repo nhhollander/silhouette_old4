@@ -51,6 +51,7 @@ add_library(silhouette SHARED
     src/se/entity.cpp
     src/se/entity/camera.cpp
     src/se/entity/fpCamera.cpp
+    src/se/entity/skybox.cpp
     src/se/entity/staticProp.cpp
     src/se/scene.cpp
     src/se/graphics/framebuffer.cpp

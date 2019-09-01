@@ -6,7 +6,8 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-layout(location = 0) out vec3 color;
+layout(location = LOC_OUT_COLOR) out vec3 color;
+layout(location = LOC_OUT_BG) out vec4 debug;
 
 in vec2 uv;
 in vec3 frag_pos;
@@ -26,5 +27,7 @@ void main() {
     float brightness = (light * .8) + .2;
 
     color = color * brightness;
+
+    debug = vec4(0.0, 0.0, 0.0, 0.0);
 
 }

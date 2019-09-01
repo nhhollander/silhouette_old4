@@ -12,6 +12,7 @@
 #include "se/scene.hpp"
 #include "se/entity/staticProp.hpp"
 #include "se/entity/fpCamera.hpp"
+#include "se/entity/skybox.hpp"
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/simpleRenderManager.hpp"
 
@@ -46,6 +47,9 @@ int main(int argc, char** argv) {
     cam.z = 1.524;
     cam.lock_mouse();
     srm.set_active_camera(&cam);
+
+    Skybox sb(&e, "skybox");
+    scene.register_entity(&sb);
 
     if(e.config->get_bool("render.use_sdl")) {
         while(e.threads_run) {

@@ -11,6 +11,7 @@
 // Inputs
 in vec2 uv;
 layout(location = LOC_TEX_SCR_COLOR) uniform sampler2DMS input_color;
+layout(location = LOC_TEX_SCR_BG) uniform sampler2DMS input_bg;
 layout(location = LOC_TEX_SCR_DEPTH) uniform sampler2DMS input_depth;
 layout(location = LOC_DIMX) uniform int dimx;
 layout(location = LOC_DIMY) uniform int dimy;
@@ -35,14 +36,23 @@ void main() {
         do that.  It turns out that raising the base value to the power of
         twenty-thousand happens to produce a good visual effect, even if it
         isn't technically "correct" */
-        float fog_val = pow(texelFetch(input_depth, coord, i).r, 10000);
-        vec3 fog_color = vec3(fog_val, fog_val, fog_val);
 
-        vec3 raw_color = texelFetch(input_color, coord, i).rgb;
+        float fog_depth = texelFetch(input_depth, coord, i).r;
+        if(fog_depth == 1) {
+            accum += texelFetch(input_bg, coord, i).rgb;
+            //accum += vec3(1.0, 0.0, 0.0);
+        } else {
 
-        accum += fog_color;
-        accum += raw_color;
+            float fog_val = pow(fog_depth, 10000);
+            vec3 fog_color = vec3(fog_val, fog_val, fog_val);
+
+            vec3 raw_color = texelFetch(input_color, coord, i).rgb;
+
+            accum += fog_color;
+            accum += raw_color;
+        }
     }
 
     color = accum / msaa_lev;
+
 }
