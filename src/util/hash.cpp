@@ -43,7 +43,7 @@ uint32_t util::hash::ejenkins(const char* format, ...) {
     // Create the message buffer
     char buf[message_length + 1];
     // Generate the digestable string
-    int actual_message_length = vsnprintf(buf, message_length, format, args);
+    int actual_message_length = vsnprintf(buf, message_length + 1, format, args);
     // Check for truncation
     if(actual_message_length > message_length) {
         // Potentially incomplete hash
@@ -52,6 +52,7 @@ uint32_t util::hash::ejenkins(const char* format, ...) {
     }
     // Get the length
     int input_len = strlen(buf);
+    DEBUG("Hashing string [%s]", buf);
     // Hash the data
     return jenkins((uint8_t*) &buf, input_len);
 }
