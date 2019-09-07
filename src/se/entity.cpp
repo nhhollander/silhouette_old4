@@ -14,12 +14,28 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
 
+// =====================
+// == VIRTUAL MEMBERS ==
+// =====================
+
 void se::Entity::render(glm::mat4 camera_matrix) {
     WARN("Renderable entity failed to override `render()`!");
 }
 
 void se::Entity::tick() {
     WARN("Tickable entity failed to override `tick()`!");
+}
+
+// =========================
+// == NON-VIRTUAL MEMBERS ==
+// =========================
+
+se::Entity::Entity() {
+    this->name = strdup("<name_not_set>");
+}
+
+se::Entity::~Entity() {
+    free((void*) this->name);
 }
 
 #define MATRIX(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p) { \
@@ -76,4 +92,11 @@ glm::mat4 se::Entity::get_model_matrix() {
 
 }
 
-se::Entity::~Entity() {}
+void se::Entity::set_name(const char* name) {
+    free((void*) this->name);
+    this->name = strdup(name);
+}
+
+const char* se::Entity::get_name() {
+    return this->name;
+}

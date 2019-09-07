@@ -44,11 +44,14 @@ int main(int argc, char** argv) {
     srm.set_active_scene(&scene);
 
     FPCamera cam(&e);
+    cam.set_name("camera");
     cam.z = 1.524;
     cam.lock_mouse();
     srm.set_active_camera(&cam);
+    scene.register_entity(&cam);
 
     Skybox sb(&e, "skybox");
+    sb.set_name("skybox");
     scene.register_entity(&sb);
 
     if(e.config->get_bool("render.use_sdl")) {
@@ -59,7 +62,7 @@ int main(int argc, char** argv) {
 
         QApplication qapp(argc, argv);
 
-        MainWindow w(&e, &cam);
+        MainWindow w(&e, &scene);
         w.show();
 
         DEBUG("Starting application");

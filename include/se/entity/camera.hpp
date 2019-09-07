@@ -48,6 +48,7 @@ namespace se::entity {
 
             bool is_renderable() { return false; }
             bool is_tickable() { return false; }
+            const char* get_type() { return "camera"; }
 
             /// Field of View (radians)
             const volatile float* fov;

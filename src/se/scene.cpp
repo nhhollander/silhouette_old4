@@ -29,13 +29,16 @@ void Scene::generate_default_wrapped_entity_constructors() {
         se::Scene* scene, nlohmann::json::value_type attribs){
             std::string geom_name = attribs.value<std::string>("geometry","<missing>");
             std::string text_name = attribs.value<std::string>("texture","<missing>");
+            std::string name =      attribs.value<std::string>("name","<sp_no_name>");
             if(geom_name == "<missing>" || text_name == "<missing>") {
                 ERROR("Unable to construct Static Prop! A required attribute "
                     "is missing! [geometry: %s] [texture: %s]",
                     geom_name.c_str(), text_name.c_str());
                 return (StaticProp*) nullptr;
             }
-            return new StaticProp(engine, geom_name.c_str(), text_name.c_str());
+            StaticProp* sp = new StaticProp(engine, geom_name.c_str(), text_name.c_str());
+            sp->set_name(name.c_str());
+            return sp;
         };
     this->register_constructor("staticprop", static_prop);
 }
@@ -135,16 +138,22 @@ std::vector<se::Entity*>* Scene::get_tickables() {
     return &this->tickable_entities;
 }
 
+std::map<uint8_t, se::Entity*>* Scene::get_entities() {
+    return &this->all_entities;
+}
+
 void Scene::register_entity(se::Entity* entity) {
+    uint8_t entity_hash = util::hash::ejenkins("%s", entity->get_name());
+
     for(auto i : this->all_entities) {
-        if(i == entity) {
+        if(i.second == entity) {
             // TODO: More detail?
             WARN("Attempted to register duplicate entity [%p]", entity);
             return;
         }
     }
 
-    this->all_entities.push_back(entity);
+    this->all_entities.insert(std::pair(entity_hash, entity));
 
     if(entity->is_renderable()) {
         this->renderable_entities.push_back(entity);
@@ -156,17 +165,19 @@ void Scene::register_entity(se::Entity* entity) {
 }
 
 void Scene::deregister_entity(se::Entity* entity) {
+    uint8_t entity_hash = util::hash::ejenkins("%s", entity->get_name());
     for(auto i : this->internally_loaded) {
         if(i == entity) {
             WARN("Attempted to deregister an internally managed entity");
             return;
         }
     }
-    for(size_t i = 0; i < this->all_entities.size(); i++) {
-        if(this->all_entities[i] == entity) {
-            this->all_entities.erase(this->all_entities.begin() + i);
-        }
+    // Delete from all entities list
+    auto iter = this->all_entities.find(entity_hash);
+    if(iter != this->all_entities.end()) {
+        this->all_entities.erase(iter);
     }
+    // Delete from other lists
     for(size_t i = 0; i < this->renderable_entities.size(); i++) {
         if(this->renderable_entities[i] == entity) {
             this->renderable_entities.erase(this->renderable_entities.begin() + i);
@@ -187,4 +198,15 @@ void Scene::register_constructor(const char* type, WrappedEntityConstructor cons
         return;
     }
     this->constructors.insert(std::pair(hash, constructor));
+}
+
+se::Entity* Scene::get_entity(const char* name) {
+    uint32_t hash = util::hash::ejenkins("%s", name);
+    DEBUG("Hash is [%#08X]", hash);
+    auto find = this->all_entities.find(hash);
+    if(find == this->all_entities.end()) {
+        return nullptr;
+    } else {
+        return find->second;
+    }
 }

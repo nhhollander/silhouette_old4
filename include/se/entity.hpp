@@ -44,9 +44,16 @@ namespace se {
             /// Scale along the z axis (multiplier)
             float sz = 1.0;
 
-            // = VIRTUALS =
+            /*!
+             *  Unique entity name.
+             * 
+             *  This name is used for referring to this entity when it's a part
+             *  of a scene or other collection of entities where a pointer may
+             *  not be readily availble.  It is also usable in debugging.
+             */
+            const char* name;
 
-            virtual ~Entity();
+            // = VIRTUALS =
 
             /*!
              *  Entity is Renderable.
@@ -82,7 +89,23 @@ namespace se {
              */
             virtual void tick();
 
+            /*!
+             *  Get the type name.
+             * 
+             *  The type name should be a unique identifier of the type of this
+             *  entity.
+             */
+            virtual const char* get_type() = 0;
+
             // = METHODS =
+
+            /*!
+             *  Construct a new entity.
+             */
+            Entity();
+
+            /// Entity Destructor
+            virtual ~Entity();
 
             /*!
              *  Get the Model Matrix.
@@ -95,6 +118,18 @@ namespace se {
              *  function only has real meaning for renderable entities.
              */
             glm::mat4 get_model_matrix();
+
+            /*!
+             *  Set the entity name.
+             */
+            void set_name(const char* name);
+
+            /*!
+             *  Get the entity name.
+             * 
+             *  Returns the name of the entity.
+             */
+            const char* get_name();
     };
 
 }

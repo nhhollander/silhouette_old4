@@ -36,6 +36,8 @@ namespace se::entity {
             FPCamera(se::Engine* engine);
             ~FPCamera();
 
+            const char* get_type() { return "first_person_camera"; }
+
             void tick(uint64_t clock, uint32_t cdelta);
 
             /// Lock the mouse to the center of the window

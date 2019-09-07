@@ -52,7 +52,6 @@ uint32_t util::hash::ejenkins(const char* format, ...) {
     }
     // Get the length
     int input_len = strlen(buf);
-    DEBUG("Hashing string [%s]", buf);
     // Hash the data
     return jenkins((uint8_t*) &buf, input_len);
 }

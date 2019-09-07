@@ -74,6 +74,8 @@ namespace se::entity {
             /// Static props are not tickable
             bool is_tickable() { return false; }
 
+            const char* get_type() { return "static_prop"; }
+
     };
 
 }

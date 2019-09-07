@@ -13,6 +13,7 @@
 
 #include <nlohmann/json.hpp>
 #include <vector>
+#include <map>
 
 namespace se {
 
@@ -51,7 +52,7 @@ namespace se {
             se::Engine* engine;
 
             /// All Entities
-            std::vector<Entity*> all_entities;
+            std::map<uint8_t, Entity*> all_entities;
 
             /// Renderable entities
             std::vector<Entity*> renderable_entities;
@@ -101,11 +102,20 @@ namespace se {
             /*!
              *  Get Tickable Entities.
              * 
-             *  Returns apointer to the tickable entity vector.
+             *  Returns a pointer to the tickable entity vector.
              * 
              *  **Do not add or remove entities from this vector**
              */
             std::vector<se::Entity*>* get_tickables();
+
+            /*!
+             *  Get All Entities.
+             * 
+             *  Returns a pointer to the entity map.
+             * 
+             *  **Do not add or remove entities from this vector**
+             */
+            std::map<uint8_t, se::Entity*>* get_entities();
 
             /*!
              *  Register an entity.
@@ -132,6 +142,15 @@ namespace se {
              */
             void register_constructor(
                 const char* type, WrappedEntityConstructor constructor);
+
+            /*!
+             *  Get an entity by name.
+             * 
+             *  Attempts to find the requested entity in the list of all
+             *  registered entities.  If it can not be found, a null pointer
+             *  will be returned.
+             */
+            se::Entity* get_entity(const char* name);
 
     };
 

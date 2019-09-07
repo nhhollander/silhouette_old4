@@ -64,6 +64,8 @@ namespace se::entity {
             /// Skyboxes are not tickable
             bool is_tickable() { return false; }
 
+            const char* get_type() { return "skybox"; }
+
     };
 
 }
