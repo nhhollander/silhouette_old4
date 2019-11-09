@@ -4,19 +4,19 @@ Silhouette is a basic 3D engine written in OpenGL.  I started work on Silhouette
 
 ## Dependencies
 
-Silhouette depends on the following packages and utilities.  If you are on linux, these dependencies can be automatically installed by running the 
+Silhouette depends on the following packages.  They can be automatically installed by running `setup_linux.sh`.
 
  * `git`
- * `libgl-dev`
- * `libglu1-mesa-dev`
+ * `libgl-dev` 
+ * `libglu1-mesa-dev` 
  * `libpng-dev`
  * `libglm-dev`
- * `nlohmann-json-dev`
+ * `nlohmann-json-dev` 
  * `make`
  * `cmake`
- * `gcc`, included with Debian's `build-essential` package
- * `glew`, see `./scripts/install_glew_linux.sh`
- * `sdl2`, see `./scripts/install_sdl2_linux.sh`
+ * `build-essential`
+ * `libglew-dev`
+ * `libsdl2-dev`
 
 ## Building
 
