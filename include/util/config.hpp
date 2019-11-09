@@ -32,8 +32,8 @@
  *  function and automatically converts it to a static callable with the
  *  appropriate arguments needed to be treated as a `util::ConfigChangeHandler`.
  * 
- *  For example, to create a static configuration change handler that wraps the
- *  method `bar` in class `Foo` in namespace `baz`, you would do the following:
+ *  For example, to create a non-static configuration change handler that wraps
+ *  the non-static method `bar` in class `baz::Foo`, you would do the following:
  * 
  *  ```c++
  *  util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(baz::Foo::bar);
@@ -74,33 +74,37 @@ namespace util {
             void invoke_change_handlers();
 
             /*!
+             *  Passkey used for bypassing lock from authorized application
+             *  components.  If this value is 0, the passkey is disabled.
+             * 
+             *  TODO: Is the passkey pattern actually a good idea?  I feel like
+             *  I might be making a terrible mistake...
+             */
+            uint64_t passkey = 0;
+
+            /*!
              *  Write Lock.
              * 
              *  The write lock prevents the value of this configuration value
              *  from being changed accidentally.
              * 
-             *  **Warning: *This is not a secure lock*, it is intended to
-             *  prevent accidental changes to values which are logically
-             *  constant.**  For example, the silhouette engine value
-             *  "window.dimx" is used to create frame buffers and texture, but
-             *  no mechanism is or likely will be implemented to automatically
-             *  re-initialize when the value is changed.  Because of this, there
-             *  is no legitimate situation where a change to this value would
-             *  lead to anything other than unexpected behavior.
+             *  **Warning: *This is not a secure lock*, it is intended only to
+             *  prevent accidental changes to values which are logically fixed,
+             *  or must only be changed under special circumstances.  For
+             *  example, the silhouette engine value "internal.gl.outputfbid"
+             *  represents the OpenGL output buffer ID.  There is no reson to
+             *  change this value except when rendering to an external GL target
+             *  from an embedded QT widget.  To prevent the application from
+             *  attempting to render to an invalid target, this value must not
+             *  be touched except by the QT module.
              * 
-             *  **Warning: *This is not a secure lock*, it is intended to
-             *  prevent accidental changes to logically constant values.**
+             *  A passkey may be set when locking a variable to permit certain
+             *  authorized parts of the application the ability to write to a
+             *  locked variable.
              * 
-             *  For example, the silhouette engine value `window.dimx` is used
-             *  to create the window and initialize the graphics pipeline.  At
-             *  this time, there is no support for display re-sizing, and such
-             *  changes to this value will be ignored, or worse, cause undefined
-             *  behavior in other parts of the application.  To prevent such a
-             *  situation, this value is write-locked on engine initialization.
-             * 
-             *  When attempting to write to a locked variable, a warning will
-             *  be printed to the console, the value will remain unchanged, and
-             *  `false` will be returned.
+             *  When attempting to write to a locked variable without the
+             *  appropriate passkey, a warning will be printed to the console,
+             *  the value will remain unchanged, and `false` will be returned.
              * 
              *  The following values may be used:
              *  | Value                   | Description                        |
@@ -138,69 +142,94 @@ namespace util {
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
+             *  A passkey may be given to permit modifications to locked values.
+             * 
              *  @param src  Input string
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(const std::string src);
+            bool set(const std::string src, uint64_t pk = 0);
             /*!
              *  Update the configuration value from a c string.
              * 
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
+             *  A passkey may be given to permit modifications to locked values.
+             * 
              *  @param src  Input c string
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(const char* src);
+            bool set(const char* src, uint64_t pk = 0);
             /*!
              *  Update the configuration value from an integer.
              * 
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
+             *  A passkey may be given to permit modifications to locked values.
+             * 
              *  @param src  Input integer
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(int src);
+            bool set(int src, uint64_t pk = 0);
             /*!
              *  Update the configuration value from a float.
              * 
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
-             *  @param src  Input double
+             *  A passkey may be given to permit modifications to locked values.
+             * 
+             *  @param src  Input float
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(float src);
+            bool set(float src, uint64_t pk = 0);
             /*!
              *  Update the configuration value from a double.
              * 
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
+             *  A passkey may be given to permit modifications to locked values.
+             * 
              *  @param src  Input double
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(double src);
+            bool set(double src, uint64_t pk = 0);
             /*!
              *  Update the configuration value from a boolean.
              * 
              *  If this value is locked, a warning will be generated and this
              *  method will return `false`.
              * 
+             *  A passkey may be given to permit modifications to locked values.
+             * 
              *  @param src  Input bool
+             *  @param pk   Lock bypass key
              * 
              *  @return `true` on success, `false` on failure.
              */
-            bool set(bool src);
+            bool set(bool src, uint64_t pk = 0);
 
-            /// Lock this configuration value
-            void lock();
+            /*!
+             *  Lock this configuration value.
+             * 
+             *  An optional passkey may be provided here to permit modifications
+             *  from authorized application components.
+             * 
+             *  A passkey value of zero disables the passkey system.
+             */
+            void lock(uint64_t pk = 0);
             /// Get the lock status
             int lock_status();
 
@@ -284,12 +313,33 @@ namespace util {
              *  This method reads data from the specified file, and passes it to
              *  the `parse()` method for loading.
              * 
+             *  Errors are defined as following:
+             * 
+             * | Code | Description                                         |
+             * |------|-----------------------------------------------------|
+             * | -1   | Failed to open configuration file                   |
+             * | -2   | Failed to locate end of configuration file (seek)   |
+             * | -3   | Failed to locate end of configuration file (tell)   |
+             * | -4   | Failed to return to beginning of configuration file |
+             * 
              *  @param fname    Name of the file to parse
              * 
              *  @return The number of entities loaded, or a negative number if
              *          an error prevented the file from being read.
              */
             int load(const char* fname);
+
+            /*!
+             *  Create a configuration value if it does not already exist.
+             * 
+             *  This function is intended to be called before retrieving a
+             *  pointer to a configuration value where that value may not yet
+             *  exist.
+             * 
+             *  @return `true` if the configuration value was created, or
+             *          `false` if it already existed.
+             */
+            bool create_if_non_existant(const char* key);
 
             /*!
              *  Get a configuration value.
@@ -506,12 +556,16 @@ namespace util {
              *  key, a warning will be generated unless the create parameter is
              *  set to true.
              * 
+             *  An optional parameter `pk` may be set to provide a passkey for
+             *  modifying locked configuration values.
+             * 
              *  @param key      Lookup key
              *  @param value    Value to set
+             *  @param pk       Passkey for locked values.
              * 
              *  @return `true` on insertion, `false` otherwise.
              */
-            bool set(const char* key, const char* value, bool create = false);
+            bool set(const char* key, const char* value, bool create = false, uint64_t pk = 0);
 
             /*!
              *  Set an integer.
@@ -523,12 +577,16 @@ namespace util {
              *  key, a warning will be generated unless the create parameter is
              *  set to true.
              * 
+             *  An optional parameter `pk` may be set to provide a passkey for
+             *  modifying locked configuration values.
+             * 
              *  @param key      Lookup key
              *  @param value    Value to set
+             *  @param pk       Passkey for locked values.
              * 
              *  @return `true` on insertion, `false` otherwise.
              */
-            bool set(const char* key, int value, bool create = false);
+            bool set(const char* key, int value, bool create = false, uint64_t pk = 0);
 
             /*!
              *  Set a double.
@@ -540,12 +598,16 @@ namespace util {
              *  key, a warning will be generated unless the create parameter is
              *  set to true.
              * 
+             *  An optional parameter `pk` may be set to provide a passkey for
+             *  modifying locked configuration values.
+             * 
              *  @param key      Lookup key
              *  @param value    Value to set
+             *  @param pk       Passkey for locked values.
              * 
              *  @return `true` on insertion, `false` otherwise.
              */
-            bool set(const char* key, double value, bool create = false);
+            bool set(const char* key, double value, bool create = false, uint64_t pk = 0);
 
             /*!
              *  Set a boolean.
@@ -557,12 +619,16 @@ namespace util {
              *  key, a warning will be generated unless the create parameter is
              *  set to true.
              * 
+             *  An optional parameter `pk` may be set to provide a passkey for
+             *  modifying locked configuration values.
+             * 
              *  @param key      Lookup key
              *  @param value    Value to set
+             *  @param pk       Passkey for locked values.
              * 
              *  @return `true` on insertion, `false` otherwise.
              */
-            bool set(const char* key, bool value, bool create = false);
+            bool set(const char* key, bool value, bool create = false, uint64_t pk = 0);
 
     };
 

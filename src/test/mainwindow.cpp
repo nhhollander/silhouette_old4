@@ -35,7 +35,7 @@ MainWindow::MainWindow(se::Engine* engine, se::Scene* scene, QWidget *parent) :
     for(auto i : engine->config->config_values) {
         const char* name = i.second->ref_name;
         const char* value = (const char*) i.second->cstring_;
-
+        DEBUG("Config: %s: %s", name, value);
     }
 
 }

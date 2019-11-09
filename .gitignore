@@ -7,3 +7,5 @@ docs/generated
 # Ignore temporary engine files
 data/temp/
 data/cache/
+# Ignore QT Creator autosave files
+*.ui.autosave

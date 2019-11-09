@@ -148,6 +148,21 @@ int util::Configuration::load(const char* fname) {
 
 }
 
+bool util::Configuration::create_if_non_existant(const char* key) {
+    insertion_lock.lock();
+
+    uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+    auto lookup = this->config_values.find(key_hash);
+    if(lookup == this->config_values.end()) {
+        // Create the value
+        DEBUG("Creating empty configuration value for key [%s]", key);
+        util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+        this->config_values.insert(std::pair(key_hash, ncv));
+    }
+
+    insertion_lock.unlock();
+}
+
 util::ConfigurationValue* util::Configuration::get(const char* key, bool quiet) {
     uint32_t key_hash = util::hash::jenkins(key, strlen(key));
     auto lookup = this->config_values.find(key_hash);
@@ -286,7 +301,7 @@ bool util::Configuration::get_bool(const char* key, bool default_) {
     return (bool) cv->bool_;
 }
 
-bool util::Configuration::set(const char* key, const char* value, bool create) {
+bool util::Configuration::set(const char* key, const char* value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
@@ -308,7 +323,7 @@ bool util::Configuration::set(const char* key, const char* value, bool create) {
         }
     } else {
         // Set the value
-        cv->set(value);
+        cv->set(value, pk);
     }
 
     if(create) {
@@ -318,7 +333,7 @@ bool util::Configuration::set(const char* key, const char* value, bool create) {
     return true;
 }
 
-bool util::Configuration::set(const char* key, int value, bool create) {
+bool util::Configuration::set(const char* key, int value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
@@ -340,7 +355,7 @@ bool util::Configuration::set(const char* key, int value, bool create) {
         }
     } else {
         // Set the value
-        cv->set(value);
+        cv->set(value, pk);
     }
 
     if(create) {
@@ -350,7 +365,7 @@ bool util::Configuration::set(const char* key, int value, bool create) {
     return true;
 }
 
-bool util::Configuration::set(const char* key, double value, bool create) {
+bool util::Configuration::set(const char* key, double value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
@@ -372,7 +387,7 @@ bool util::Configuration::set(const char* key, double value, bool create) {
         }
     } else {
         // Set the value
-        cv->set(value);
+        cv->set(value, pk);
     }
 
     if(create) {
@@ -382,7 +397,7 @@ bool util::Configuration::set(const char* key, double value, bool create) {
     return true;
 }
 
-bool util::Configuration::set(const char* key, bool value, bool create) {
+bool util::Configuration::set(const char* key, bool value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
@@ -404,7 +419,7 @@ bool util::Configuration::set(const char* key, bool value, bool create) {
         }
     } else {
         // Set the value
-        cv->set(value);
+        cv->set(value, pk);
     }
 
     if(create) {

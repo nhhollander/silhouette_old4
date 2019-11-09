@@ -5,6 +5,12 @@
 #include "util/config.hpp"
 #include "util/log.hpp"
 
+/*!
+ *  Ranomly generated passkey for permitting modifications to the special
+ *  internal.gl.outputfbid variable.
+*/
+#define OUTPUT_FBID_PASSKEY 0xb2f131ae43c55c86
+
 using namespace se::graphics;
 
 // ====================
@@ -20,6 +26,8 @@ QTSilhouetteWidget::~QTSilhouetteWidget() {
 
 void QTSilhouetteWidget::configure(se::Engine* engine) {
     this->engine = engine;
+    // Lock output fbid variable
+    engine->config->get("internal.gl.outputfbid")->lock(OUTPUT_FBID_PASSKEY);
     // Configure the surface
     int gl_major = engine->config->get_int("render.gl.major", 0);
     int gl_minor = engine->config->get_int("render.gl.minor", 0);
@@ -44,7 +52,9 @@ void QTSilhouetteWidget::initializeGL() {
 }
 
 void QTSilhouetteWidget::paintGL() {
-    this->engine->config->set("internal.gl.outputfbid", (int) this->defaultFramebufferObject());
+    this->engine->config->set(
+        "internal.gl.outputfbid", (int) this->defaultFramebufferObject(),
+        false, OUTPUT_FBID_PASSKEY);
     this->engine->graphics_controller->do_frame();
 
     // Check for pending tasks and initiate refresh

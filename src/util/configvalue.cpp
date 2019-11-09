@@ -32,16 +32,23 @@ util::ConfigurationValue::~ConfigurationValue() {
 // = PUBLIC MEMBERS =
 // ==================
 
-bool util::ConfigurationValue::set(const std::string src) {
+bool util::ConfigurationValue::set(const std::string src, uint64_t pk) {
     // Forward as a c string
-    return this->set(src.c_str());
+    return this->set(src.c_str(), pk);
 }
 
-bool util::ConfigurationValue::set(const char* src) {
+bool util::ConfigurationValue::set(const char* src, uint64_t pk) {
     // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
-        WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
-        return false;
+        if(this->passkey != 0) {
+            if(this->passkey != pk) {
+                WARN("Invalid passkey when writing to locked configuratrion value [%s]", this->ref_name);
+                return false;
+            }
+        } else {
+            WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
+            return false;
+        }
     }
     // Allocate a new string
     delete[] this->cstring_;
@@ -104,11 +111,18 @@ bool util::ConfigurationValue::set(const char* src) {
     return true;
 }
 
-bool util::ConfigurationValue::set(int src) {
-    // Check for lock
+bool util::ConfigurationValue::set(int src, uint64_t pk) {
+    // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
-        WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
-        return false;
+        if(this->passkey != 0) {
+            if(this->passkey != pk) {
+                WARN("Invalid passkey when writing to locked configuratrion value [%s]", this->ref_name);
+                return false;
+            }
+        } else {
+            WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
+            return false;
+        }
     }
     // Interpretation of integers is pretty darn easy
     delete[] this->cstring_;
@@ -131,14 +145,21 @@ bool util::ConfigurationValue::set(int src) {
     }
     return true;
 }
-bool util::ConfigurationValue::set(float src) {
+bool util::ConfigurationValue::set(float src, uint64_t pk) {
     return this->set((double) src);
 }
-bool util::ConfigurationValue::set(double src) {
-    // Check for lock
+bool util::ConfigurationValue::set(double src, uint64_t pk) {
+    // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
-        WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
-        return false;
+        if(this->passkey != 0) {
+            if(this->passkey != pk) {
+                WARN("Invalid passkey when writing to locked configuratrion value [%s]", this->ref_name);
+                return false;
+            }
+        } else {
+            WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
+            return false;
+        }
     }
     // Interpretation of integers is pretty darn easy
     delete[] this->cstring_;
@@ -162,11 +183,18 @@ bool util::ConfigurationValue::set(double src) {
     return true;
 }
 
-bool util::ConfigurationValue::set(bool src) {
-    // Check for lock
+bool util::ConfigurationValue::set(bool src, uint64_t pk) {
+    // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
-        WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
-        return false;
+        if(this->passkey != 0) {
+            if(this->passkey != pk) {
+                WARN("Invalid passkey when writing to locked configuratrion value [%s]", this->ref_name);
+                return false;
+            }
+        } else {
+            WARN("Attempted to write to locked configuration value [%s]", this->ref_name);
+            return false;
+        }
     }
     delete[] this->cstring_;
     this->cstring_ = new char[6];
@@ -202,8 +230,11 @@ bool util::ConfigurationValue::set(bool src) {
     return true;
 }
 
-void util::ConfigurationValue::lock() {
+void util::ConfigurationValue::lock(uint64_t pk) {
     this->write_lock = CV_WRITE_LOCK_LOCKED;
+    this->passkey = pk;
+    DEBUG("Configuration value [%s] locked (passkey: %s)", this->ref_name,
+        (pk == 0) ? "FALSE" : "TRUE");
 }
 
 int util::ConfigurationValue::lock_status() {
