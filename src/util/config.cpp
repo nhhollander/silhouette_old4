@@ -151,6 +151,7 @@ int util::Configuration::load(const char* fname) {
 bool util::Configuration::create_if_non_existant(const char* key) {
     insertion_lock.lock();
 
+    bool result = false;
     uint32_t key_hash = util::hash::jenkins(key, strlen(key));
     auto lookup = this->config_values.find(key_hash);
     if(lookup == this->config_values.end()) {
@@ -158,9 +159,12 @@ bool util::Configuration::create_if_non_existant(const char* key) {
         DEBUG("Creating empty configuration value for key [%s]", key);
         util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
         this->config_values.insert(std::pair(key_hash, ncv));
+        result = true;
     }
 
     insertion_lock.unlock();
+    
+    return result;
 }
 
 util::ConfigurationValue* util::Configuration::get(const char* key, bool quiet) {

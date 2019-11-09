@@ -6,6 +6,8 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
+#ifdef SE_ENABLE_QT_WIDGET_SUPPORT
+
 #ifndef _SE_GRAPHICS_QTSILHOUETTEWIDGET_H_
 #define _SE_GRAPHICS_QTSILHOUETTEWIDGET_H_
 
@@ -44,4 +46,5 @@ namespace se::graphics {
 
 }
 
+#endif
 #endif

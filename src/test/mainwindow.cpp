@@ -1,3 +1,12 @@
+/*!
+ *  @file src/test/mainwindow.cpp
+ * 
+ *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
+ * 
+ *  Licensed under the MIT license (see LICENSE for the complete text)
+ */
+
+#ifdef SE_ENABLE_QT_WIDGET_SUPPORT
 
 #include "se/graphics/graphicsController.hpp"
 #include "se/engine.hpp"
@@ -151,3 +160,5 @@ void MainWindow::on_entity_list_itemDoubleClicked(QListWidgetItem *item)
 
     this->no_update_entity = false;
 }
+
+#endif

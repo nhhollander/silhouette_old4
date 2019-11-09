@@ -23,8 +23,10 @@
 #include <cstdlib>
 #include <vector>
 
+#ifdef SE_ENABLE_QT_WIDGET_SUPPORT
 #include "mainwindow.h"
 #include <QApplication>
+#endif
 
 using namespace se;
 using namespace se::entity;
@@ -60,6 +62,7 @@ int main(int argc, char** argv) {
         }
     } else {
 
+        #ifdef SE_ENABLE_QT_WIDGET_SUPPORT
         QApplication qapp(argc, argv);
 
         MainWindow w(&e, &scene);
@@ -67,6 +70,9 @@ int main(int argc, char** argv) {
 
         DEBUG("Starting application");
         return qapp.exec();
+        #else
+        FATAL("Attempted to create QT window, but QT libraries were not found when buildilng!");
+        #endif
     }
 
 

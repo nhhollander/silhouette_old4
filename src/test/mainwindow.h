@@ -1,3 +1,5 @@
+#ifdef SE_ENABLE_QT_WIDGET_SUPPORT
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -59,3 +61,5 @@ class MainWindow : public QMainWindow {
 };
 
 #endif // MAINWINDOW_H
+
+#endif

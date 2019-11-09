@@ -1,3 +1,13 @@
+/*!
+ *  @file src/se/graphics/qtSilhouetteWidget.cpp
+ * 
+ *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
+ * 
+ *  Licensed under the MIT license (see LICENSE for the complete text)
+ */
+
+#ifdef SE_ENABLE_QT_WIDGET_SUPPORT
+
 #include "se/engine.hpp"
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/qtSilhouetteWidget.hpp"
@@ -79,3 +89,5 @@ QSize QTSilhouetteWidget::sizeHint() const {
 // =====================
 // == PRIVATE MEMBERS ==
 // =====================
+
+#endif

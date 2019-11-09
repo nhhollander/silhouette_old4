@@ -23,16 +23,21 @@ include_directories(include)
 # Use c++ 17
 set(CMAKE_CXX_STANDARD 17)
 
-# Enable QT
-set(CMAKE_AUTOUIC_SEARCH_PATHS ./forms)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
+# Optionally enable QT build components
+find_package(Qt5 COMPONENTS Widgets OpenGL)
+if(Qt5_FOUND)
+    set(CMAKE_AUTOUIC_SEARCH_PATHS ./forms)
+    set(CMAKE_AUTOMOC ON)
+    set(CMAKE_AUTOUIC ON)
+    set(SE_QT_LIB_NAME "Qt5::OpenGL Qt5::Widgets")
+    add_compile_options(-DSE_ENABLE_QT_WIDGET_SUPPORT)
+else()
+    message(WARNING "QT SDK was not found on this system, QT components will not be built")
+endif()
 
 # Calculate the log text offset (workaround for absolute paths in cmake)
 string(LENGTH ${CMAKE_SOURCE_DIR}/src/ UTIL_LOG_PATH_OFFSET)
 add_compile_options(-DUTIL_LOG_PATH_OFFSET=${UTIL_LOG_PATH_OFFSET})
-add_compile_options(-DSE_ENABLE_QT_WIDGET_SUPPORT)
 
 # Add the utility library
 add_library(seutil SHARED
@@ -70,7 +75,7 @@ add_library(silhouette SHARED
     src/se/logic/logicController.cpp
 )
 # Link to required libraries
-target_link_libraries(silhouette GL SDL2 seutil GLEW Qt5::OpenGL)
+target_link_libraries(silhouette GL SDL2 seutil GLEW ${SE_QT_LIB_NAME})
 
 # Add the test implementation
 add_executable(se_test
@@ -78,4 +83,4 @@ add_executable(se_test
     src/test/mainwindow.cpp
 )
 # Link to the required libraries
-target_link_libraries(se_test GL GLEW silhouette seutil pthread png Qt5::Widgets)
+target_link_libraries(se_test GL GLEW silhouette seutil pthread png ${SE_QT_LIB_NAME})
