@@ -14,7 +14,7 @@
 #include "se/graphics/renderManager.hpp"
 #include "se/graphics/shader.hpp"
 #include "se/graphics/shaderProgram.hpp"
-#include "se/graphics/texture.hpp"
+#include "se/graphics/imageTexture.hpp"
 
 #include "util/log.hpp"
 
@@ -28,7 +28,7 @@ StaticProp::StaticProp(se::Engine* engine, const char* model, const char* textur
     this->model_name = strdup(model);
     this->texture_name = strdup(texture);
     this->geometry = se::graphics::Geometry::get_geometry(engine, model);
-    this->texture = se::graphics::Texture::get_texture(engine, texture);
+    this->texture = se::graphics::ImageTexture::get_texture(engine, texture);
     this->shader_program = se::graphics::ShaderProgram::get_program(
         engine, "static_prop", "", "static_prop", "");
     this->geometry->increment_active_users();

@@ -39,7 +39,7 @@ namespace se::entity {
              *  be replaced by a more configurable system with multiple types
              *  of textures to be applied to models.
              */
-            se::graphics::Texture* texture;
+            se::graphics::ImageTexture* texture;
 
             /*!
              *  Model Name.

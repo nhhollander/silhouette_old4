@@ -1,58 +1,47 @@
 /*!
- *  @file include/se/graphics/texture.hpp
+ *  @file include/se/graphics/imageTexture.hpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _SE_GRAPHICS_TEXTURE_H_
-#define _SE_GRAPHICS_TEXTURE_H_
+#ifndef _SE_GRAPHICS_IMAGETEXTURE_H_
+#define _SE_GRAPHICS_IMAGETEXTURE_H_
 
-#include "se/graphics/graphicsResource.hpp"
-
-#include "se/fwd.hpp"
+#include "se/graphics/texture.hpp"
 
 namespace se::graphics {
 
     /*!
-     *  Texture Class.
+     *  Image Texture Class.
+     * 
+     *  Image textures are populated with data loaded from PNG or other
+     *  image files.
      */
-    class Texture : public GraphicsResource {
+    class ImageTexture : public Texture {
 
         private:
 
             /*!
-             *  Construct a new Texture.
+             *  Construct a new ImageTexture.
              * 
              *  This function creates new entries in the graphics resource
              *  cache, and should be called paringly.  Textures should be
              *  obtained by calling the `get_texture()`.
              */
-            Texture(se::Engine* engine, const char* name);
-
-        protected:
-
-            /*!
-             *  Construct a new Texture (for child classes).
-             * 
-             *  This function creates new entries in the graphics resource
-             *  cache, and should be called paringly.  Textures should be
-             *  obtained by calling the `get_texture()`.
-             * 
-             *  The hash parameter specifies which hash should be used when
-             *  inserting this texture into the graphics resource cache.
-             */
-            Texture(se::Engine* engine, const char* name, uint32_t hash);
-
-            /// Texture Name
-            const char* name;
-
-            /// Parent Engine
-            se::Engine* engine;
+            ImageTexture(se::Engine* engine, const char* name);
 
             /// Texture Destructor
-            ~Texture();
+            ~ImageTexture();
+
+            /*!
+             *  Raw Decoded Texture Data.
+             * 
+             *  Contains the raw pixels as read from whatever image format this
+             *  texture was in.
+             */
+            char* raw_texture = nullptr;
 
             /*!
              *  Bind texture data to the GPU.
@@ -70,18 +59,10 @@ namespace se::graphics {
              */
             virtual void unbind();
 
-            /// Buffer Width
-            int width = 0;
-            /// Buffer Height
-            int height = 0;
+        protected:
 
-            /// OpenGL texture ID
-            unsigned int gl_texture = 0;
-
-            /// @see graphicsResource.hpp
             virtual void load_();
 
-            /// @see graphicsResource.hpp
             virtual void unload_();
 
         public:
@@ -91,12 +72,8 @@ namespace se::graphics {
              * 
              *  This method attempts to retrieve a texture from the texture
              *  cache, and failing that instantiates a new object.
-             * 
-             *  Setting the `virt` flag to `true` indicates that this is a
-             *  virtual texture which should not be loaded from disk.
              */
-            static Texture* get_texture(se::Engine* engine, const char* name,
-                bool virt = false);
+            static ImageTexture* get_texture(se::Engine* engine, const char* name);
 
             /*!
              *  Make this the active texture.

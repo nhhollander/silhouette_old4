@@ -31,6 +31,7 @@ namespace se {
         class GraphicsController;
         class GraphicsEventHandler;
         class GraphicsResource;
+        class ImageTexture;
         class RenderManager;
         class SimpleRenderManager;
         class Screen;
