@@ -11,6 +11,8 @@
 
 #include "se/fwd.hpp"
 
+#include "GL/glew.h"
+
 namespace se::graphics {
 
     /// Framebuffer State
@@ -20,6 +22,12 @@ namespace se::graphics {
         INITIALIZED,
         DE_INITIALIZING,
         ERROR
+    };
+
+    /// Framebuffer type
+    enum class FramebufferType {
+        MULTISAMPLE,
+        SINGLESAMPLE
     };
 
     /*!
@@ -39,9 +47,6 @@ namespace se::graphics {
             /// Parent Engine.
             se::Engine* engine;
 
-            /// Buffer Location
-            unsigned int location;
-
             /// OpenGL id for the framebuffer.
             unsigned int gl_framebuffer_id = 0;
 
@@ -56,6 +61,18 @@ namespace se::graphics {
 
             /// OpenGL id for the depth texture.
             unsigned int gl_depth_texture_id = 0;
+
+            /// Base texture unit is enabled.
+            bool base_texture_enabled;
+
+            /// Background texture unit is enabled.
+            bool bg_texture_enabled;
+
+            /// Depth texture unit is enabled.
+            bool depth_texture_enabled;
+
+            /// Texture wrapping mode
+            GLenum texture_wrapping_mode;
 
             /// Pointer to the screen width.
             const volatile int* dimx;
@@ -74,6 +91,9 @@ namespace se::graphics {
 
             /// Status.
             FramebufferState state = FramebufferState::NOT_INITIALIZED;
+
+            /// Framebuffer type
+            FramebufferType type = FramebufferType::MULTISAMPLE;
 
             /// Re-initialize
             void re_init();
@@ -99,20 +119,29 @@ namespace se::graphics {
             /*!
              *  Create a new framebuffer.
              * 
-             *  The `layout` parameter specifies which color attachment point
-             *  the internal buffer will be bound to.  When rendering to this
-             *  framebuffer, use the same location attribute in the shader
-             *  program as was used when creating this buffer.
+             *  Buffers can be either multisampled or single-sampled.
              * 
-             *  For example, if you create this buffer with `location=4`, then
-             *  your fragment shader should have
-             *  `layout(location=5) out vec3 color`.  The resultant value of 
-             *  color will be stored as a pixel in the image.
+             *  The three `*_texture_enabled` attributes determine which of the
+             *  available render layers are allocated and used by this buffer.
+             *  By default all available layers are enabled.
+             * 
+             *  The texture wrapping mode specifies how edge cases of the
+             *  internal textures will be handled.  By default this value is set
+             *  to `GL_REPEAT`.
              * 
              *  @param engine   Parent engine
-             *  @param location Output attachment location
+             *  @param type     Framebuffer type
+             *  @param base_texture_enabled
+             *  @param bg_texture_enabled
+             *  @param depth_texture_enalbed
+             *  @param texture_wrapping_mode
              */
-            Framebuffer(Engine* engine, unsigned int location);
+            Framebuffer(Engine* engine,
+                FramebufferType type = FramebufferType::MULTISAMPLE,
+                bool base_texture_enabled = true,
+                bool bg_texture_enabled = true,
+                bool depth_texture_enabled = true,
+                GLenum texture_wrapping_mode = GL_REPEAT);
 
             /// Destroy the framebuffer
             ~Framebuffer();

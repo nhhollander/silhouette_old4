@@ -30,6 +30,8 @@ namespace se::graphics {
 
             /// Screen shader program
             se::graphics::ShaderProgram* screen_program;
+            /// Screen post-process shading program
+            se::graphics::ShaderProgram* post_process_program;
 
             /// OpenGL id for the screen vertex array
             unsigned int gl_screen_vert_array_id = 0;
@@ -37,7 +39,9 @@ namespace se::graphics {
             unsigned int gl_screen_vert_buffer_id = 0;
 
             /// Render framebuffer
-            Framebuffer* framebuffer;
+            Framebuffer* primarybuffer;
+            /// Post processing buffer
+            Framebuffer* postprocessbuffer;
 
             /// Ready to rumble flag
             bool ready = false;

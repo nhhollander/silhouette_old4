@@ -180,6 +180,8 @@ void ShaderProgram::load_() {
 
     this->resource_state = GraphicsResourceState::LOADING;
 
+    DEBUG("Loading shader program with fs [%s.frag]", fsname);
+
     // Get the shaders
     this->vshader = Shader::get_shader(engine, vsname, GL_VERTEX_SHADER, vdefines);
     this->fshader = Shader::get_shader(engine, fsname, GL_FRAGMENT_SHADER, fdefines);

@@ -59,28 +59,44 @@ Screen::Screen(se::Engine* engine) {
     this->screen_program = ShaderProgram::get_program(
         engine, "screen", "", "screen", "");
     this->screen_program->increment_active_users();
+    this->post_process_program = ShaderProgram::get_program(
+        engine, "screen", "", "screen_post", "");
+    this->post_process_program->increment_active_users();
     this->engine->graphics_controller->submit_graphics_task([this](){
         this->init();
     });
-    this->framebuffer = new Framebuffer(engine, 0);
+    this->primarybuffer = new Framebuffer(engine);
+    this->postprocessbuffer = new Framebuffer(engine,
+        FramebufferType::SINGLESAMPLE, true, false, false, GL_CLAMP_TO_EDGE);
 }
 
 Screen::~Screen() {
     this->screen_program->decrement_active_users();
-    delete this->framebuffer;
+    delete this->primarybuffer;
+    delete this->postprocessbuffer;
 }
 
 void Screen::activate_framebuffer() {
     if(!this->ready) { return; }
-    this->framebuffer->use_as_target();
+    this->primarybuffer->use_as_target();
 }
 
 void Screen::render() {
     if(!this->ready) { return; }
-    glBindFramebuffer(GL_FRAMEBUFFER, *this->output_fbid);
+
+    // First pass
+    this->postprocessbuffer->use_as_target();
+    this->primarybuffer->use_as_texture();
     this->screen_program->use_program();
     glBindVertexArray(this->gl_screen_vert_array_id);
     glDisable(GL_DEPTH_TEST);
-    this->framebuffer->use_as_texture();
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // Second pass
+    DEBUG("Beginning second pass");
+    glBindFramebuffer(GL_FRAMEBUFFER, *this->output_fbid);
+    this->postprocessbuffer->use_as_texture();
+    this->post_process_program->use_program();
+    glBindVertexArray(this->gl_screen_vert_array_id);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

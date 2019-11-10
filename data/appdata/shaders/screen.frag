@@ -1,7 +1,9 @@
 /*!
  *  Screen Output Fragment Shader.
  *
- *  This shader combines and renders frame buffers to the display.
+ *  This shader combines and renders frame buffers to the post processing
+ *  buffer.  There are certain operationst that can not reasonably be performed
+ *  in a single pass.
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
@@ -19,7 +21,7 @@ layout(location = LOC_MSAA_LEVEL) uniform int msaa_lev;
 layout(location = LOC_CAM_NEAR) uniform float cam_near;
 layout(location = LOC_CAM_FAR) uniform float cam_far;
 
-out vec3 color;
+layout(location = LOC_OUT_COLOR) out vec3 color;
 
 float linearDepth(float depthSample);
 
@@ -31,11 +33,6 @@ void main() {
     ivec2 coord = ivec2(x,y);
     vec3 accum = vec3(0,0,0);
     for(int i = 0; i < msaa_lev; i++) {
-        /* Calculate fog density.  This should involve depth buffer
-        linearization, but I have been completely unable to figure out how to
-        do that.  It turns out that raising the base value to the power of
-        twenty-thousand happens to produce a good visual effect, even if it
-        isn't technically "correct" */
 
         float fog_depth = texelFetch(input_depth, coord, i).r;
         if(fog_depth == 1) {
@@ -43,6 +40,11 @@ void main() {
             //accum += vec3(1.0, 0.0, 0.0);
         } else {
 
+            /* TODO: This is a pretty hacky and inaccurate way of calculating
+            the fog value.  Ideally it should linearize the depth buffer, but I
+            can not for the life of me figure out how to calculate that.  In the
+            meantime, this quick and dirty hack of raising the value to the
+            power of 10000 produces acceptable results. */
             float fog_val = pow(fog_depth, 10000);
             vec3 fog_color = vec3(fog_val, fog_val, fog_val);
 
