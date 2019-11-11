@@ -14,7 +14,7 @@
 #include "se/graphics/renderManager.hpp"
 #include "se/graphics/shader.hpp"
 #include "se/graphics/shaderProgram.hpp"
-#include "se/graphics/texture.hpp"
+#include "se/graphics/imageTexture.hpp"
 
 #include "util/log.hpp"
 
@@ -34,7 +34,7 @@ using namespace se::graphics;
 Skybox::Skybox(se::Engine* engine, const char* texture) {
     this->engine = engine;
     this->texture_name = strdup(texture);
-    this->texture = Texture::get_texture(engine, texture);
+    this->texture = ImageTexture::get_texture(engine, texture);
     this->shader_program = 
         ShaderProgram::get_program(engine, "skybox", "", "skybox", "");
     this->geometry = Geometry::get_geometry(engine, "skybox");

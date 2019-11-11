@@ -42,39 +42,19 @@ ImageTexture::~ImageTexture() {
 }
 
 void ImageTexture::bind() {
-    /* Is clearing the error queue actually necessary?  I'm not sure. */
-    while(glGetError() != GL_NO_ERROR) {}
 
-    glGenTextures(1, &this->gl_texture);
-    glBindTexture(GL_TEXTURE_2D, this->gl_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width, this->height, 0,
-        GL_RGB, GL_UNSIGNED_BYTE, this->raw_texture);
-    // TODO: Configure Sampling
-    // TODO: Configure Wrapping
-    // TODO: Configure MipMapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    delete[] this->raw_texture;
-    this->raw_texture = nullptr;
+    Texture::bind();
 
-    GLenum err = glGetError();
-    if(err != GL_NO_ERROR) {
-        ERROR("[%s] Failed to bind texture [%s: %s]", this->name,
-            util::string::gl_error_name(err), util::string::gl_error_desc(err));
-        this->resource_state = GraphicsResourceState::ERROR;
-        return;
-    }
-    
-    DEBUG("Texture [%s] bound successfuly as!", this->name);
-    this->resource_state = GraphicsResourceState::LOADED;
+    /* Deleting texture data is optional, but will help conserve some memory.
+    the texture re-loading process will re-read it from disk, so there's no
+    need to keep a copy cached in memory after it's been bound to the disk. */
+    delete this->texture_data;
+    this->texture_data = nullptr;
+
 }
 
 void ImageTexture::unbind() {
-    glDeleteTextures(1, &this->gl_texture);
-    this->gl_texture = 0;
-    DEBUG("Texture [%s] unbound", this->name);
+    Texture::unbind();
 }
 
 // =======================
@@ -133,8 +113,8 @@ void ImageTexture::load_() {
     png_init_io(png_ptr, fp);
     png_set_sig_bytes(png_ptr, 8);
     png_read_info(png_ptr, info_ptr);
-    this->width = png_get_image_width(png_ptr, info_ptr);
-    this->height = png_get_image_height(png_ptr, info_ptr);
+    this->options.dimx = png_get_image_width(png_ptr, info_ptr);
+    this->options.dimy = png_get_image_height(png_ptr, info_ptr);
     //png_byte color_type = png_get_color_type(png_ptr, info_ptr);
     //png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr);
     //int number_of_passes = png_set_interlace_handling(png_ptr);
@@ -150,17 +130,17 @@ void ImageTexture::load_() {
     }
     /* We're reading the image data into this multi-array structure first
     because that's the way libpng does it. */
-    png_bytep* rows[this->height];
-    for(int y = 0; y < this->height; y++) {
+    png_bytep* rows[this->options.dimx];
+    for(int y = 0; y < this->options.dimy; y++) {
         rows[y] = new png_bytep[row_bytes];
     }
     png_read_image(png_ptr, (png_bytepp) rows);
     /* Now we convert the row data into a single continuous string of bytes so
     that it can be bound by opengl */
-    this->raw_texture = new char[this->height * row_bytes];
-    for(int y = 0; y < this->height; y++) {
-        unsigned int index = (this->height - y) - 1;
-        memcpy(this->raw_texture + (y * row_bytes), rows[index], row_bytes);
+    this->texture_data = new char[this->options.dimy * row_bytes];
+    for(int y = 0; y < this->options.dimy; y++) {
+        unsigned int index = (this->options.dimy - y) - 1;
+        memcpy(this->texture_data + (y * row_bytes), rows[index], row_bytes);
         delete[] rows[index];
     }
 

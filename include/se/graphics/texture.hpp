@@ -13,7 +13,27 @@
 
 #include "se/fwd.hpp"
 
+#include <GL/glew.h>
+
 namespace se::graphics {
+
+    /// Texture Sampling Type
+    enum class TextureType {
+        SINGLESAMPLE,
+        MULTISAMPLE
+    };
+
+    /// Texture Construction Options
+    struct TextureOptions {
+        TextureType type = TextureType::SINGLESAMPLE;
+        int mscount = 0;
+        int dimx = 0;
+        int dimy = 0;
+        GLenum gl_mag_filter = GL_LINEAR;
+        GLenum gl_min_filter = GL_LINEAR;
+        GLenum gl_tex_wrap_s = GL_REPEAT;
+        GLenum gl_tex_wrap_t = GL_REPEAT;
+    };
 
     /*!
      *  Texture Class.
@@ -28,6 +48,8 @@ namespace se::graphics {
              *  This function creates new entries in the graphics resource
              *  cache, and should be called paringly.  Textures should be
              *  obtained by calling the `get_texture()`.
+             * 
+             *  The `type` parameter is required to appropriately initialize the 
              */
             Texture(se::Engine* engine, const char* name);
 
@@ -51,6 +73,18 @@ namespace se::graphics {
             /// Parent Engine
             se::Engine* engine;
 
+            /*!
+             *  Raw Texture Data.
+             * 
+             *  This data will be copied to the graphics device during the
+             *  binding process.  It should already be in the format specified
+             *  in the options structure.
+             * 
+             *  Setting this value to `nullptr` or `0` will initialize the
+             *  texture as empty (black).
+             */
+            char* texture_data = nullptr;
+
             /// Texture Destructor
             ~Texture();
 
@@ -70,11 +104,6 @@ namespace se::graphics {
              */
             virtual void unbind();
 
-            /// Buffer Width
-            int width = 0;
-            /// Buffer Height
-            int height = 0;
-
             /// OpenGL texture ID
             unsigned int gl_texture = 0;
 
@@ -85,6 +114,13 @@ namespace se::graphics {
             virtual void unload_();
 
         public:
+
+            /*!
+             *  Texture Options.
+             * 
+             *  Call `reload()` after changing these.
+             */
+            TextureOptions options;
 
             /*!
              *  Get a texture instance.

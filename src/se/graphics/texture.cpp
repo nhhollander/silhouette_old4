@@ -43,7 +43,7 @@ Texture::Texture(se::Engine* engine, const char* name) :
 // == PROTECTED METHODS ==
 // =======================
 
-Texture::Texture(se::Engine* engine, const char* name, uint32_t hash) : 
+Texture::Texture(se::Engine* engine, const char* name, uint32_t hash) :
     GraphicsResource(hash) {
     this->engine = engine;
     this->name = strdup(name);
@@ -57,17 +57,19 @@ void Texture::bind() {
     /* Is clearing the error queue actually necessary?  I'm not sure. */
     while(glGetError() != GL_NO_ERROR) {}
 
+    FATAL("Dimensions are [%i x %i]", this->options.dimx, this->options.dimy);
+
     glGenTextures(1, &this->gl_texture);
     glBindTexture(GL_TEXTURE_2D, this->gl_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width, this->height, 0,
-        GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->options.dimx, 
+        this->options.dimy, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture_data);
     // TODO: Configure Sampling
     // TODO: Configure Wrapping
     // TODO: Configure MipMapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->options.gl_mag_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->options.gl_min_filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->options.gl_tex_wrap_s);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->options.gl_tex_wrap_t);
 
     GLenum err = glGetError();
     if(err != GL_NO_ERROR) {
@@ -77,7 +79,7 @@ void Texture::bind() {
         return;
     }
     
-    DEBUG("Texture [%s] bound successfuly as!", this->name);
+    DEBUG("Texture [%s] bound successfuly as [%i]!", this->name, this->gl_texture);
     this->resource_state = GraphicsResourceState::LOADED;
 }
 
@@ -88,7 +90,9 @@ void Texture::unbind() {
 }
 
 void Texture::load_() {
-
+    DEBUG("Loaded [%s], waiting for bind", this->name);
+    std::function job = [this](){this->bind();};
+    this->engine->graphics_controller->submit_graphics_task(job);
 }
 
 void Texture::unload_() {

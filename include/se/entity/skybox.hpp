@@ -32,7 +32,7 @@ namespace se::entity {
             se::graphics::Geometry* geometry;
 
             /// Skybox texture.
-            se::graphics::Texture* texture;
+            se::graphics::ImageTexture* texture;
 
             /// Parent Engine.
             se::Engine* engine;

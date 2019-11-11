@@ -36,14 +36,6 @@ namespace se::graphics {
             ~ImageTexture();
 
             /*!
-             *  Raw Decoded Texture Data.
-             * 
-             *  Contains the raw pixels as read from whatever image format this
-             *  texture was in.
-             */
-            char* raw_texture = nullptr;
-
-            /*!
              *  Bind texture data to the GPU.
              * 
              *  **Warning:** This method must only be called from the graphics
