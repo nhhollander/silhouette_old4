@@ -91,6 +91,25 @@ const char* util::string::gl_type_name(GLenum input) {
     }
 }
 
+const char* util::string::gl_tex_type_name(unsigned int type) {
+    switch(type) {
+        CASE(GL_TEXTURE_2D)
+        CASE(GL_PROXY_TEXTURE_2D)
+        CASE(GL_TEXTURE_1D_ARRAY)
+        CASE(GL_PROXY_TEXTURE_1D_ARRAY)
+        CASE(GL_TEXTURE_RECTANGLE)
+        CASE(GL_PROXY_TEXTURE_RECTANGLE)
+        CASE(GL_TEXTURE_CUBE_MAP_POSITIVE_X)
+        CASE(GL_TEXTURE_CUBE_MAP_NEGATIVE_X)
+        CASE(GL_TEXTURE_CUBE_MAP_POSITIVE_Y)
+        CASE(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y)
+        CASE(GL_TEXTURE_CUBE_MAP_POSITIVE_Z)
+        CASE(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z)
+        CASE(GL_PROXY_TEXTURE_CUBE_MAP)
+        default: return "<invalid texture type>";
+    }
+}
+
 const char* util::string::sdl_event_type_name(unsigned int type) {
     switch(type) {
         CASE(SDL_FIRSTEVENT)

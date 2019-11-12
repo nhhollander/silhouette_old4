@@ -57,19 +57,35 @@ void Texture::bind() {
     /* Is clearing the error queue actually necessary?  I'm not sure. */
     while(glGetError() != GL_NO_ERROR) {}
 
-    FATAL("Dimensions are [%i x %i]", this->options.dimx, this->options.dimy);
+    if(this->options.type != GL_TEXTURE_2D && this->options.type != GL_TEXTURE_2D_MULTISAMPLE) {
+        ERROR("Unsupported texture type [%s]", util::string::gl_type_name(this->options.type));
+        return;
+    }
 
     glGenTextures(1, &this->gl_texture);
-    glBindTexture(GL_TEXTURE_2D, this->gl_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->options.dimx, 
-        this->options.dimy, 0, GL_RGB, GL_UNSIGNED_BYTE, this->texture_data);
-    // TODO: Configure Sampling
-    // TODO: Configure Wrapping
-    // TODO: Configure MipMapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->options.gl_mag_filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->options.gl_min_filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->options.gl_tex_wrap_s);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->options.gl_tex_wrap_t);
+    glBindTexture(this->options.type, this->gl_texture);
+    
+    // TODO: Add additional texture parameter configuration options
+    glTexParameteri(this->options.type, GL_TEXTURE_MAG_FILTER, this->options.gl_mag_filter);
+    glTexParameteri(this->options.type, GL_TEXTURE_MIN_FILTER, this->options.gl_min_filter);
+    glTexParameteri(this->options.type, GL_TEXTURE_WRAP_S,     this->options.gl_tex_wrap_s);
+    glTexParameteri(this->options.type, GL_TEXTURE_WRAP_T,     this->options.gl_tex_wrap_t);
+
+    if(this->options.type == GL_TEXTURE_2D) {
+        glTexImage2D(GL_TEXTURE_2D, 0, this->options.gl_color_format, this->options.dimx, 
+            this->options.dimy, 0, this->options.gl_data_format,
+            GL_UNSIGNED_BYTE, this->texture_data);
+    } else if(this->options.type == GL_TEXTURE_2D_MULTISAMPLE) {
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, this->options.mscount,
+            this->options.gl_color_format, this->options.dimx,
+            this->options.dimy, true);
+    }
+
+    if(this->options.gl_color_attachment != 0) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER,
+            this->options.gl_color_attachment, this->options.type,
+            this->gl_texture, 0);
+    }
 
     GLenum err = glGetError();
     if(err != GL_NO_ERROR) {
@@ -106,12 +122,12 @@ void Texture::unload_() {
 // == PUBLIC METHODS ==
 // ====================
 
-Texture* Texture::get_texture(se::Engine* engine, const char* name, bool virt) {
-    uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name, virt);
+Texture* Texture::get_texture(se::Engine* engine, const char* name) {
+    uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
     GraphicsResource* resource = Texture::get_resource(hash);
     if(resource == nullptr) {
         DEBUG("Texture [%s] not in cache :(", name);
-        return new Texture(engine, name, virt);
+        return new Texture(engine, name);
     }
     DEBUG("Found texture [%s] in cache!", name);
     return static_cast<Texture*>(resource);

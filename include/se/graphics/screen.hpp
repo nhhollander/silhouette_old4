@@ -11,6 +11,8 @@
 
 #include "se/fwd.hpp"
 
+#include <vector>
+
 namespace se::graphics {
 
     /*!
@@ -38,6 +40,13 @@ namespace se::graphics {
             /// OpenGL id for the screen vertex buffer
             unsigned int gl_screen_vert_buffer_id = 0;
 
+            /*!
+             *  Buffer textures.
+             * 
+             *  This vector exists for housekeeping and should not be directly
+             *  passed to either of the framebuffers during construction.
+             */
+            //std::vector<Texture> textures;
             /// Render framebuffer
             Framebuffer* primarybuffer;
             /// Post processing buffer
@@ -48,6 +57,15 @@ namespace se::graphics {
 
             /// Pointer to the output framebuffer ID
             const volatile int* output_fbid = nullptr;
+
+            /*!
+             *  Update framebuffer texture callback.
+             * 
+             *  Invoked when screen dimensions or other screen variables change
+             *  or something like that I don't know I'm writing documentation
+             *  instead of doing my homework someone please help me.
+             */
+            void update_fb_textures();
 
             /*!
              *  Initialize the screen.

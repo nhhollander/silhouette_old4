@@ -51,6 +51,15 @@ namespace util::string {
     const char* gl_type_name(unsigned int input);
 
     /*!
+     *  Return the name of an OpenGL texture type.
+     * 
+     *  @param input    Texture type.
+     * 
+     *  @return Name of the type, or "<invalid gl texture type>"
+     */
+    const char* gl_tex_type_name(unsigned int input);
+
+    /*!
      *  Return the name of an SDL event type.
      * 
      *  @param type     Event type
