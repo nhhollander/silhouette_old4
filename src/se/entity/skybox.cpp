@@ -38,29 +38,29 @@ Skybox::Skybox(se::Engine* engine, const char* texture) {
     this->shader_program = 
         ShaderProgram::get_program(engine, "skybox", "", "skybox", "");
     this->geometry = Geometry::get_geometry(engine, "skybox");
-    this->texture->increment_active_users();
-    this->shader_program->increment_active_users();
-    this->geometry->increment_active_users();
+    this->texture->increment_resource_user_counter();
+    this->shader_program->increment_resource_user_counter();
+    this->geometry->increment_resource_user_counter();
 }
 
 Skybox::~Skybox() {
-    this->texture->decrement_active_users();
-    this->shader_program->decrement_active_users();
-    this->geometry->decrement_active_users();
+    this->texture->decrement_resource_user_counter();
+    this->shader_program->decrement_resource_user_counter();
+    this->geometry->decrement_resource_user_counter();
     free((void*)this->texture_name);
 }
 
 void Skybox::render(glm::mat4 camera_matrix) {
 
-    if(this->geometry->get_resource_state() != GraphicsResourceState::LOADED ||
-        this->texture->get_resource_state() != GraphicsResourceState::LOADED ||
-        this->shader_program->get_resource_state() != GraphicsResourceState::LOADED){
+    if(this->geometry->get_resource_state() != util::LoadableResourceState::LOADED ||
+        this->texture->get_resource_state() != util::LoadableResourceState::LOADED ||
+        this->shader_program->get_resource_state() != util::LoadableResourceState::LOADED){
         // Not ready to render
         DEBUG("Skybox [t: %s] not ready [t: %s s: %s g: %s]",
             this->texture_name,
-            graphics_resource_state_name(this->texture->get_resource_state()),
-            graphics_resource_state_name(this->geometry->get_resource_state()),
-            graphics_resource_state_name(this->shader_program->get_resource_state()));
+            util::loadable_resource_state_name(this->texture->get_resource_state()),
+            util::loadable_resource_state_name(this->geometry->get_resource_state()),
+            util::loadable_resource_state_name(this->shader_program->get_resource_state()));
         return;
     }
 

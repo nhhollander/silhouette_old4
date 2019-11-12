@@ -29,6 +29,7 @@
 #include <glm/vec3.hpp>
 
 using namespace se::graphics;
+using namespace util;
 
 // =====================
 // == PRIVATE MEMBERS ==
@@ -36,14 +37,13 @@ using namespace se::graphics;
 
 #define GEOM_HASH_FORMAT "geometry:%p:%s"
 
-Geometry::Geometry(se::Engine* engine, const char* name) :
-    GraphicsResource(util::hash::ejenkins(GEOM_HASH_FORMAT, engine, name)) {
+Geometry::Geometry(se::Engine* engine, const char* name) {
     this->engine = engine;
-    this->name = strdup(name);
+    this->name = strdup(name); 
+    this->cache_resource(this);
 }
 
 Geometry::~Geometry() {
-    FATAL("Geometry destroyed");
     free((void*)this->name);
 }
 
@@ -79,7 +79,7 @@ void Geometry::bind() {
 
     DEBUG("Geometry [%s] bound successfuly as [%u]!", this->name,
         this->gl_vertex_array_object_id);
-    this->resource_state = GraphicsResourceState::LOADED;
+    this->resource_state = LoadableResourceState::LOADED;
 
 }
 
@@ -102,7 +102,7 @@ void Geometry::unbind() {
 
 void Geometry::load_() {
     DEBUG("Loading geometry [%s]", this->name);
-    this->resource_state = GraphicsResourceState::LOADING;
+    this->resource_state = LoadableResourceState::LOADING;
 
     /* This OBJ loader was adapted from the awesome folks at
     http://www.opengl-tutorial.org/ */
@@ -122,7 +122,7 @@ void Geometry::load_() {
     if(fp == nullptr) {
         ERROR("[%s] Failed to open model file [%s] [%i: %s]",
             this->name, fname.c_str(), errno, strerror(errno));
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
 
@@ -163,7 +163,7 @@ void Geometry::load_() {
             if(matches != 9) {
                 ERROR("[%s] OBJ format unsupported [%s]",
                     this->name, fname.c_str());
-                this->resource_state = GraphicsResourceState::ERROR;
+                this->resource_state = LoadableResourceState::ERROR;
                 return;
             }
             vertex_indices.push_back(vertex_index[0]);
@@ -209,9 +209,20 @@ void Geometry::load_() {
 
 void Geometry::unload_() {
     DEBUG("Unloading [%s], waiting for unbind", this->name);
-    this->resource_state = GraphicsResourceState::NOT_LOADED;
+    this->resource_state = LoadableResourceState::NOT_LOADED;
     std::function job = [this](){this->unbind();};
     this->engine->graphics_controller->submit_graphics_task(job);
+}
+
+uint32_t Geometry::resource_id() {
+    return util::hash::ejenkins(GEOM_HASH_FORMAT, this->engine, this->name);
+}
+
+std::string Geometry::resource_name() {
+    std::string resname;
+    resname += "Geometry_";
+    resname += this->name;
+    return resname;
 }
 
 // ====================
@@ -219,8 +230,8 @@ void Geometry::unload_() {
 // ====================
 
 Geometry* Geometry::get_geometry(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins(GEOM_HASH_FORMAT, engine, name);
-    GraphicsResource* resource = Geometry::get_resource(hash);
+    uint32_t hash = hash::ejenkins(GEOM_HASH_FORMAT, engine, name);
+    CacheableResource* resource = CacheableResource::find_resource(hash);
     if(resource == nullptr) {
         DEBUG("Geometry [%s] not in cache :(", name);
         return new Geometry(engine, name);
@@ -230,7 +241,7 @@ Geometry* Geometry::get_geometry(se::Engine* engine, const char* name) {
 }
 
 void Geometry::use_geometry() {
-    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
+    if(this->resource_state != LoadableResourceState::LOADED) { return; }
     glBindVertexArray(this->gl_vertex_array_object_id);
     glDrawArrays(GL_TRIANGLES, 0, this->vertex_array_size);
 }

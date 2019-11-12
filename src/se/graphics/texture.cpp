@@ -26,28 +26,13 @@
 #include <GL/gl.h>
 
 using namespace se::graphics;
+using namespace util;
 
 #define TEXTURE_HASH_FORMAT "texture:%p:%s"
-
-// =====================
-// == PRIVATE METHODS ==
-// =====================
-
-Texture::Texture(se::Engine* engine, const char* name) : 
-    GraphicsResource(util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name)) {
-    this->engine = engine;
-    this->name = strdup(name);
-}
 
 // =======================
 // == PROTECTED METHODS ==
 // =======================
-
-Texture::Texture(se::Engine* engine, const char* name, uint32_t hash) :
-    GraphicsResource(hash) {
-    this->engine = engine;
-    this->name = strdup(name);
-}
 
 Texture::~Texture() {
     free((void*)this->name);
@@ -91,12 +76,12 @@ void Texture::bind() {
     if(err != GL_NO_ERROR) {
         ERROR("[%s] Failed to bind texture [%s: %s]", this->name,
             util::string::gl_error_name(err), util::string::gl_error_desc(err));
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     
     DEBUG("Texture [%s] bound successfuly as [%i]!", this->name, this->gl_texture);
-    this->resource_state = GraphicsResourceState::LOADED;
+    this->resource_state = LoadableResourceState::LOADED;
 }
 
 void Texture::unbind() {
@@ -113,7 +98,7 @@ void Texture::load_() {
 
 void Texture::unload_() {
     DEBUG("Unloading [%s], waiting for unbind", this->name);
-    this->resource_state = GraphicsResourceState::NOT_LOADED;
+    this->resource_state = LoadableResourceState::NOT_LOADED;
     std::function job = [this](){this->unbind();};
     this->engine->graphics_controller->submit_graphics_task(job);
 }
@@ -122,19 +107,13 @@ void Texture::unload_() {
 // == PUBLIC METHODS ==
 // ====================
 
-Texture* Texture::get_texture(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
-    GraphicsResource* resource = Texture::get_resource(hash);
-    if(resource == nullptr) {
-        DEBUG("Texture [%s] not in cache :(", name);
-        return new Texture(engine, name);
-    }
-    DEBUG("Found texture [%s] in cache!", name);
-    return static_cast<Texture*>(resource);
+Texture::Texture(se::Engine* engine, const char* name) {
+    this->engine = engine;
+    this->name = strdup(name);
 }
 
 void Texture::use_texture(unsigned int tex_unit) {
-    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
+    if(this->resource_state != LoadableResourceState::LOADED) { return; }
     int unit_num = GL_TEXTURE0 - tex_unit;
     glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
     glActiveTexture(tex_unit);

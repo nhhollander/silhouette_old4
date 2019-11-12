@@ -11,6 +11,8 @@
 
 #include "se/graphics/texture.hpp"
 
+#include "util/cacheableResource.hpp"
+
 namespace se::graphics {
 
     /*!
@@ -19,7 +21,7 @@ namespace se::graphics {
      *  Image textures are populated with data loaded from PNG or other
      *  image files.
      */
-    class ImageTexture : public Texture {
+    class ImageTexture : public Texture, public util::CacheableResource {
 
         private:
 
@@ -53,9 +55,13 @@ namespace se::graphics {
 
         protected:
 
-            virtual void load_();
+            void load_();
 
-            virtual void unload_();
+            void unload_();
+
+            uint32_t resource_id();
+
+            std::string resource_name();
 
         public:
 

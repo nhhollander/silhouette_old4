@@ -30,7 +30,6 @@ namespace se {
         class Geometry;
         class GraphicsController;
         class GraphicsEventHandler;
-        class GraphicsResource;
         class ImageTexture;
         class RenderManager;
         class SimpleRenderManager;

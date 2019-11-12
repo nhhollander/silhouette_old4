@@ -10,7 +10,9 @@
 #define _SE_GRAPHICS_SHADERPROGRAM_H_
 
 #include "se/fwd.hpp"
-#include "se/graphics/graphicsResource.hpp"
+
+#include "util/cacheableResource.hpp"
+#include "util/loadableResource.hpp"
 
 #include <map>
 
@@ -21,7 +23,7 @@ namespace se::graphics {
      * 
      *  This class represents a usable shader program.
      */
-    class ShaderProgram : public GraphicsResource {
+    class ShaderProgram : public util::CacheableResource, public util::LoadableResource {
 
         private:
 
@@ -118,6 +120,10 @@ namespace se::graphics {
              */
             void unload_();
 
+            uint32_t resource_id();
+
+            std::string resource_name();
+
         public:
 
             /*!
@@ -152,7 +158,7 @@ namespace se::graphics {
              * 
              *  @return The state the program is in after loading.
              */
-            se::graphics::GraphicsResourceState wait_for_loading();
+            util::LoadableResourceState wait_for_loading();
 
             /*!
              *  Use this Program.

@@ -9,7 +9,8 @@
 #ifndef _SE_GRAPHICS_GEOMETRY_H_
 #define _SE_GRAPHICS_GEOMETRY_H_
 
-#include "se/graphics/graphicsResource.hpp"
+#include "util/cacheableResource.hpp"
+#include "util/loadableResource.hpp"
 
 #include "se/fwd.hpp"
 
@@ -22,7 +23,7 @@ namespace se::graphics {
     /*!
      *  Geometry Class.
      */
-    class Geometry : public GraphicsResource {
+    class Geometry : public util::CacheableResource, public util::LoadableResource {
 
         private:
 
@@ -97,9 +98,17 @@ namespace se::graphics {
 
         protected:
 
+            /// @see `util::LoadableResource::load_()`
             void load_();
 
+            /// @see `util::LoadableResource::unload_()`
             void unload_();
+
+            /// @see `util::CacheableResource::resource_id()`
+            uint32_t resource_id();
+
+            /// @see `util::CacheableResource::resource_name()`
+            std::string resource_name();
 
         public:
 

@@ -58,10 +58,10 @@ Screen::Screen(se::Engine* engine) {
     this->output_fbid = engine->config->get_intp("internal.gl.outputfbid");
     this->screen_program = ShaderProgram::get_program(
         engine, "screen", "", "screen", "");
-    this->screen_program->increment_active_users();
+    this->screen_program->increment_resource_user_counter();
     this->post_process_program = ShaderProgram::get_program(
         engine, "screen", "", "screen_post", "");
-    this->post_process_program->increment_active_users();
+    this->post_process_program->increment_resource_user_counter();
     this->engine->graphics_controller->submit_graphics_task([this](){
         this->init();
     });
@@ -71,7 +71,8 @@ Screen::Screen(se::Engine* engine) {
 }
 
 Screen::~Screen() {
-    this->screen_program->decrement_active_users();
+    this->screen_program->decrement_resource_user_counter();
+    this->post_process_program->decrement_resource_user_counter();
     delete this->primarybuffer;
     delete this->postprocessbuffer;
 }

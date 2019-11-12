@@ -42,11 +42,13 @@ add_compile_options(-DUTIL_LOG_PATH_OFFSET=${UTIL_LOG_PATH_OFFSET})
 
 # Add the utility library
 add_library(seutil SHARED
+    src/util/cacheableResource.cpp
     src/util/config.cpp
     src/util/configvalue.cpp
     src/util/debugstrings.cpp
     src/util/dirs.cpp
     src/util/hash.cpp
+    src/util/loadableResource.cpp
     src/util/log.cpp
 )
 
@@ -59,12 +61,10 @@ add_library(silhouette SHARED
     src/se/entity/fpCamera.cpp
     src/se/entity/skybox.cpp
     src/se/entity/staticProp.cpp
-    src/se/scene.cpp
     src/se/graphics/framebuffer.cpp
     src/se/graphics/geometry.cpp
     src/se/graphics/graphicsController.cpp
     src/se/graphics/graphicsEventHandler.cpp
-    src/se/graphics/graphicsResource.cpp
     src/se/graphics/imageTexture.cpp
     src/se/graphics/screen.cpp
     src/se/graphics/shader.cpp
@@ -75,6 +75,8 @@ add_library(silhouette SHARED
     src/se/graphics/texture.cpp
     src/se/input/inputController.cpp
     src/se/logic/logicController.cpp
+    src/se/scene.cpp
+
 )
 # Link to required libraries
 target_link_libraries(silhouette GL SDL2 seutil GLEW ${SE_QT_LIB_NAME})

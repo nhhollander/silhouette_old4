@@ -31,30 +31,30 @@ StaticProp::StaticProp(se::Engine* engine, const char* model, const char* textur
     this->texture = se::graphics::ImageTexture::get_texture(engine, texture);
     this->shader_program = se::graphics::ShaderProgram::get_program(
         engine, "static_prop", "", "static_prop", "");
-    this->geometry->increment_active_users();
-    this->texture->increment_active_users();
-    this->shader_program->increment_active_users();
+    this->geometry->increment_resource_user_counter();
+    this->texture->increment_resource_user_counter();
+    this->shader_program->increment_resource_user_counter();
 }
 
 StaticProp::~StaticProp() {
-    this->geometry->decrement_active_users();
-    this->texture->decrement_active_users();
-    this->shader_program->decrement_active_users();
+    this->geometry->decrement_resource_user_counter();
+    this->texture->decrement_resource_user_counter();
+    this->shader_program->decrement_resource_user_counter();
     free((void*)this->model_name);
     free((void*)this->texture_name);
 }
 
 void StaticProp::render(glm::mat4 camera_matrix) {
 
-    if(this->geometry->get_resource_state() != GraphicsResourceState::LOADED ||
-        this->texture->get_resource_state() != GraphicsResourceState::LOADED ||
-        this->shader_program->get_resource_state() != GraphicsResourceState::LOADED){
+    if(this->geometry->get_resource_state() != util::LoadableResourceState::LOADED ||
+        this->texture->get_resource_state() != util::LoadableResourceState::LOADED ||
+        this->shader_program->get_resource_state() != util::LoadableResourceState::LOADED){
         // Not ready to render
         DEBUG("Static prop [m: %s t: %s] not ready [m: %s t: %s s: %s]",
             this->model_name, this->texture_name,
-            graphics_resource_state_name(this->geometry->get_resource_state()),
-            graphics_resource_state_name(this->texture->get_resource_state()),
-            graphics_resource_state_name(this->shader_program->get_resource_state()));
+            util::loadable_resource_state_name(this->geometry->get_resource_state()),
+            util::loadable_resource_state_name(this->texture->get_resource_state()),
+            util::loadable_resource_state_name(this->shader_program->get_resource_state()));
         return;
     }
 

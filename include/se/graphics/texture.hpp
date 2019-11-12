@@ -11,7 +11,7 @@
 
 #include "se/fwd.hpp"
 
-#include "se/graphics/graphicsResource.hpp"
+#include "util/loadableResource.hpp"
 
 #include <GL/glew.h>
 
@@ -55,34 +55,16 @@ namespace se::graphics {
     /*!
      *  Texture Class.
      */
-    class Texture : public GraphicsResource {
+    class Texture : public util::LoadableResource {
 
-        private:
+        public:
 
             /*!
-             *  Construct a new Texture.
-             * 
-             *  This function creates new entries in the graphics resource
-             *  cache, and should be called paringly.  Textures should be
-             *  obtained by calling the `get_texture()`.
-             * 
-             *  The `type` parameter is required to appropriately initialize the 
+             *  Construct a new plain Texture.
              */
             Texture(se::Engine* engine, const char* name);
 
         protected:
-
-            /*!
-             *  Construct a new Texture (for child classes).
-             * 
-             *  This function creates new entries in the graphics resource
-             *  cache, and should be called paringly.  Textures should be
-             *  obtained by calling the `get_texture()`.
-             * 
-             *  The hash parameter specifies which hash should be used when
-             *  inserting this texture into the graphics resource cache.
-             */
-            Texture(se::Engine* engine, const char* name, uint32_t hash);
 
             /// Texture Name
             const char* name;
@@ -124,10 +106,10 @@ namespace se::graphics {
             /// OpenGL texture ID
             unsigned int gl_texture = 0;
 
-            /// @see graphicsResource.hpp
+            /// @see `util::LoadableResource`
             virtual void load_();
 
-            /// @see graphicsResource.hpp
+            /// @see `util::LoadableResource`
             virtual void unload_();
 
         public:
@@ -138,14 +120,6 @@ namespace se::graphics {
              *  Call `reload()` after changing these.
              */
             TextureOptions options;
-
-            /*!
-             *  Get a texture instance.
-             * 
-             *  This method attempts to retrieve a texture from the texture
-             *  cache, and failing that instantiates a new object.
-             */
-            static Texture* get_texture(se::Engine* engine, const char* name);
 
             /*!
              *  Make this the active texture.

@@ -27,6 +27,7 @@
 #include <GL/gl.h>
 
 using namespace se::graphics;
+using namespace util;
 
 // =====================
 // == PRIVATE MEMBERS ==
@@ -34,8 +35,8 @@ using namespace se::graphics;
 
 #define TEXTURE_HASH_FORMAT "imagetexture:%p:%s"
 
-ImageTexture::ImageTexture(se::Engine* engine, const char* name) : 
-    Texture(engine, name, util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name)) {
+ImageTexture::ImageTexture(se::Engine* engine, const char* name) : Texture(engine, name) {
+    this->cache_resource(this);
 }
 
 ImageTexture::~ImageTexture() {
@@ -63,7 +64,7 @@ void ImageTexture::unbind() {
 
 void ImageTexture::load_() {
     DEBUG("Loading texture [%s]", this->name);
-    this->resource_state = GraphicsResourceState::LOADING;
+    this->resource_state = LoadableResourceState::LOADING;
     
     std::string fname = util::dirs::app_data();
     fname += "/textures/";
@@ -75,7 +76,7 @@ void ImageTexture::load_() {
     if(fp == nullptr) {
         ERROR("[%s] Failed to open texture file [%s] [%i: %s]",
             this->name, fname.c_str(), errno, strerror(errno));
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     char png_signature[8];
@@ -83,30 +84,30 @@ void ImageTexture::load_() {
     if(header_read_count != 8) {
         ERROR("[%s] Read wrong number of signature bytes (expected %i, got %i)",
             8, header_read_count);
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     if(png_sig_cmp((png_const_bytep) png_signature, 0, 8)) {
         ERROR("[%s] Not a PNG file [%s]",
             this->name, fname.c_str());
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if(!png_ptr) {
         ERROR("[%s] Failed to create png read structure", this->name);
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if(!info_ptr) {
         ERROR("[%s] Failed to create png info structure", this->name);
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     if(setjmp(png_jmpbuf(png_ptr))) {
         ERROR("[%s] Encountered error during init_io", this->name);
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
 
@@ -125,7 +126,7 @@ void ImageTexture::load_() {
     // This is the part where the png file actually gets read
     if(setjmp(png_jmpbuf(png_ptr))) {
         ERROR("[%s] Error during read_image", this->name);
-        this->resource_state = GraphicsResourceState::ERROR;
+        this->resource_state = LoadableResourceState::ERROR;
         return;
     }
     /* We're reading the image data into this multi-array structure first
@@ -153,9 +154,20 @@ void ImageTexture::load_() {
 
 void ImageTexture::unload_() {
     DEBUG("Unloading [%s], waiting for unbind", this->name);
-    this->resource_state = GraphicsResourceState::NOT_LOADED;
+    this->resource_state = LoadableResourceState::NOT_LOADED;
     std::function job = [this](){this->unbind();};
     this->engine->graphics_controller->submit_graphics_task(job);
+}
+
+uint32_t ImageTexture::resource_id() {
+    return util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
+}
+
+std::string ImageTexture::resource_name() {
+    std::string resname;
+    resname += "ImageTexture_";
+    resname += this->name;
+    return resname;
 }
 
 // ====================
@@ -164,7 +176,7 @@ void ImageTexture::unload_() {
 
 ImageTexture* ImageTexture::get_texture(se::Engine* engine, const char* name) {
     uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
-    GraphicsResource* resource = ImageTexture::get_resource(hash);
+    CacheableResource* resource = ImageTexture::find_resource(hash);
     if(resource == nullptr) {
         DEBUG("Texture [%s] not in cache :(", name);
         return new ImageTexture(engine, name);
@@ -174,7 +186,7 @@ ImageTexture* ImageTexture::get_texture(se::Engine* engine, const char* name) {
 }
 
 void ImageTexture::use_texture(unsigned int tex_unit) {
-    if(this->resource_state != GraphicsResourceState::LOADED) { return; }
+    if(this->resource_state != LoadableResourceState::LOADED) { return; }
     int unit_num = GL_TEXTURE0 - tex_unit;
     glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
     glActiveTexture(tex_unit);
