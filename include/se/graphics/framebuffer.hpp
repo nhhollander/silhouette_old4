@@ -13,6 +13,8 @@
 
 #include "GL/glew.h"
 
+#include <vector>
+
 namespace se::graphics {
 
     /// Framebuffer State
@@ -50,53 +52,11 @@ namespace se::graphics {
             /// OpenGL id for the framebuffer.
             unsigned int gl_framebuffer_id = 0;
 
-            /// OpenGL id for the target texture.
-            unsigned int gl_texture_id = 0;
-
-            /// OpenGL id for the background target texture.
-            unsigned int gl_bg_texture_id = 0;
-
-            /// OpenGL id for the depth buffer.
-            unsigned int gl_depthbuffer_id = 0;
-
-            /// OpenGL id for the depth texture.
-            unsigned int gl_depth_texture_id = 0;
-
-            /// Base texture unit is enabled.
-            bool base_texture_enabled;
-
-            /// Background texture unit is enabled.
-            bool bg_texture_enabled;
-
-            /// Depth texture unit is enabled.
-            bool depth_texture_enabled;
-
-            /// Texture wrapping mode
-            GLenum texture_wrapping_mode;
-
-            /// Pointer to the screen width.
-            const volatile int* dimx;
-
-            /// Pointer to the screen height.
-            const volatile int* dimy;
-
-            /// Pointer to the MSAA level.
-            const volatile int* msaa_level;
-
-            /// Pointer to the camera far distance
-            const volatile float* cam_far;
-
-            /// Pointer to the camera near distance
-            const volatile float* cam_near;
+            /// Textures in the buffer
+            std::vector<Texture*> textures;
 
             /// Status.
             FramebufferState state = FramebufferState::NOT_INITIALIZED;
-
-            /// Framebuffer type
-            FramebufferType type = FramebufferType::MULTISAMPLE;
-
-            /// Re-initialize
-            void re_init();
 
             /*!
              *  Framebuffer initialization method.
@@ -116,6 +76,9 @@ namespace se::graphics {
         
         public:
 
+            /// Re-initialize
+            void re_init();
+
             /*!
              *  Create a new framebuffer.
              * 
@@ -130,18 +93,9 @@ namespace se::graphics {
              *  to `GL_REPEAT`.
              * 
              *  @param engine   Parent engine
-             *  @param type     Framebuffer type
-             *  @param base_texture_enabled
-             *  @param bg_texture_enabled
-             *  @param depth_texture_enalbed
-             *  @param texture_wrapping_mode
+             *  @param textures Textures to include in the buffer
              */
-            Framebuffer(Engine* engine,
-                FramebufferType type = FramebufferType::MULTISAMPLE,
-                bool base_texture_enabled = true,
-                bool bg_texture_enabled = true,
-                bool depth_texture_enabled = true,
-                GLenum texture_wrapping_mode = GL_REPEAT);
+            Framebuffer(Engine* engine, std::vector<Texture*> textures);
 
             /// Destroy the framebuffer
             ~Framebuffer();
@@ -153,14 +107,6 @@ namespace se::graphics {
              *  thread.
              */
             void use_as_target();
-
-            /*!
-             *  Use this framebuffer as a texture.
-             * 
-             *  **Warning:** This method must only be called from the graphics
-             *  thread.
-             */
-            void use_as_texture();
 
     };
 

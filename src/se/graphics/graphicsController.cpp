@@ -136,6 +136,7 @@ void GraphicsController::do_frame() {
     if(this->render_manager != nullptr) {
         this->render_manager->render_frame();
     }
+
 }
 
 

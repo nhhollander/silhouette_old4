@@ -6,7 +6,7 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-layout(location = LOC_OUT_BG) out vec3 color;
+layout(location = 1) out vec3 color;
 
 in vec2 uv;
 

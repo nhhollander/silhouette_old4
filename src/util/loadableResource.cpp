@@ -48,3 +48,8 @@ void LoadableResource::decrement_resource_user_counter() {
 LoadableResourceState LoadableResource::get_resource_state() {
     return this->resource_state;
 }
+
+void LoadableResource::reload() {
+    this->unload_();
+    this->load_();
+}

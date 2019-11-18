@@ -12,9 +12,9 @@
 
 // Inputs
 in vec2 uv;
-layout(location = LOC_TEX_SCR_COLOR) uniform sampler2DMS input_color;
-layout(location = LOC_TEX_SCR_BG) uniform sampler2DMS input_bg;
-layout(location = LOC_TEX_SCR_DEPTH) uniform sampler2DMS input_depth;
+layout(location = LOC_TEX_(0)) uniform sampler2DMS input_color;
+layout(location = LOC_TEX_(1)) uniform sampler2DMS input_bg;
+layout(location = LOC_TEX_(2)) uniform sampler2DMS input_depth;
 layout(location = LOC_DIMX) uniform int dimx;
 layout(location = LOC_DIMY) uniform int dimy;
 layout(location = LOC_MSAA_LEVEL) uniform int msaa_lev;

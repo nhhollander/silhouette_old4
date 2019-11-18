@@ -87,6 +87,17 @@ namespace se::graphics {
             /// Texture Destructor
             ~Texture();
 
+            /// OpenGL texture ID
+            unsigned int gl_texture = 0;
+
+            /// @see `util::LoadableResource`
+            virtual void load_();
+
+            /// @see `util::LoadableResource`
+            virtual void unload_();
+
+        public:
+
             /*!
              *  Bind texture data to the GPU.
              * 
@@ -102,17 +113,6 @@ namespace se::graphics {
              *  thread.
              */
             virtual void unbind();
-
-            /// OpenGL texture ID
-            unsigned int gl_texture = 0;
-
-            /// @see `util::LoadableResource`
-            virtual void load_();
-
-            /// @see `util::LoadableResource`
-            virtual void unload_();
-
-        public:
 
             /*!
              *  Texture Options.
@@ -130,6 +130,11 @@ namespace se::graphics {
              *  @param tex_unit Texture unit to bind the texture to.
              */
             void use_texture(unsigned int tex_unit);
+
+            /*!
+             *  Get the OpenGL texture ID.
+             */
+            unsigned int get_texture_id();
 
     };
 

@@ -51,12 +51,14 @@ void Texture::bind() {
     glBindTexture(this->options.type, this->gl_texture);
     
     // TODO: Add additional texture parameter configuration options
-    glTexParameteri(this->options.type, GL_TEXTURE_MAG_FILTER, this->options.gl_mag_filter);
-    glTexParameteri(this->options.type, GL_TEXTURE_MIN_FILTER, this->options.gl_min_filter);
-    glTexParameteri(this->options.type, GL_TEXTURE_WRAP_S,     this->options.gl_tex_wrap_s);
-    glTexParameteri(this->options.type, GL_TEXTURE_WRAP_T,     this->options.gl_tex_wrap_t);
 
     if(this->options.type == GL_TEXTURE_2D) {
+        // begind ebug
+        glTexParameteri(this->options.type, GL_TEXTURE_MAG_FILTER, this->options.gl_mag_filter);
+        glTexParameteri(this->options.type, GL_TEXTURE_MIN_FILTER, this->options.gl_min_filter);
+        glTexParameteri(this->options.type, GL_TEXTURE_WRAP_S,     this->options.gl_tex_wrap_s);
+        glTexParameteri(this->options.type, GL_TEXTURE_WRAP_T,     this->options.gl_tex_wrap_t);
+        // endd ebug
         glTexImage2D(GL_TEXTURE_2D, 0, this->options.gl_color_format, this->options.dimx, 
             this->options.dimy, 0, this->options.gl_data_format,
             GL_UNSIGNED_BYTE, this->texture_data);
@@ -66,11 +68,11 @@ void Texture::bind() {
             this->options.dimy, true);
     }
 
-    if(this->options.gl_color_attachment != 0) {
-        glFramebufferTexture2D(GL_FRAMEBUFFER,
-            this->options.gl_color_attachment, this->options.type,
-            this->gl_texture, 0);
-    }
+    //if(this->options.gl_color_attachment != 0) {
+    //    glFramebufferTexture2D(GL_FRAMEBUFFER,
+    //        this->options.gl_color_attachment, this->options.type,
+    //        this->gl_texture, 0);
+    //}
 
     GLenum err = glGetError();
     if(err != GL_NO_ERROR) {
@@ -91,12 +93,22 @@ void Texture::unbind() {
 }
 
 void Texture::load_() {
+    if(this->resource_state != LoadableResourceState::NOT_LOADED) {
+        WARN("Attempted to load texture in state [%s]",
+            util::loadable_resource_state_name(this->resource_state));
+        return;
+    }
     DEBUG("Loaded [%s], waiting for bind", this->name);
     std::function job = [this](){this->bind();};
     this->engine->graphics_controller->submit_graphics_task(job);
 }
 
 void Texture::unload_() {
+    if(this->resource_state != LoadableResourceState::LOADED) {
+        WARN("Attempted to unload texture in state [%s]",
+            util::loadable_resource_state_name(this->resource_state));
+        return;
+    }
     DEBUG("Unloading [%s], waiting for unbind", this->name);
     this->resource_state = LoadableResourceState::NOT_LOADED;
     std::function job = [this](){this->unbind();};
@@ -114,8 +126,12 @@ Texture::Texture(se::Engine* engine, const char* name) {
 
 void Texture::use_texture(unsigned int tex_unit) {
     if(this->resource_state != LoadableResourceState::LOADED) { return; }
-    int unit_num = GL_TEXTURE0 - tex_unit;
+    int unit_num = tex_unit - GL_TEXTURE0;
     glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
     glActiveTexture(tex_unit);
-    glBindTexture(GL_TEXTURE_2D, this->gl_texture);
+    glBindTexture(this->options.type, this->gl_texture);
+}
+
+unsigned int Texture::get_texture_id() {
+    return this->gl_texture;
 }

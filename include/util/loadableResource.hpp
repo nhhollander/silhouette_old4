@@ -75,6 +75,9 @@ namespace util {
             /// Get the resource stat
             LoadableResourceState get_resource_state();
 
+            /// Reload resource
+            void reload();
+
 
     };
 

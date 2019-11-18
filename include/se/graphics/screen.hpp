@@ -40,13 +40,18 @@ namespace se::graphics {
             /// OpenGL id for the screen vertex buffer
             unsigned int gl_screen_vert_buffer_id = 0;
 
-            /*!
-             *  Buffer textures.
-             * 
-             *  This vector exists for housekeeping and should not be directly
-             *  passed to either of the framebuffers during construction.
-             */
-            //std::vector<Texture> textures;
+            Texture* primary_color_tex;
+            Texture* primary_bg_tex;
+            Texture* primary_depth_tex;
+            Texture* post_color_tex;
+
+            const volatile int* dimx;
+            const volatile int* dimy;
+            const volatile int* msaa;
+
+            /// Reconfigure textures
+            void reconfigure_textures();
+
             /// Render framebuffer
             Framebuffer* primarybuffer;
             /// Post processing buffer

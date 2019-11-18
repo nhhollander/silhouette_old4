@@ -9,3 +9,5 @@ data/temp/
 data/cache/
 # Ignore QT Creator autosave files
 *.ui.autosave
+# Ignore core dumps
+core.*
