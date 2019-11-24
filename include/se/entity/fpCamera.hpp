@@ -31,6 +31,9 @@ namespace se::entity {
             bool key_a = false;
             bool key_d = false;
 
+            /// Camera locked
+            bool camera_locked = false;
+
         public:
 
             FPCamera(se::Engine* engine);

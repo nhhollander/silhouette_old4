@@ -84,7 +84,6 @@ namespace se::input {
             /// Deregister an input handler
             void deregister_handler(InputHandler handler);
 
-
     };
 
 }

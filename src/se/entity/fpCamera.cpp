@@ -24,15 +24,33 @@ using namespace se::entity;
 // =====================
 
 void FPCamera::sdl_event_handler(SDL_Event event) {
+    // Check if begin or end mouse lock
+    if(!this->camera_locked && event.type == SDL_MOUSEBUTTONDOWN) {
+        this->lock_mouse();
+    } else if(event.type == SDL_KEYDOWN) {
+        if(event.key.keysym.sym == SDLK_ESCAPE) {
+            if(this->camera_locked) {
+                this->release_mouse();
+            } else {
+                // Mouse is unlocked and escape was pressed, time to terminate
+                SDL_Event quit_event;
+                quit_event.type = SDL_QUIT;
+                SDL_PushEvent(&quit_event);
+            }
+        }
+    }
+
+    // Only process movement if the camera is locked
+    if(!this->camera_locked) { return; }
     if(event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
         if(event.key.keysym.sym == SDLK_w) {
-            this->key_w = event.type == SDL_KEYDOWN;
+            this->key_w = (event.type == SDL_KEYDOWN);
         } else if(event.key.keysym.sym == SDLK_s) {
-            this->key_s = event.type == SDL_KEYDOWN;
+            this->key_s = (event.type == SDL_KEYDOWN);
         } else if(event.key.keysym.sym == SDLK_a) {
-            this->key_a = event.type == SDL_KEYDOWN;
+            this->key_a = (event.type == SDL_KEYDOWN);
         } else if(event.key.keysym.sym == SDLK_d) {
-            this->key_d = event.type == SDL_KEYDOWN;
+            this->key_d = (event.type == SDL_KEYDOWN);
         }
     } else if(event.type == SDL_MOUSEMOTION) {
         int x = event.motion.xrel;
@@ -65,11 +83,15 @@ FPCamera::FPCamera(se::Engine* engine) : Camera(engine) {
 FPCamera::~FPCamera() {}
 
 void FPCamera::lock_mouse() {
+    DEBUG("Locking mouse pointer");
     SDL_SetRelativeMouseMode(SDL_TRUE);
+    this->camera_locked = true;
 }
 
 void FPCamera::release_mouse() {
+    DEBUG("Releasing mouse pointer");
     SDL_SetRelativeMouseMode(SDL_FALSE);
+    this->camera_locked = false;
 }
 
 void FPCamera::tick(uint64_t clock, uint32_t cdelta) {

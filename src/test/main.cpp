@@ -48,7 +48,6 @@ int main(int argc, char** argv) {
     FPCamera cam(&e);
     cam.set_name("camera");
     cam.z = 1.524;
-    cam.lock_mouse();
     srm.set_active_camera(&cam);
     scene.register_entity(&cam);
 

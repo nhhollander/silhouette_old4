@@ -27,9 +27,9 @@ void InputController::input_thread_main() {
     INFO("Hello from the input thread!");
 
     // Main input loop
+    SDL_Event input_event;
     while(this->engine->threads_run) {
 
-        SDL_Event input_event;
         if(SDL_PollEvent(&input_event)) {
             for(auto handler : this->handlers) {
                 handler(input_event);
@@ -46,9 +46,9 @@ void InputController::input_thread_main() {
 
 void InputController::quit_handler(SDL_Event event) {
     if(event.type == SDL_KEYDOWN) {
-        if(event.key.keysym.sym == SDLK_ESCAPE) {
-            this->engine->threads_run = false;
-        }
+        //if(event.key.keysym.sym == SDLK_ESCAPE) {
+        //    this->engine->threads_run = false;
+        //}
     } else if(event.type == SDL_QUIT) {
         this->engine->threads_run = false;
     }

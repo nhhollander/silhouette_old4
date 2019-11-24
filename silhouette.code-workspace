@@ -68,7 +68,8 @@
 			"string": "cpp",
 			"qglwidget": "cpp",
 			"qapplication": "cpp",
-			"qopenglwidget": "cpp"
+			"qopenglwidget": "cpp",
+			"qevent": "cpp"
 		},
 		"editor.rulers": [
 			80

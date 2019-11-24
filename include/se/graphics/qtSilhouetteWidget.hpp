@@ -39,6 +39,12 @@ namespace se::graphics {
             void paintGL();
             void resizeGL(int width, int height);
 
+            /*!
+             *  Translate a received QT event into a SDL event understood by the
+             *  engine.
+             */
+            bool event(QEvent* event);
+
             QSize minimumSizeHint() const;
             QSize sizeHint() const;
 
