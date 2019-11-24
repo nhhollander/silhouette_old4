@@ -21,6 +21,7 @@ namespace se {
 
         class StaticProp;
         class Camera;
+        class Sign;
 
     }
 
@@ -37,6 +38,7 @@ namespace se {
         class Shader;
         class ShaderProgram;
         class Texture;
+        class TextTexture;
 
         #ifdef SE_ENABLE_QT_WIDGET_SUPPORT
         class QTSilhouetteWidget;

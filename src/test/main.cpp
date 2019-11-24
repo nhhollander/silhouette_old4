@@ -13,8 +13,10 @@
 #include "se/entity/staticProp.hpp"
 #include "se/entity/fpCamera.hpp"
 #include "se/entity/skybox.hpp"
+#include "se/entity/sign.hpp"
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/simpleRenderManager.hpp"
+#include "se/graphics/textTexture.hpp"
 
 #include "util/config.hpp"
 #include "util/log.hpp"
@@ -55,9 +57,22 @@ int main(int argc, char** argv) {
     sb.set_name("skybox");
     scene.register_entity(&sb);
 
+    TextTexture tt(&e, "");
+    tt.set_texturesize(300, 300);
+    tt.update_text("Hello World!\nBeep Boop!\ntestΔ");
+
+    Sign sign(&e,"sign");
+    sign.set_text("Hello World");
+    scene.register_entity(&sign);
+
+    int counter = 0;
     if(e.config->get_bool("render.use_sdl")) {
         while(e.threads_run) {
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            std::string msg = ">";
+            msg += std::to_string(counter);
+            counter++;
+            sign.set_text(msg);
         }
     } else {
 

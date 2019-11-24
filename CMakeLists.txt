@@ -52,6 +52,10 @@ add_library(seutil SHARED
     src/util/log.cpp
 )
 
+# Heck
+include(FindFreetype)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 # Add the silhouette library
 # QT Headers have to be added to the sources list because... uh... reasons.
 add_library(silhouette SHARED
@@ -59,6 +63,7 @@ add_library(silhouette SHARED
     src/se/entity.cpp
     src/se/entity/camera.cpp
     src/se/entity/fpCamera.cpp
+    src/se/entity/sign.cpp
     src/se/entity/skybox.cpp
     src/se/entity/staticProp.cpp
     src/se/graphics/framebuffer.cpp
@@ -70,6 +75,7 @@ add_library(silhouette SHARED
     src/se/graphics/shader.cpp
     src/se/graphics/shaderProgram.cpp
     src/se/graphics/simpleRenderManager.cpp
+    src/se/graphics/textTexture.cpp
     include/se/graphics/qtSilhouetteWidget.hpp
     src/se/graphics/qtSilhouetteWidget.cpp
     src/se/graphics/texture.cpp
@@ -79,7 +85,7 @@ add_library(silhouette SHARED
 
 )
 # Link to required libraries
-target_link_libraries(silhouette GL SDL2 seutil GLEW ${SE_QT_LIB_NAME})
+target_link_libraries(silhouette GL SDL2 seutil GLEW freetype ${SE_QT_LIB_NAME})
 
 # Add the test implementation
 add_executable(se_test

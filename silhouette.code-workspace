@@ -69,7 +69,12 @@
 			"qglwidget": "cpp",
 			"qapplication": "cpp",
 			"qopenglwidget": "cpp",
-			"qevent": "cpp"
+			"qevent": "cpp",
+			"bit": "cpp",
+			"codecvt": "cpp",
+			"set": "cpp",
+			"shared_mutex": "cpp",
+			"variant": "cpp"
 		},
 		"editor.rulers": [
 			80

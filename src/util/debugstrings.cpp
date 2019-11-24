@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <SDL2/SDL_events.h>
 #include <png.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 #define CASE(c) case(c): return #c;
 
@@ -282,5 +284,115 @@ const char* util::string::gl_message_severity(unsigned int severity) {
         CASE(GL_DEBUG_SEVERITY_LOW)
         CASE(GL_DEBUG_SEVERITY_NOTIFICATION)
         default: return "<invalid message severity>";
+    }
+}
+
+const char* util::string::ft2_error_name(unsigned int code) {
+    switch(code) {
+        // Not an error
+        CASE(FT_Err_Ok)
+        // Generic Errors
+        CASE(FT_Err_Cannot_Open_Resource)
+        CASE(FT_Err_Unknown_File_Format)
+        CASE(FT_Err_Invalid_File_Format)
+        CASE(FT_Err_Invalid_Version)
+        CASE(FT_Err_Lower_Module_Version)
+        CASE(FT_Err_Invalid_Argument)
+        CASE(FT_Err_Unimplemented_Feature)
+        CASE(FT_Err_Invalid_Table)
+        CASE(FT_Err_Invalid_Offset)
+        CASE(FT_Err_Array_Too_Large)
+        CASE(FT_Err_Missing_Module)
+        CASE(FT_Err_Missing_Property)
+        // Glyph/character errors
+        CASE(FT_Err_Invalid_Glyph_Index)
+        CASE(FT_Err_Invalid_Character_Code)
+        CASE(FT_Err_Invalid_Glyph_Format)
+        CASE(FT_Err_Cannot_Render_Glyph)
+        CASE(FT_Err_Invalid_Outline)
+        CASE(FT_Err_Invalid_Composite)
+        CASE(FT_Err_Too_Many_Hints)
+        CASE(FT_Err_Invalid_Pixel_Size)
+        // Handle Errors
+        CASE(FT_Err_Invalid_Handle)
+        CASE(FT_Err_Invalid_Library_Handle)
+        CASE(FT_Err_Invalid_Driver_Handle)
+        CASE(FT_Err_Invalid_Face_Handle)
+        CASE(FT_Err_Invalid_Size_Handle)
+        CASE(FT_Err_Invalid_Slot_Handle)
+        CASE(FT_Err_Invalid_CharMap_Handle)
+        CASE(FT_Err_Invalid_Stream_Handle)
+        // Driver Errros
+        CASE(FT_Err_Too_Many_Drivers)
+        CASE(FT_Err_Too_Many_Extensions)
+        // Mamory Errors
+        CASE(FT_Err_Out_Of_Memory)
+        CASE(FT_Err_Unlisted_Object)
+        // Stream Errors
+        CASE(FT_Err_Cannot_Open_Stream)
+        CASE(FT_Err_Invalid_Stream_Seek)
+        CASE(FT_Err_Invalid_Stream_Skip)
+        CASE(FT_Err_Invalid_Stream_Read)
+        CASE(FT_Err_Invalid_Stream_Operation)
+        CASE(FT_Err_Invalid_Frame_Operation)
+        CASE(FT_Err_Nested_Frame_Access)
+        CASE(FT_Err_Invalid_Frame_Read)
+        // Raster Errors
+        CASE(FT_Err_Raster_Uninitialized)
+        CASE(FT_Err_Raster_Corrupted)
+        CASE(FT_Err_Raster_Overflow)
+        CASE(FT_Err_Raster_Negative_Height)
+        // Cache Errors
+        CASE(FT_Err_Too_Many_Caches)
+        // TrueType and SFNT errors
+        CASE(FT_Err_Invalid_Opcode)
+        CASE(FT_Err_Too_Few_Arguments)
+        CASE(FT_Err_Stack_Overflow)
+        CASE(FT_Err_Code_Overflow)
+        CASE(FT_Err_Bad_Argument)
+        CASE(FT_Err_Divide_By_Zero)
+        CASE(FT_Err_Invalid_Reference)
+        CASE(FT_Err_Debug_OpCode)
+        CASE(FT_Err_ENDF_In_Exec_Stream)
+        CASE(FT_Err_Nested_DEFS)
+        CASE(FT_Err_Invalid_CodeRange)
+        CASE(FT_Err_Execution_Too_Long)
+        CASE(FT_Err_Too_Many_Function_Defs)
+        CASE(FT_Err_Too_Many_Instruction_Defs)
+        CASE(FT_Err_Table_Missing)
+        CASE(FT_Err_Horiz_Header_Missing)
+        CASE(FT_Err_Locations_Missing)
+        CASE(FT_Err_Name_Table_Missing)
+        CASE(FT_Err_CMap_Table_Missing)
+        CASE(FT_Err_Hmtx_Table_Missing)
+        CASE(FT_Err_Post_Table_Missing)
+        CASE(FT_Err_Invalid_Horiz_Metrics)
+        CASE(FT_Err_Invalid_CharMap_Format)
+        CASE(FT_Err_Invalid_PPem)
+        CASE(FT_Err_Invalid_Vert_Metrics)
+        CASE(FT_Err_Could_Not_Find_Context)
+        CASE(FT_Err_Invalid_Post_Table_Format)
+        CASE(FT_Err_Invalid_Post_Table)
+        CASE(FT_Err_DEF_In_Glyf_Bytecode)
+        CASE(FT_Err_Missing_Bitmap)
+        // CFF, CID, and Type 1 errors (what the heck does that mean?)
+        CASE(FT_Err_Syntax_Error)
+        CASE(FT_Err_Stack_Underflow)
+        CASE(FT_Err_Ignore)
+        CASE(FT_Err_No_Unicode_Glyph_Name)
+        CASE(FT_Err_Glyph_Too_Big)
+        // BDF errors
+        CASE(FT_Err_Missing_Startfont_Field)
+        CASE(FT_Err_Missing_Font_Field)
+        CASE(FT_Err_Missing_Size_Field)
+        CASE(FT_Err_Missing_Fontboundingbox_Field)
+        CASE(FT_Err_Missing_Chars_Field)
+        CASE(FT_Err_Missing_Startchar_Field)
+        CASE(FT_Err_Missing_Encoding_Field)
+        CASE(FT_Err_Missing_Bbx_Field)
+        CASE(FT_Err_Bbx_Too_Big)
+        CASE(FT_Err_Corrupted_Font_Header)
+        CASE(FT_Err_Corrupted_Font_Glyphs)
+        default: return "<invalid error>";
     }
 }

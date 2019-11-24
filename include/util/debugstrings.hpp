@@ -126,6 +126,15 @@ namespace util::string {
      */
     const char* gl_message_severity(unsigned int severity);
 
+    /*!
+     *  Return the name of a FreeType 2 error.
+     * 
+     *  @param code FreeType 2 error code.
+     * 
+     *  @return Name of the error, or "<invalid error>"
+     */
+    const char* ft2_error_name(unsigned int code);
+
 }
 
 #endif

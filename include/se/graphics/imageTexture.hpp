@@ -45,14 +45,6 @@ namespace se::graphics {
              */
             virtual void bind();
 
-            /*!
-             *  Unbind texture data from the GPU.
-             * 
-             *  **Warning:** This method must only be called from the garphics
-             *  thread.
-             */
-            virtual void unbind();
-
         protected:
 
             void load_();
@@ -72,16 +64,6 @@ namespace se::graphics {
              *  cache, and failing that instantiates a new object.
              */
             static ImageTexture* get_texture(se::Engine* engine, const char* name);
-
-            /*!
-             *  Make this the active texture.
-             * 
-             *  **Warning:** This method must only be called from the graphics
-             *  thread.
-             *  
-             *  @param tex_unit Texture unit to bind the texture to.
-             */
-            void use_texture(unsigned int tex_unit);
 
     };
 

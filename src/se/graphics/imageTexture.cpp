@@ -54,10 +54,6 @@ void ImageTexture::bind() {
 
 }
 
-void ImageTexture::unbind() {
-    Texture::unbind();
-}
-
 // =======================
 // == PROTECTED METHODS ==
 // =======================
@@ -183,12 +179,4 @@ ImageTexture* ImageTexture::get_texture(se::Engine* engine, const char* name) {
     }
     DEBUG("Found texture [%s] in cache!", name);
     return static_cast<ImageTexture*>(resource);
-}
-
-void ImageTexture::use_texture(unsigned int tex_unit) {
-    if(this->resource_state != LoadableResourceState::LOADED) { return; }
-    int unit_num = GL_TEXTURE0 - tex_unit;
-    glUniform1i(SE_SHADER_LOC_TEX_0 + unit_num, unit_num);
-    glActiveTexture(tex_unit);
-    glBindTexture(GL_TEXTURE_2D, this->gl_texture);
 }
