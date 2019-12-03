@@ -54,7 +54,6 @@ void Screen::deinit() {
 }
 
 void Screen::reconfigure_textures() {
-    FATAL("Reconfiguring textures [%ix%ix%i]", *this->dimx, *this->dimy, *this->msaa);
     this->primary_color_tex->options.dimx = *this->dimx;
     this->primary_color_tex->options.dimy = *this->dimy;
     this->primary_color_tex->options.mscount = *this->msaa;

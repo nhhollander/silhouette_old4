@@ -26,7 +26,6 @@ using namespace util;
 // =====================
 
 FT_Vector TextTexture::render_char(char32_t glyph, int x, int y) {
-    DEBUG("Rendering character [%c] at [%i,%i]", glyph, x, y);
     FT_Error error = FT_Load_Char(this->font_face, glyph, FT_LOAD_RENDER);
     if(error) {
         ERROR("Failed to load glyph [%c] [%s]", glyph,
