@@ -46,15 +46,15 @@ StaticProp::~StaticProp() {
 
 void StaticProp::render(glm::mat4 camera_matrix) {
 
-    if(this->geometry->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->texture->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->shader_program->get_resource_state() != util::LoadableResourceState::LOADED){
+    if(this->geometry->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->texture->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->shader_program->get_resource_state() != se::util::LoadableResourceState::LOADED){
         // Not ready to render
         DEBUG("Static prop [m: %s t: %s] not ready [m: %s t: %s s: %s]",
             this->model_name, this->texture_name,
-            util::loadable_resource_state_name(this->geometry->get_resource_state()),
-            util::loadable_resource_state_name(this->texture->get_resource_state()),
-            util::loadable_resource_state_name(this->shader_program->get_resource_state()));
+            se::util::loadable_resource_state_name(this->geometry->get_resource_state()),
+            se::util::loadable_resource_state_name(this->texture->get_resource_state()),
+            se::util::loadable_resource_state_name(this->shader_program->get_resource_state()));
         return;
     }
 

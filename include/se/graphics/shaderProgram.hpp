@@ -23,7 +23,7 @@ namespace se::graphics {
      * 
      *  This class represents a usable shader program.
      */
-    class ShaderProgram : public util::CacheableResource, public util::LoadableResource {
+    class ShaderProgram : public se::util::CacheableResource, public se::util::LoadableResource {
 
         private:
 
@@ -158,7 +158,7 @@ namespace se::graphics {
              * 
              *  @return The state the program is in after loading.
              */
-            util::LoadableResourceState wait_for_loading();
+            se::util::LoadableResourceState wait_for_loading();
 
             /*!
              *  Use this Program.

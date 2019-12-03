@@ -35,7 +35,7 @@ using namespace se::entity;
 using namespace se::graphics;
 
 int main(int argc, char** argv) {
-    util::log::set_thread_name("MAIN");
+    se::util::log::set_thread_name("MAIN");
     INFO("Hello World!");
 
     Engine e;

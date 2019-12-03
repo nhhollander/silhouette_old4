@@ -62,7 +62,7 @@ void ImageTexture::load_() {
     DEBUG("Loading texture [%s]", this->name);
     this->resource_state = LoadableResourceState::LOADING;
     
-    std::string fname = util::dirs::app_data();
+    std::string fname = se::util::dirs::app_data();
     fname += "/textures/";
     fname += this->name;
     fname += ".png";
@@ -156,7 +156,7 @@ void ImageTexture::unload_() {
 }
 
 uint32_t ImageTexture::resource_id() {
-    return util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
+    return se::util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
 }
 
 std::string ImageTexture::resource_name() {
@@ -171,7 +171,7 @@ std::string ImageTexture::resource_name() {
 // ====================
 
 ImageTexture* ImageTexture::get_texture(se::Engine* engine, const char* name) {
-    uint32_t hash = util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
+    uint32_t hash = se::util::hash::ejenkins(TEXTURE_HASH_FORMAT, engine, name);
     CacheableResource* resource = ImageTexture::find_resource(hash);
     if(resource == nullptr) {
         DEBUG("Texture [%s] not in cache :(", name);

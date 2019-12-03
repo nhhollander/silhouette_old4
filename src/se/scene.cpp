@@ -67,7 +67,7 @@ Scene::~Scene() {
 void Scene::load_scene(const char* fname) {
     // Get the file path
     std::string fpath;
-    fpath += util::dirs::app_data();
+    fpath += se::util::dirs::app_data();
     fpath += "/scenes/";
     fpath += fname;
     fpath += ".scene";
@@ -90,7 +90,7 @@ void Scene::load_scene(const char* fname) {
             WARN("Missing entity type for entity [%s]", ename.c_str());
             continue;
         }
-        uint32_t type_hash = util::hash::ejenkins("%s", type.c_str());
+        uint32_t type_hash = se::util::hash::ejenkins("%s", type.c_str());
         auto find = this->constructors.find(type_hash);
         if(find == this->constructors.end()) {
             WARN("[%s] has unknown entity type [%s]", ename.c_str(), type.c_str());
@@ -143,7 +143,7 @@ std::map<uint8_t, se::Entity*>* Scene::get_entities() {
 }
 
 void Scene::register_entity(se::Entity* entity) {
-    uint8_t entity_hash = util::hash::ejenkins("%s", entity->get_name());
+    uint8_t entity_hash = se::util::hash::ejenkins("%s", entity->get_name());
 
     for(auto i : this->all_entities) {
         if(i.second == entity) {
@@ -165,7 +165,7 @@ void Scene::register_entity(se::Entity* entity) {
 }
 
 void Scene::deregister_entity(se::Entity* entity) {
-    uint8_t entity_hash = util::hash::ejenkins("%s", entity->get_name());
+    uint8_t entity_hash = se::util::hash::ejenkins("%s", entity->get_name());
     for(auto i : this->internally_loaded) {
         if(i == entity) {
             WARN("Attempted to deregister an internally managed entity");
@@ -191,7 +191,7 @@ void Scene::deregister_entity(se::Entity* entity) {
 }
 
 void Scene::register_constructor(const char* type, WrappedEntityConstructor constructor) {
-    uint32_t hash = util::hash::ejenkins("%s", type);
+    uint32_t hash = se::util::hash::ejenkins("%s", type);
     auto search = this->constructors.find(hash);
     if(search != this->constructors.end()) {
         WARN("Attempted to register duplicate constructor for type [%s]", type);
@@ -201,7 +201,7 @@ void Scene::register_constructor(const char* type, WrappedEntityConstructor cons
 }
 
 se::Entity* Scene::get_entity(const char* name) {
-    uint32_t hash = util::hash::ejenkins("%s", name);
+    uint32_t hash = se::util::hash::ejenkins("%s", name);
     DEBUG("Hash is [%#08X]", hash);
     auto find = this->all_entities.find(hash);
     if(find == this->all_entities.end()) {

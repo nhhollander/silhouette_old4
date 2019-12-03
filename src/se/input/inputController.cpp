@@ -23,7 +23,7 @@ using namespace se::input;
 // =====================
 
 void InputController::input_thread_main() {
-    util::log::set_thread_name("INPUT");
+    se::util::log::set_thread_name("INPUT");
     INFO("Hello from the input thread!");
 
     // Main input loop

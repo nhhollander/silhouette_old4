@@ -78,8 +78,8 @@ Shader* Shader::get_shader(se::Engine* engine, const char* name, GLuint type, co
     /* Hash for defines is calculated separately because there is a somewhat 
     arbitrary size limit for the ejenkins function, and it's possible that the
     definitions will overwhelm that limit, potentially poisoning the result. */
-    uint32_t defines_hash = util::hash::jenkins(defines, strlen(defines));
-    uint32_t hash = util::hash::ejenkins("%p:%s:%u:%u", engine, name, type, defines_hash);
+    uint32_t defines_hash = se::util::hash::jenkins(defines, strlen(defines));
+    uint32_t hash = se::util::hash::ejenkins("%p:%s:%u:%u", engine, name, type, defines_hash);
 
     // Check the cache
     auto check = Shader::cache.find(hash);
@@ -112,12 +112,12 @@ Shader::Shader(se::Engine* engine, const char* name, GLuint type, const char* de
         this->name += ".frag";
     } else {
         ERROR("[%s] Invalid or unsupported shader type [%u: %s]",
-            name, type, util::string::gl_type_name(type));
+            name, type, se::util::string::gl_type_name(type));
         return;
     }
 
     // Load the shader source code from disk
-    std::string fname = util::dirs::app_data() + "/shaders/" + this->name;
+    std::string fname = se::util::dirs::app_data() + "/shaders/" + this->name;
     FILE* fp = fopen(fname.c_str(), "rb");
     if(fp == nullptr) {
         ERROR("[%s] Failed to open source file [%s] [%i: %s]",
@@ -203,8 +203,8 @@ void Shader::compile() {
         GLenum error = glGetError();
         ERROR("[%s] Failed to create new shader [%s: %s]",
             this->name.c_str(),
-            util::string::gl_error_name(error),
-            util::string::gl_error_desc(error));
+            se::util::string::gl_error_name(error),
+            se::util::string::gl_error_desc(error));
         this->state = ShaderState::ERROR;
         return;
     }

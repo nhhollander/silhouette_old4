@@ -69,7 +69,7 @@ void Framebuffer::init() {
     GLenum framebuffer_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if(framebuffer_status != GL_FRAMEBUFFER_COMPLETE) {
         ERROR("Failed to generate framebuffer! [%s]",
-            util::string::gl_framebuffer_status_name(framebuffer_status));
+            se::util::string::gl_framebuffer_status_name(framebuffer_status));
         this->state = FramebufferState::ERROR;
     } else {
         this->state = FramebufferState::INITIALIZED;

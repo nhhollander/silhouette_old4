@@ -22,7 +22,7 @@ using namespace se::logic;
 // =====================
 
 void LogicController::logic_thread_main() {
-    util::log::set_thread_name("LOGIC");
+    se::util::log::set_thread_name("LOGIC");
     INFO("Hello from the logic thread!");
 
     // Set up the TPS cap

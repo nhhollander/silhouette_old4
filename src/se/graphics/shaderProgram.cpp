@@ -109,8 +109,8 @@ void ShaderProgram::link() {
         GLenum error = glGetError();
         ERROR("[%s] Failed to create new program [%s: %s]",
             this->name.c_str(),
-            util::string::gl_error_name(error),
-            util::string::gl_error_desc(error));
+            se::util::string::gl_error_name(error),
+            se::util::string::gl_error_desc(error));
         this->resource_state = LoadableResourceState::ERROR;
         return;
     }

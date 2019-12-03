@@ -29,7 +29,7 @@ using namespace se::graphics;
 
 void SimpleRenderManager::support_thread_main() {
 
-    util::log::set_thread_name("SRMSUP");
+    se::util::log::set_thread_name("SRMSUP");
     INFO("Hello from the simple render manager support thread");
 
     // Variables for sorting benchmarking

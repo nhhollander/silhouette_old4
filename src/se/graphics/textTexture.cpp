@@ -29,7 +29,7 @@ FT_Vector TextTexture::render_char(char32_t glyph, int x, int y) {
     FT_Error error = FT_Load_Char(this->font_face, glyph, FT_LOAD_RENDER);
     if(error) {
         ERROR("Failed to load glyph [%c] [%s]", glyph,
-            util::string::ft2_error_name(error));
+            se::util::string::ft2_error_name(error));
         // TODO: More error detail here
         return {0,0};
     }
@@ -64,13 +64,13 @@ TextTexture::TextTexture(se::Engine* engine, const char* name) : Texture(engine,
     auto err = FT_Init_FreeType(&this->ft);
     if(err) {
         ERROR("Failed to initialize FreeType library [%s]",
-            util::string::ft2_error_name(err));
+            se::util::string::ft2_error_name(err));
         this->init_success = false;
         return;
     }
 
     // Default font configuration
-    this->set_font(util::dirs::app_data() + "/fonts/roboto.ttf");
+    this->set_font(se::util::dirs::app_data() + "/fonts/roboto.ttf");
     this->set_size(45);
     this->set_texturesize(256,256);
 
@@ -84,7 +84,7 @@ bool TextTexture::set_font(std::string font) {
     FT_Error error = FT_New_Face(this->ft, font.c_str(), 0, &this->font_face);
     if(error) {
         ERROR("Failed to load font [%s] [%s]", font.c_str(),
-            util::string::ft2_error_name(error));
+            se::util::string::ft2_error_name(error));
         return false;
     }
     DEBUG("Set font to [%s]", font.c_str());
@@ -95,7 +95,7 @@ bool TextTexture::set_size(int height) {
     FT_Error error = FT_Set_Pixel_Sizes(this->font_face, 0, height);
     if(error) {
         ERROR("Failed to set font size to [%i] [%s]", height,
-            util::string::ft2_error_name(error));
+            se::util::string::ft2_error_name(error));
         return false;
     }
     DEBUG("Set font size to [%i]", height);

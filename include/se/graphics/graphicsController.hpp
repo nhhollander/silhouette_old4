@@ -135,7 +135,7 @@ namespace se::graphics {
              *  Invoke this method by updating the `render.fpscap` configuration
              *  value.
              */
-            void recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config);
+            void recalculate_fps_limit(se::util::ConfigurationValue* value, se::util::Configuration* config);
 
             /*!
              *  Process pending graphics tasks.

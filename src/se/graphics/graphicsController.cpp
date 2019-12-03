@@ -59,9 +59,9 @@ void GLAPIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id,
 }
 
 void GraphicsController::graphics_thread_main() {
-    util::log::set_thread_name("RENDER");
+    se::util::log::set_thread_name("RENDER");
     INFO("Hello from the render thread!");
-    util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(GraphicsController::recalculate_fps_limit);
+    se::util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(GraphicsController::recalculate_fps_limit);
     this->engine->config->get("render.fpscap")->add_change_handler(handler);
 
     this->init_sdl();
@@ -140,7 +140,7 @@ void GraphicsController::do_frame() {
 }
 
 
-void GraphicsController::recalculate_fps_limit(util::ConfigurationValue* value, util::Configuration* config) {
+void GraphicsController::recalculate_fps_limit(se::util::ConfigurationValue* value, se::util::Configuration* config) {
     INFO("FPS limit changed to %i", value->int_);
     int fps_cap = value->int_;
     this->target_frame_time = 1000000000 / fps_cap;

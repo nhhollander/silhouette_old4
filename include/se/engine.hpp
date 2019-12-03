@@ -33,7 +33,7 @@ namespace se {
              *  All configuration settings for this instance of this engine are
              *  contained here.
              */
-            util::Configuration* config = nullptr;
+            se::util::Configuration* config = nullptr;
 
             /*!
              *  Thread Run Flag.

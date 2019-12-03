@@ -113,7 +113,7 @@ void Geometry::load_() {
     std::vector<glm::vec2> temp_uvs;
     std::vector<glm::vec3> temp_normals;
 
-    std::string fname = util::dirs::app_data();
+    std::string fname = se::util::dirs::app_data();
     fname += "/models/";
     fname += name;
     fname += ".obj";
@@ -215,7 +215,7 @@ void Geometry::unload_() {
 }
 
 uint32_t Geometry::resource_id() {
-    return util::hash::ejenkins(GEOM_HASH_FORMAT, this->engine, this->name);
+    return se::util::hash::ejenkins(GEOM_HASH_FORMAT, this->engine, this->name);
 }
 
 std::string Geometry::resource_name() {

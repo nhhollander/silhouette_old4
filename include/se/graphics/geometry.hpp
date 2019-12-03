@@ -23,7 +23,7 @@ namespace se::graphics {
     /*!
      *  Geometry Class.
      */
-    class Geometry : public util::CacheableResource, public util::LoadableResource {
+    class Geometry : public se::util::CacheableResource, public se::util::LoadableResource {
 
         private:
 
@@ -98,16 +98,16 @@ namespace se::graphics {
 
         protected:
 
-            /// @see `util::LoadableResource::load_()`
+            /// @see `se::util::LoadableResource::load_()`
             void load_();
 
-            /// @see `util::LoadableResource::unload_()`
+            /// @see `se::util::LoadableResource::unload_()`
             void unload_();
 
-            /// @see `util::CacheableResource::resource_id()`
+            /// @see `se::util::CacheableResource::resource_id()`
             uint32_t resource_id();
 
-            /// @see `util::CacheableResource::resource_name()`
+            /// @see `se::util::CacheableResource::resource_name()`
             std::string resource_name();
 
         public:

@@ -21,7 +21,7 @@ namespace se::graphics {
      *  Image textures are populated with data loaded from PNG or other
      *  image files.
      */
-    class ImageTexture : public Texture, public util::CacheableResource {
+    class ImageTexture : public Texture, public se::util::CacheableResource {
 
         private:
 

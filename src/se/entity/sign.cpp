@@ -43,9 +43,9 @@ Sign::~Sign() {
 
 void Sign::render(glm::mat4 camera_matrix) {
 
-    if(this->geometry->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->texture->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->shader_program->get_resource_state() != util::LoadableResourceState::LOADED){
+    if(this->geometry->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->texture->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->shader_program->get_resource_state() != se::util::LoadableResourceState::LOADED){
         // Not ready to render
         return;
     }

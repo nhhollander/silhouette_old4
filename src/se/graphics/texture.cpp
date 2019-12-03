@@ -43,7 +43,7 @@ void Texture::bind() {
     while(glGetError() != GL_NO_ERROR) {}
 
     if(this->options.type != GL_TEXTURE_2D && this->options.type != GL_TEXTURE_2D_MULTISAMPLE) {
-        ERROR("Unsupported texture type [%s]", util::string::gl_type_name(this->options.type));
+        ERROR("Unsupported texture type [%s]", se::util::string::gl_type_name(this->options.type));
         return;
     }
 
@@ -77,7 +77,7 @@ void Texture::bind() {
     GLenum err = glGetError();
     if(err != GL_NO_ERROR) {
         ERROR("[%s] Failed to bind texture [%s: %s]", this->name,
-            util::string::gl_error_name(err), util::string::gl_error_desc(err));
+            se::util::string::gl_error_name(err), se::util::string::gl_error_desc(err));
         this->resource_state = LoadableResourceState::ERROR;
         return;
     }
@@ -95,7 +95,7 @@ void Texture::unbind() {
 void Texture::load_() {
     if(this->resource_state != LoadableResourceState::NOT_LOADED) {
         WARN("Attempted to load texture in state [%s]",
-            util::loadable_resource_state_name(this->resource_state));
+            se::util::loadable_resource_state_name(this->resource_state));
         return;
     }
     DEBUG("Loaded [%s], waiting for bind", this->name);
@@ -106,7 +106,7 @@ void Texture::load_() {
 void Texture::unload_() {
     if(this->resource_state != LoadableResourceState::LOADED) {
         WARN("Attempted to unload texture in state [%s]",
-            util::loadable_resource_state_name(this->resource_state));
+            se::util::loadable_resource_state_name(this->resource_state));
         return;
     }
     DEBUG("Unloading [%s], waiting for unbind", this->name);

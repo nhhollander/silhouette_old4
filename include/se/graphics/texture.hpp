@@ -55,7 +55,7 @@ namespace se::graphics {
     /*!
      *  Texture Class.
      */
-    class Texture : public util::LoadableResource {
+    class Texture : public se::util::LoadableResource {
 
         public:
 
@@ -90,10 +90,10 @@ namespace se::graphics {
             /// OpenGL texture ID
             unsigned int gl_texture = 0;
 
-            /// @see `util::LoadableResource`
+            /// @see `se::util::LoadableResource`
             virtual void load_();
 
-            /// @see `util::LoadableResource`
+            /// @see `se::util::LoadableResource`
             virtual void unload_();
 
         public:

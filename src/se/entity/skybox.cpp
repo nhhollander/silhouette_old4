@@ -52,15 +52,15 @@ Skybox::~Skybox() {
 
 void Skybox::render(glm::mat4 camera_matrix) {
 
-    if(this->geometry->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->texture->get_resource_state() != util::LoadableResourceState::LOADED ||
-        this->shader_program->get_resource_state() != util::LoadableResourceState::LOADED){
+    if(this->geometry->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->texture->get_resource_state() != se::util::LoadableResourceState::LOADED ||
+        this->shader_program->get_resource_state() != se::util::LoadableResourceState::LOADED){
         // Not ready to render
         DEBUG("Skybox [t: %s] not ready [t: %s s: %s g: %s]",
             this->texture_name,
-            util::loadable_resource_state_name(this->texture->get_resource_state()),
-            util::loadable_resource_state_name(this->geometry->get_resource_state()),
-            util::loadable_resource_state_name(this->shader_program->get_resource_state()));
+            se::util::loadable_resource_state_name(this->texture->get_resource_state()),
+            se::util::loadable_resource_state_name(this->geometry->get_resource_state()),
+            se::util::loadable_resource_state_name(this->shader_program->get_resource_state()));
         return;
     }
 

@@ -130,7 +130,7 @@ Screen::Screen(se::Engine* engine) {
     this->postprocessbuffer = new Framebuffer(engine, post_textures);
 
     // Configure the resize and reconfiguration handlers
-    auto handler = [this](util::ConfigurationValue* a,util::Configuration* b){
+    auto handler = [this](se::util::ConfigurationValue* a,se::util::Configuration* b){
         this->reconfigure_textures();};
     this->engine->config->get("window.dimx")->add_change_handler(handler);
     this->engine->config->get("window.dimy")->add_change_handler(handler);
