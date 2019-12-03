@@ -11,15 +11,15 @@
 #include "se/engine.hpp"
 #include "se/graphics/graphicsController.hpp"
 
-#include "util/log.hpp"
-#include "util/debugstrings.hpp"
-#include "util/dirs.hpp"
+#include "se/util/log.hpp"
+#include "se/util/debugstrings.hpp"
+#include "se/util/dirs.hpp"
 
 #include <codecvt>
 #include <locale>
 
 using namespace se::graphics;
-using namespace util;
+using namespace se::util;
 
 // =====================
 // == PRIVATE METHODS ==

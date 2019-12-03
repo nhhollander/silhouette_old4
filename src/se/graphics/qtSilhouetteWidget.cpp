@@ -12,8 +12,8 @@
 #include "se/graphics/graphicsController.hpp"
 #include "se/graphics/qtSilhouetteWidget.hpp"
 
-#include "util/config.hpp"
-#include "util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/log.hpp"
 
 #include <QEvent>
 #include <QKeyEvent>

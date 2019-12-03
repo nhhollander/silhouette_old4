@@ -12,10 +12,10 @@
 #include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
-#include "util/dirs.hpp"
-#include "util/hash.hpp"
-#include "util/log.hpp"
-#include "util/debugstrings.hpp"
+#include "se/util/dirs.hpp"
+#include "se/util/hash.hpp"
+#include "se/util/log.hpp"
+#include "se/util/debugstrings.hpp"
 
 #include <string.h>
 #include <string>
@@ -26,7 +26,7 @@
 #include <GL/gl.h>
 
 using namespace se::graphics;
-using namespace util;
+using namespace se::util;
 
 #define TEXTURE_HASH_FORMAT "texture:%p:%s"
 

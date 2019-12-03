@@ -16,7 +16,7 @@
 #include "se/graphics/shaderProgram.hpp"
 #include "se/graphics/imageTexture.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <string.h>
 

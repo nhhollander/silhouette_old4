@@ -1,5 +1,5 @@
 /*!
- *  @file include/util/hash.hpp
+ *  @file include/se/util/hash.hpp
  * 
  *  Static hashing helper functions.  This file provides basic **non-
  *  cryptographic** hashing functions.
@@ -9,13 +9,13 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_HASH_H_
-#define _UTIL_HASH_H_
+#ifndef _SE_UTIL_HASH_H_
+#define _SE_UTIL_HASH_H_
 
 #include <cstdint>
 #include <cstdlib>
 
-namespace util::hash {
+namespace se::util::hash {
 
     /*!
      *  Jenkins' one-at-a time hash.

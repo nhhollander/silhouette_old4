@@ -1,15 +1,15 @@
 /*!
- *  @file src/util/config.cpp
+ *  @file src/se/util/config.cpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/config.hpp"
+#include "se/util/config.hpp"
 
-#include "util/log.hpp"
-#include "util/hash.hpp"
+#include "se/util/log.hpp"
+#include "se/util/hash.hpp"
 
 #include <stdio.h>
 #include <errno.h>
@@ -24,13 +24,13 @@ std::mutex insertion_lock;
 // = CONSTRUCTOR AND DESTRUCTOR =
 // ==============================
 
-util::Configuration::Configuration(const char* name) {
+se::util::Configuration::Configuration(const char* name) {
 
     this->name = name;
 
 }
 
-util::Configuration::~Configuration() {
+se::util::Configuration::~Configuration() {
 
     // Destroy all of the keys
     for(auto iterator = this->config_values.begin(); iterator != this->config_values.end(); iterator++) {
@@ -47,7 +47,7 @@ util::Configuration::~Configuration() {
 // = PUBLIC METHODS =
 // ==================
 
-int util::Configuration::parse(const char* config_data) {
+int se::util::Configuration::parse(const char* config_data) {
 
     int entry_count = 0;
 
@@ -95,7 +95,7 @@ int util::Configuration::parse(const char* config_data) {
 
 }
 
-int util::Configuration::load(const char* fname) {
+int se::util::Configuration::load(const char* fname) {
 
     // Open the file
     FILE* cfile = fopen(fname, "r");
@@ -148,16 +148,16 @@ int util::Configuration::load(const char* fname) {
 
 }
 
-bool util::Configuration::create_if_non_existant(const char* key) {
+bool se::util::Configuration::create_if_non_existant(const char* key) {
     insertion_lock.lock();
 
     bool result = false;
-    uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+    uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
     auto lookup = this->config_values.find(key_hash);
     if(lookup == this->config_values.end()) {
         // Create the value
         DEBUG("Creating empty configuration value for key [%s]", key);
-        util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+        se::util::ConfigurationValue* ncv = new se::util::ConfigurationValue(this, key);
         this->config_values.insert(std::pair(key_hash, ncv));
         result = true;
     }
@@ -167,8 +167,8 @@ bool util::Configuration::create_if_non_existant(const char* key) {
     return result;
 }
 
-util::ConfigurationValue* util::Configuration::get(const char* key, bool quiet) {
-    uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+se::util::ConfigurationValue* se::util::Configuration::get(const char* key, bool quiet) {
+    uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
     auto lookup = this->config_values.find(key_hash);
     if(lookup == this->config_values.end()) {
         // Not found
@@ -180,9 +180,9 @@ util::ConfigurationValue* util::Configuration::get(const char* key, bool quiet) 
     return lookup->second;
 }
 
-const volatile char** util::Configuration::get_cstringp(const char* key, const char** default_) {
+const volatile char** se::util::Configuration::get_cstringp(const char* key, const char** default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile char**) default_;
     }
@@ -190,9 +190,9 @@ const volatile char** util::Configuration::get_cstringp(const char* key, const c
     return (const volatile char**) &cv->cstring_;
 }
 
-const volatile int* util::Configuration::get_intp(const char* key, int* default_) {
+const volatile int* se::util::Configuration::get_intp(const char* key, int* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile int*) default_;
     }
@@ -200,18 +200,18 @@ const volatile int* util::Configuration::get_intp(const char* key, int* default_
     return (const volatile int*) &cv->int_;
 }
 
-const volatile float* util::Configuration::get_floatp(const char* key, float* default_) {
+const volatile float* se::util::Configuration::get_floatp(const char* key, float* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile float*) default_;
     }
     // Return the double
     return (const volatile float*) &cv->float_;}
 
-const volatile double* util::Configuration::get_doublep(const char* key, double* default_) {
+const volatile double* se::util::Configuration::get_doublep(const char* key, double* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile double*) default_;
     }
@@ -219,9 +219,9 @@ const volatile double* util::Configuration::get_doublep(const char* key, double*
     return (const volatile double*) &cv->double_;
 }
 
-const volatile bool* util::Configuration::get_boolp(const char* key, bool* default_) {
+const volatile bool* se::util::Configuration::get_boolp(const char* key, bool* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (const volatile bool*) default_;
     }
@@ -235,14 +235,14 @@ const volatile bool* util::Configuration::get_boolp(const char* key, bool* defau
     return (const volatile bool*) &cv->bool_;
 }
 
-const std::string util::Configuration::get_string(const char* key, std::string default_) {
+const std::string se::util::Configuration::get_string(const char* key, std::string default_) {
     // Forward to standard string getter
     return this->get_string(key, default_.c_str());
 }
 
-const std::string util::Configuration::get_string(const char* key, const char* default_) {
+const std::string se::util::Configuration::get_string(const char* key, const char* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return std::string(default_);
     }
@@ -250,9 +250,9 @@ const std::string util::Configuration::get_string(const char* key, const char* d
     return std::string((char*) cv->cstring_);
 }
 
-const char* util::Configuration::get_cstring(const char* key, const char* default_) {
+const char* se::util::Configuration::get_cstring(const char* key, const char* default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return default_;
     }
@@ -260,9 +260,9 @@ const char* util::Configuration::get_cstring(const char* key, const char* defaul
     return (const char*) cv->cstring_;
 }
 
-int util::Configuration::get_int(const char* key, int default_) {
+int se::util::Configuration::get_int(const char* key, int default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return default_;
     }
@@ -270,9 +270,9 @@ int util::Configuration::get_int(const char* key, int default_) {
     return (const volatile int) cv->int_;
 }
 
-float util::Configuration::get_float(const char* key, float default_) {
+float se::util::Configuration::get_float(const char* key, float default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return default_;
     }
@@ -280,9 +280,9 @@ float util::Configuration::get_float(const char* key, float default_) {
     return (float) cv->float_;
 }
 
-double util::Configuration::get_double(const char* key, double default_) {
+double se::util::Configuration::get_double(const char* key, double default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return default_;
     }
@@ -290,9 +290,9 @@ double util::Configuration::get_double(const char* key, double default_) {
     return (double) cv->double_;
 }
 
-bool util::Configuration::get_bool(const char* key, bool default_) {
+bool se::util::Configuration::get_bool(const char* key, bool default_) {
     // Get the value
-    const util::ConfigurationValue* cv = this->get(key);
+    const se::util::ConfigurationValue* cv = this->get(key);
     if(cv == nullptr) {
         return (bool) default_;
     }
@@ -305,20 +305,20 @@ bool util::Configuration::get_bool(const char* key, bool default_) {
     return (bool) cv->bool_;
 }
 
-bool util::Configuration::set(const char* key, const char* value, bool create, uint64_t pk) {
+bool se::util::Configuration::set(const char* key, const char* value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
 
     // Locate the value
-    util::ConfigurationValue* cv = (util::ConfigurationValue*) this->get(key, create);
+    se::util::ConfigurationValue* cv = (se::util::ConfigurationValue*) this->get(key, create);
     // Check if exists
     if(cv == nullptr) {
         // Check if create
         if(create) {
-            util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+            se::util::ConfigurationValue* ncv = new se::util::ConfigurationValue(this, key);
             ncv->set(value);
-            uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+            uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
             this->config_values.insert(std::pair(key_hash, ncv));
         } else {
             WARN("Attempted to set non-existant configuration value [%s] to [%s]",
@@ -337,20 +337,20 @@ bool util::Configuration::set(const char* key, const char* value, bool create, u
     return true;
 }
 
-bool util::Configuration::set(const char* key, int value, bool create, uint64_t pk) {
+bool se::util::Configuration::set(const char* key, int value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
 
     // Locate the value
-    util::ConfigurationValue* cv = (util::ConfigurationValue*) this->get(key, create);
+    se::util::ConfigurationValue* cv = (se::util::ConfigurationValue*) this->get(key, create);
     // Check if exists
     if(cv == nullptr) {
         // Check if create
         if(create) {
-            util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+            se::util::ConfigurationValue* ncv = new se::util::ConfigurationValue(this, key);
             ncv->set(value);
-            uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+            uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
             this->config_values.insert(std::pair(key_hash, ncv));
         } else {
             WARN("Attempted to set non-existant configuration value [%s] to [%i]",
@@ -369,20 +369,20 @@ bool util::Configuration::set(const char* key, int value, bool create, uint64_t 
     return true;
 }
 
-bool util::Configuration::set(const char* key, double value, bool create, uint64_t pk) {
+bool se::util::Configuration::set(const char* key, double value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
 
     // Locate the value
-    util::ConfigurationValue* cv = (util::ConfigurationValue*) this->get(key, create);
+    se::util::ConfigurationValue* cv = (se::util::ConfigurationValue*) this->get(key, create);
     // Check if exists
     if(cv == nullptr) {
         // Check if create
         if(create) {
-            util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+            se::util::ConfigurationValue* ncv = new se::util::ConfigurationValue(this, key);
             ncv->set(value);
-            uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+            uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
             this->config_values.insert(std::pair(key_hash, ncv));
         } else {
             WARN("Attempted to set non-existant configuration value [%s] to [%f]",
@@ -401,20 +401,20 @@ bool util::Configuration::set(const char* key, double value, bool create, uint64
     return true;
 }
 
-bool util::Configuration::set(const char* key, bool value, bool create, uint64_t pk) {
+bool se::util::Configuration::set(const char* key, bool value, bool create, uint64_t pk) {
     if(create) {
         insertion_lock.lock();
     }
 
     // Locate the value
-    util::ConfigurationValue* cv = (util::ConfigurationValue*) this->get(key, create);
+    se::util::ConfigurationValue* cv = (se::util::ConfigurationValue*) this->get(key, create);
     // Check if exists
     if(cv == nullptr) {
         // Check if create
         if(create) {
-            util::ConfigurationValue* ncv = new util::ConfigurationValue(this, key);
+            se::util::ConfigurationValue* ncv = new se::util::ConfigurationValue(this, key);
             ncv->set(value);
-            uint32_t key_hash = util::hash::jenkins(key, strlen(key));
+            uint32_t key_hash = se::util::hash::jenkins(key, strlen(key));
             this->config_values.insert(std::pair(key_hash, ncv));
         } else {
             WARN("Attempted to set non-existant configuration value [%s] to [%s]",

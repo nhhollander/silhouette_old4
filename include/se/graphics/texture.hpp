@@ -11,7 +11,7 @@
 
 #include "se/fwd.hpp"
 
-#include "util/loadableResource.hpp"
+#include "se/util/loadableResource.hpp"
 
 #include <GL/glew.h>
 

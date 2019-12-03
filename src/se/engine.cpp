@@ -12,9 +12,9 @@
 #include "se/input/inputController.hpp"
 #include "se/logic/logicController.hpp"
 
-#include "util/log.hpp"
-#include "util/config.hpp"
-#include "util/dirs.hpp"
+#include "se/util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/dirs.hpp"
 
 se::Engine::Engine() {
     // Load the base configuration

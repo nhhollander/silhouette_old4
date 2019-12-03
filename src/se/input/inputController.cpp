@@ -10,8 +10,8 @@
 
 #include "se/engine.hpp"
 
-#include "util/config.hpp"
-#include "util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/log.hpp"
 
 #include <chrono>
 #include <SDL2/SDL.h>

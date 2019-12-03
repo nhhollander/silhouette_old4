@@ -1,16 +1,16 @@
 /*!
- *  @file src/util/cacheableReource.hpp
+ *  @file src/se/util/cacheableReource.hpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/cacheableResource.hpp"
+#include "se/util/cacheableResource.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
-using namespace util;
+using namespace se::util;
 
 std::map<uint32_t, CacheableResource*> CacheableResource::resource_cache;
 

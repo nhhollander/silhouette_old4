@@ -1,5 +1,5 @@
 /*!
- *  @file include/util/xdg.hpp
+ *  @file include/se/util/xdg.hpp
  * 
  *  Definitions for functions that provide information about various important
  *  system directories, including global and user specific application data.
@@ -12,12 +12,12 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_DIRS_H_
-#define _UTIL_DIRS_H_
+#ifndef _SE_UTIL_DIRS_H_
+#define _SE_UTIL_DIRS_H_
 
 #include <string>
 
-namespace util::dirs {
+namespace se::util::dirs {
 
     /*!
      *  Get the user data base folder.

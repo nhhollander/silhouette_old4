@@ -1,5 +1,5 @@
 /*!
- *  @file include/util/config.hpp
+ *  @file include/se/util/config.hpp
  * 
  *  This file defines the Configuration object and it's helper functions.
  * 
@@ -8,15 +8,15 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_CONFIG_H_
-#define _UTIL_CONFIG_H_
+#ifndef _SE_UTIL_CONFIG_H_
+#define _SE_UTIL_CONFIG_H_
 
 #include <unordered_map>
 #include <vector>
 #include <functional>
 #include <string>
 
-#include "util/fwd.hpp"
+#include "se/fwd.hpp"
 
 #define CV_WRITE_LOCK_NONE 0
 #define CV_WRITE_LOCK_NEXTWRITE 1
@@ -30,24 +30,25 @@
  *  use the black magic known as `std::bind` to create a callable object with
  *  the object reference built in.  This macro takes the static name of a member
  *  function and automatically converts it to a static callable with the
- *  appropriate arguments needed to be treated as a `util::ConfigChangeHandler`.
+ *  appropriate arguments needed to be treated as a
+ *  `se::util::ConfigChangeHandler`.
  * 
  *  For example, to create a non-static configuration change handler that wraps
  *  the non-static method `bar` in class `baz::Foo`, you would do the following:
  * 
  *  ```c++
- *  util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(baz::Foo::bar);
+ *  se::util::ConfigChangeHandler handler = CREATE_LOCAL_CHANGE_HANDLER(baz::Foo::bar);
  *  ```
  */
 #define CREATE_LOCAL_CHANGE_HANDLER(func) \
-    (util::ConfigChangeHandler) \
+    (se::util::ConfigChangeHandler) \
     std::bind( \
         &func, this, std::placeholders::_1, std::placeholders::_2);
 
-namespace util {
+namespace se::util {
 
     /// Configuration change handler
-    typedef std::function<void(util::ConfigurationValue*,util::Configuration*)> ConfigChangeHandler;
+    typedef std::function<void(se::util::ConfigurationValue*,se::util::Configuration*)> ConfigChangeHandler;
 
     /*!
      *  Configuration Value Container.
@@ -65,7 +66,7 @@ namespace util {
         private:
 
             /// Parent Configuration
-            util::Configuration* parent;
+            se::util::Configuration* parent;
 
             /// Change handlers
             std::vector<ConfigChangeHandler> change_handlers;
@@ -239,7 +240,7 @@ namespace util {
             void add_change_handler(ConfigChangeHandler handler);
 
             /// Configuration value constructor
-            ConfigurationValue(util::Configuration* parent, const char* ref_name = "<unnamed>");
+            ConfigurationValue(se::util::Configuration* parent, const char* ref_name = "<unnamed>");
             /// Configuration value destructor
             ~ConfigurationValue();
 

@@ -12,7 +12,7 @@
 #include "se/scene.hpp"
 #include "se/graphics/screen.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>

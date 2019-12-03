@@ -1,23 +1,23 @@
 /*!
- *  @file src/util/hash.cpp
+ *  @file src/se/util/hash.cpp
  * 
  *  Copyright 2018 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/hash.hpp"
+#include "se/util/hash.hpp"
 
 #include <cstdarg>
 #include <stdio.h>
 #include <string.h>
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 /// Extended hash buffer size
 #define LINE_BUFFER_SIZE 4096*2
 
-uint32_t util::hash::jenkins(const void* data, size_t len) {
+uint32_t se::util::hash::jenkins(const void* data, size_t len) {
     uint32_t hash = 0;
     // Digest the next byte
     for(size_t i = 0; i < len; i++) {
@@ -32,7 +32,7 @@ uint32_t util::hash::jenkins(const void* data, size_t len) {
     return hash;
 }
 
-uint32_t util::hash::ejenkins(const char* format, ...) {
+uint32_t se::util::hash::ejenkins(const char* format, ...) {
     // Prepare the variable arguments
     va_list args;
     va_start(args, format);

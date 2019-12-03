@@ -1,12 +1,12 @@
 /*!
- *  @file include/util/debugstrings.hpp
+ *  @file include/se/util/debugstrings.hpp
  * 
  *  Copyright 2018 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/debugstrings.hpp"
+#include "se/util/debugstrings.hpp"
 
 #include <GL/glew.h>
 #include <SDL2/SDL_events.h>
@@ -16,7 +16,7 @@
 
 #define CASE(c) case(c): return #c;
 
-const char* util::string::gl_shader_type(unsigned int shader) {
+const char* se::util::string::gl_shader_type(unsigned int shader) {
     switch(shader) {
         CASE(GL_VERTEX_SHADER)
         CASE(GL_FRAGMENT_SHADER)
@@ -25,7 +25,7 @@ const char* util::string::gl_shader_type(unsigned int shader) {
     }
 }
 
-const char* util::string::gl_error_name(unsigned int code) {
+const char* se::util::string::gl_error_name(unsigned int code) {
     switch(code) {
         CASE(GL_NO_ERROR)
         CASE(GL_INVALID_ENUM)
@@ -39,7 +39,7 @@ const char* util::string::gl_error_name(unsigned int code) {
     }
 }
 
-const char* util::string::gl_error_desc(unsigned int code) {
+const char* se::util::string::gl_error_desc(unsigned int code) {
     switch(code) {
         case(GL_NO_ERROR): return "No error has been recorded. The value of this symbolic constant is guaranteed to be 0.";
         case(GL_INVALID_ENUM): return "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.";
@@ -53,7 +53,7 @@ const char* util::string::gl_error_desc(unsigned int code) {
     }
 }
 
-const char* util::string::gl_type_name(GLenum input) {
+const char* se::util::string::gl_type_name(GLenum input) {
     switch(input) {
         CASE(GL_FLOAT)
         CASE(GL_FLOAT_VEC2)
@@ -93,7 +93,7 @@ const char* util::string::gl_type_name(GLenum input) {
     }
 }
 
-const char* util::string::gl_tex_type_name(unsigned int type) {
+const char* se::util::string::gl_tex_type_name(unsigned int type) {
     switch(type) {
         CASE(GL_TEXTURE_2D)
         CASE(GL_PROXY_TEXTURE_2D)
@@ -112,7 +112,7 @@ const char* util::string::gl_tex_type_name(unsigned int type) {
     }
 }
 
-const char* util::string::sdl_event_type_name(unsigned int type) {
+const char* se::util::string::sdl_event_type_name(unsigned int type) {
     switch(type) {
         CASE(SDL_FIRSTEVENT)
         CASE(SDL_QUIT)
@@ -167,7 +167,7 @@ const char* util::string::sdl_event_type_name(unsigned int type) {
     }
 }
 
-const char* util::string::sdl_event_type_description(unsigned int type) {
+const char* se::util::string::sdl_event_type_description(unsigned int type) {
     switch(type) {
         case(SDL_FIRSTEVENT): return "do not remove (unused)";
         case(SDL_QUIT): return "use-requested quit";
@@ -222,7 +222,7 @@ const char* util::string::sdl_event_type_description(unsigned int type) {
     }
 }
 
-const char* util::string::libpng_color_type_name(unsigned int type) {
+const char* se::util::string::libpng_color_type_name(unsigned int type) {
     switch(type) {
         CASE(PNG_COLOR_TYPE_GRAY)
         CASE(PNG_COLOR_TYPE_PALETTE)
@@ -235,7 +235,7 @@ const char* util::string::libpng_color_type_name(unsigned int type) {
     }
 }
 
-const char* util::string::gl_framebuffer_status_name(unsigned int status) {
+const char* se::util::string::gl_framebuffer_status_name(unsigned int status) {
     switch(status) {
         CASE(GL_FRAMEBUFFER_COMPLETE)
         CASE(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
@@ -250,7 +250,7 @@ const char* util::string::gl_framebuffer_status_name(unsigned int status) {
     }
 }
 
-const char* util::string::gl_message_source(unsigned int source) {
+const char* se::util::string::gl_message_source(unsigned int source) {
     switch(source) {
         CASE(GL_DEBUG_SOURCE_API)
         CASE(GL_DEBUG_SOURCE_WINDOW_SYSTEM)
@@ -262,7 +262,7 @@ const char* util::string::gl_message_source(unsigned int source) {
     }
 }
 
-const char* util::string::gl_message_type(unsigned int type) {
+const char* se::util::string::gl_message_type(unsigned int type) {
     switch(type) {
         CASE(GL_DEBUG_TYPE_ERROR)
         CASE(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
@@ -277,7 +277,7 @@ const char* util::string::gl_message_type(unsigned int type) {
     }
 }
 
-const char* util::string::gl_message_severity(unsigned int severity) {
+const char* se::util::string::gl_message_severity(unsigned int severity) {
     switch(severity) {
         CASE(GL_DEBUG_SEVERITY_HIGH)
         CASE(GL_DEBUG_SEVERITY_MEDIUM)
@@ -287,7 +287,7 @@ const char* util::string::gl_message_severity(unsigned int severity) {
     }
 }
 
-const char* util::string::ft2_error_name(unsigned int code) {
+const char* se::util::string::ft2_error_name(unsigned int code) {
     switch(code) {
         // Not an error
         CASE(FT_Err_Ok)

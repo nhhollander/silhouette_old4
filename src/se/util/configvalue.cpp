@@ -1,29 +1,29 @@
 /*!
- *  @file src/util/configvalue.cpp
+ *  @file src/se/util/configvalue.cpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/config.hpp"
+#include "se/util/config.hpp"
 
 #include <string.h>
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 // ==============================
 // = CONSTRUCTOR AND DESTRUCTOR =
 // ==============================
 
-util::ConfigurationValue::ConfigurationValue(Configuration* parent, const char* ref_name) {
+se::util::ConfigurationValue::ConfigurationValue(Configuration* parent, const char* ref_name) {
     this->parent = parent;
     // Save the reference name
     this->ref_name = (const char*) new char[strlen(ref_name) + 1];
     strcpy((char*) this->ref_name, ref_name);
 }
 
-util::ConfigurationValue::~ConfigurationValue() {
+se::util::ConfigurationValue::~ConfigurationValue() {
     delete[] this->cstring_;
     delete[] this->ref_name;
 }
@@ -32,12 +32,12 @@ util::ConfigurationValue::~ConfigurationValue() {
 // = PUBLIC MEMBERS =
 // ==================
 
-bool util::ConfigurationValue::set(const std::string src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(const std::string src, uint64_t pk) {
     // Forward as a c string
     return this->set(src.c_str(), pk);
 }
 
-bool util::ConfigurationValue::set(const char* src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(const char* src, uint64_t pk) {
     // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
         if(this->passkey != 0) {
@@ -111,7 +111,7 @@ bool util::ConfigurationValue::set(const char* src, uint64_t pk) {
     return true;
 }
 
-bool util::ConfigurationValue::set(int src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(int src, uint64_t pk) {
     // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
         if(this->passkey != 0) {
@@ -145,10 +145,10 @@ bool util::ConfigurationValue::set(int src, uint64_t pk) {
     }
     return true;
 }
-bool util::ConfigurationValue::set(float src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(float src, uint64_t pk) {
     return this->set((double) src);
 }
-bool util::ConfigurationValue::set(double src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(double src, uint64_t pk) {
     // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
         if(this->passkey != 0) {
@@ -183,7 +183,7 @@ bool util::ConfigurationValue::set(double src, uint64_t pk) {
     return true;
 }
 
-bool util::ConfigurationValue::set(bool src, uint64_t pk) {
+bool se::util::ConfigurationValue::set(bool src, uint64_t pk) {
     // Check if this value is locked
     if(this->write_lock == CV_WRITE_LOCK_LOCKED) {
         if(this->passkey != 0) {
@@ -230,18 +230,18 @@ bool util::ConfigurationValue::set(bool src, uint64_t pk) {
     return true;
 }
 
-void util::ConfigurationValue::lock(uint64_t pk) {
+void se::util::ConfigurationValue::lock(uint64_t pk) {
     this->write_lock = CV_WRITE_LOCK_LOCKED;
     this->passkey = pk;
     DEBUG("Configuration value [%s] locked (passkey: %s)", this->ref_name,
         (pk == 0) ? "FALSE" : "TRUE");
 }
 
-int util::ConfigurationValue::lock_status() {
+int se::util::ConfigurationValue::lock_status() {
     return this->write_lock;
 }
 
-void util::ConfigurationValue::add_change_handler(ConfigChangeHandler handler) {
+void se::util::ConfigurationValue::add_change_handler(ConfigChangeHandler handler) {
     this->change_handlers.push_back(handler);
 }
 
@@ -249,7 +249,7 @@ void util::ConfigurationValue::add_change_handler(ConfigChangeHandler handler) {
 // = PRIVATE MEMBERS =
 // ===================
 
-void util::ConfigurationValue::invoke_change_handlers() {
+void se::util::ConfigurationValue::invoke_change_handlers() {
     // Invoke those handlers
     for(auto handler : this->change_handlers) {
         handler(this, this->parent);

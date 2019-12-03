@@ -11,8 +11,8 @@
 #include "se/engine.hpp"
 #include "se/input/inputController.hpp"
 
-#include "util/log.hpp"
-#include "util/debugstrings.hpp"
+#include "se/util/log.hpp"
+#include "se/util/debugstrings.hpp"
 
 #include <SDL2/SDL.h>
 #include <math.h>

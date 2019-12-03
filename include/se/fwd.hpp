@@ -59,6 +59,13 @@ namespace se {
         
     }
 
+    namespace util {
+
+        class Configuration;
+        class ConfigurationValue;
+        
+    }
+
 }
 
 #endif

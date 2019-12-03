@@ -11,7 +11,7 @@
 
 #include "se/graphics/texture.hpp"
 
-#include "util/cacheableResource.hpp"
+#include "se/util/cacheableResource.hpp"
 
 namespace se::graphics {
 

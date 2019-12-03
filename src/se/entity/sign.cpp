@@ -17,7 +17,7 @@
 #include "se/graphics/imageTexture.hpp"
 #include "se/graphics/textTexture.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <string.h>
 

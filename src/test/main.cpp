@@ -18,8 +18,8 @@
 #include "se/graphics/simpleRenderManager.hpp"
 #include "se/graphics/textTexture.hpp"
 
-#include "util/config.hpp"
-#include "util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/log.hpp"
 
 #include <thread>
 #include <cstdlib>

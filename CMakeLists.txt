@@ -40,18 +40,6 @@ endif()
 string(LENGTH ${CMAKE_SOURCE_DIR}/src/ UTIL_LOG_PATH_OFFSET)
 add_compile_options(-DUTIL_LOG_PATH_OFFSET=${UTIL_LOG_PATH_OFFSET})
 
-# Add the utility library
-add_library(seutil SHARED
-    src/util/cacheableResource.cpp
-    src/util/config.cpp
-    src/util/configvalue.cpp
-    src/util/debugstrings.cpp
-    src/util/dirs.cpp
-    src/util/hash.cpp
-    src/util/loadableResource.cpp
-    src/util/log.cpp
-)
-
 # Heck
 include(FindFreetype)
 include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -82,10 +70,18 @@ add_library(silhouette SHARED
     src/se/input/inputController.cpp
     src/se/logic/logicController.cpp
     src/se/scene.cpp
+    src/se/util/cacheableResource.cpp
+    src/se/util/config.cpp
+    src/se/util/configvalue.cpp
+    src/se/util/debugstrings.cpp
+    src/se/util/dirs.cpp
+    src/se/util/hash.cpp
+    src/se/util/loadableResource.cpp
+    src/se/util/log.cpp
 
 )
 # Link to required libraries
-target_link_libraries(silhouette GL SDL2 seutil GLEW freetype ${SE_QT_LIB_NAME})
+target_link_libraries(silhouette GL SDL2 GLEW freetype ${SE_QT_LIB_NAME})
 
 # Add the test implementation
 add_executable(se_test
@@ -93,4 +89,4 @@ add_executable(se_test
     src/test/mainwindow.cpp
 )
 # Link to the required libraries
-target_link_libraries(se_test GL GLEW silhouette seutil pthread png ${SE_QT_LIB_NAME})
+target_link_libraries(se_test GL GLEW silhouette pthread png ${SE_QT_LIB_NAME})

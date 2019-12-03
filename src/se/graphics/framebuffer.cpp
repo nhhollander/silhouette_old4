@@ -13,9 +13,9 @@
 #include "se/graphics/shader.hpp"
 #include "se/graphics/texture.hpp"
 
-#include "util/config.hpp"
-#include "util/debugstrings.hpp"
-#include "util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/debugstrings.hpp"
+#include "se/util/log.hpp"
 
 using namespace se::graphics;
 

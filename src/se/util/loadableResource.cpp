@@ -1,18 +1,18 @@
 /*!
- *  @file src/util/loadableReource.hpp
+ *  @file src/se/util/loadableReource.hpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/loadableResource.hpp"
+#include "se/util/loadableResource.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
-using namespace util;
+using namespace se::util;
 
-const char* util::loadable_resource_state_name(LoadableResourceState state) {
+const char* se::util::loadable_resource_state_name(LoadableResourceState state) {
     switch(state) {
         case LoadableResourceState::NOT_LOADED:  return "NOT_LOADED";
         case LoadableResourceState::LOADING:     return "LOADING";

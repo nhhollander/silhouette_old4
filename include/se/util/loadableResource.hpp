@@ -1,17 +1,17 @@
 /*!
- *  @file include/util/loadableResource.hpp
+ *  @file include/se/util/loadableResource.hpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_LOADABLERESOURCE_H_
-#define _UTIL_LOADABLERESOURCE_H_
+#ifndef _SE_UTIL_LOADABLERESOURCE_H_
+#define _SE_UTIL_LOADABLERESOURCE_H_
 
 #include <mutex>
 
-namespace util {
+namespace se::util {
 
     /// Resource state
     enum class LoadableResourceState {

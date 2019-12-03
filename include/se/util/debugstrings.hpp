@@ -1,5 +1,5 @@
 /*!
- *  @file include/util/debugstrings.hpp
+ *  @file include/se/util/debugstrings.hpp
  * 
  *  Static functions for returning string representations of constants, as well
  *  as their descriptions.
@@ -9,10 +9,10 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_DEBUGSTRINGS_H_
-#define _UTIL_DEBUGSTRINGS_H_
+#ifndef _SE_UTIL_DEBUGSTRINGS_H_
+#define _SE_UTIL_DEBUGSTRINGS_H_
 
-namespace util::string {
+namespace se::util::string {
 
     /*!
      *  Return the type of a GL_xxx_SHADER.

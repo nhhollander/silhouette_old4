@@ -1,12 +1,12 @@
 /*!
- *  @file src/util/log.cpp
+ *  @file src/se/util/log.cpp
  * 
  *  Copyright 2018 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <cstdarg>
 #include <unistd.h>
@@ -57,7 +57,7 @@ const char* getformat(char level) {
     };
 }
 
-void util::log::log(char level, const char* fname, int line, const char* func, const char* message, ...) {
+void se::util::log::log(char level, const char* fname, int line, const char* func, const char* message, ...) {
     // Check if the message is filtered
     if(level < min_print_level && level < min_logfile_level) {
         // Message will not be printed or written to file - discard it
@@ -96,17 +96,17 @@ void util::log::log(char level, const char* fname, int line, const char* func, c
     }
 }
 
-void util::log::set_min_print_level(char level) {
+void se::util::log::set_min_print_level(char level) {
     // Set the level
     min_print_level = level;
 }
 
-void util::log::set_min_logfile_level(char level) {
+void se::util::log::set_min_logfile_level(char level) {
     // Set the level
     min_logfile_level = level;
 }
 
-bool util::log::open_log_file(const char* fname) {
+bool se::util::log::open_log_file(const char* fname) {
     // Open the file
     logfile = fopen(fname, "w");
     // Check if the file opened
@@ -119,7 +119,7 @@ bool util::log::open_log_file(const char* fname) {
     return true;
 }
 
-void util::log::set_thread_name(const char* name) {
+void se::util::log::set_thread_name(const char* name) {
     // Save the name
     thread_name = strdup(name);
 

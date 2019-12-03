@@ -16,8 +16,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "util/config.hpp"
-#include "util/log.hpp"
+#include "se/util/config.hpp"
+#include "se/util/log.hpp"
 
 #include "se/graphics/qtSilhouetteWidget.hpp"
 

@@ -1,5 +1,5 @@
 /*!
- *  @file include/util/log.hpp
+ *  @file include/se/util/log.hpp
  * 
  *  Static logging helper library.  This basic helper library provides a fast,
  *  configurable, and easy to use logging interface.  Other major logging
@@ -11,8 +11,8 @@
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_LOG_H_
-#define _UTIL_LOG_H_
+#ifndef _SE_UTIL_LOG_H_
+#define _SE_UTIL_LOG_H_
 
 // Log levels
 
@@ -71,17 +71,17 @@
 #endif
 
 /// Log a debug level message
-#define DEBUG(message, ...) util::log::log(LL_DEBUG, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
+#define DEBUG(message, ...) se::util::log::log(LL_DEBUG, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
 /// Log an info level message
-#define INFO(message, ...)  util::log::log(LL_INFO,  __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
+#define INFO(message, ...)  se::util::log::log(LL_INFO,  __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
 /// Log a warning level message
-#define WARN(message, ...)  util::log::log(LL_WARN,  __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
+#define WARN(message, ...)  se::util::log::log(LL_WARN,  __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
 /// Log an error level message
-#define ERROR(message, ...) util::log::log(LL_ERROR, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
+#define ERROR(message, ...) se::util::log::log(LL_ERROR, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
 /// Log a fatal error level message
-#define FATAL(message, ...) util::log::log(LL_FATAL, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
+#define FATAL(message, ...) se::util::log::log(LL_FATAL, __FILE__ + UTIL_LOG_PATH_OFFSET, __LINE__, __func__, message, ##__VA_ARGS__)
 
-namespace util::log {
+namespace se::util::log {
 
     /*!
      *  Log a message.

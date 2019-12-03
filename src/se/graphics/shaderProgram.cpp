@@ -12,9 +12,9 @@
 #include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
-#include "util/log.hpp"
-#include "util/hash.hpp"
-#include "util/debugstrings.hpp"
+#include "se/util/log.hpp"
+#include "se/util/hash.hpp"
+#include "se/util/debugstrings.hpp"
 
 #include <chrono>
 #include <thread>
@@ -25,7 +25,7 @@
 #include <GL/gl.h>
 
 using namespace se::graphics;
-using namespace util;
+using namespace se::util;
 
 // ====================
 // == STATIC METHODS ==
@@ -34,7 +34,7 @@ using namespace util;
 uint32_t get_shader_program_hash(
     const char* vshader, const char* vdefines,
     const char* fshader, const char* fdefines) {
-    return util::hash::ejenkins("shaderprogram:%s:%s:%s:%s",
+    return se::util::hash::ejenkins("shaderprogram:%s:%s:%s:%s",
         vshader, vdefines, fshader, fdefines);
 }
 

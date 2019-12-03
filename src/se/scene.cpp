@@ -10,9 +10,9 @@
 
 #include "se/entity/staticProp.hpp"
 
-#include "util/dirs.hpp"
-#include "util/hash.hpp"
-#include "util/log.hpp"
+#include "se/util/dirs.hpp"
+#include "se/util/hash.hpp"
+#include "se/util/log.hpp"
 
 #include <fstream>
 

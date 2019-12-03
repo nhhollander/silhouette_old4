@@ -14,8 +14,6 @@
 #include "se/fwd.hpp"
 #include "se/graphics/graphicsEventHandler.hpp"
 
-#include "util/fwd.hpp"
-
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <SDL2/SDL_opengl.h>

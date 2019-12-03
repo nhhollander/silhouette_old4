@@ -12,10 +12,10 @@
 #include "se/graphics/shader.hpp"
 #include "se/graphics/graphicsController.hpp"
 
-#include "util/dirs.hpp"
-#include "util/hash.hpp"
-#include "util/log.hpp"
-#include "util/debugstrings.hpp"
+#include "se/util/dirs.hpp"
+#include "se/util/hash.hpp"
+#include "se/util/log.hpp"
+#include "se/util/debugstrings.hpp"
 
 #include <string.h>
 #include <string>
@@ -29,7 +29,7 @@
 #include <glm/vec3.hpp>
 
 using namespace se::graphics;
-using namespace util;
+using namespace se::util;
 
 // =====================
 // == PRIVATE MEMBERS ==

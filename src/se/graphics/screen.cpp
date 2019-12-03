@@ -15,8 +15,8 @@
 #include "se/graphics/shader.hpp"
 #include "se/graphics/texture.hpp"
 
-#include "util/log.hpp"
-#include "util/config.hpp"
+#include "se/util/log.hpp"
+#include "se/util/config.hpp"
 
 using namespace se::graphics;
 

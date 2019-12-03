@@ -9,8 +9,8 @@
 #ifndef _SE_GRAPHICS_GEOMETRY_H_
 #define _SE_GRAPHICS_GEOMETRY_H_
 
-#include "util/cacheableResource.hpp"
-#include "util/loadableResource.hpp"
+#include "se/util/cacheableResource.hpp"
+#include "se/util/loadableResource.hpp"
 
 #include "se/fwd.hpp"
 

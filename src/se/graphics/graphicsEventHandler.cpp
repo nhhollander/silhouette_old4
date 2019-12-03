@@ -12,8 +12,8 @@
 #include "se/graphics/graphicsController.hpp"
 #include "se/input/inputController.hpp"
 
-#include "util/log.hpp"
-#include "util/config.hpp"
+#include "se/util/log.hpp"
+#include "se/util/config.hpp"
 
 using namespace se::graphics;
 

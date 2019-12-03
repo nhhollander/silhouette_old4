@@ -11,8 +11,8 @@
 
 #include "se/fwd.hpp"
 
-#include "util/cacheableResource.hpp"
-#include "util/loadableResource.hpp"
+#include "se/util/cacheableResource.hpp"
+#include "se/util/loadableResource.hpp"
 
 #include <map>
 

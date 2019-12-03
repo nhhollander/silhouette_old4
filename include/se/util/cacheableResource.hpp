@@ -1,19 +1,19 @@
 /*!
- *  @file include/util/cacheableResource.hpp
+ *  @file include/se/util/cacheableResource.hpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#ifndef _UTIL_CACHEABLERESOURCE_H_
-#define _UTIL_CACHEABLERESOURCE_H_
+#ifndef _SE_UTIL_CACHEABLERESOURCE_H_
+#define _SE_UTIL_CACHEABLERESOURCE_H_
 
 #include <cstdint>
 #include <map>
 #include <mutex>
 
-namespace util {
+namespace se::util {
 
     /*!
      *  Cacheable Resource.

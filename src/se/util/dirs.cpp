@@ -1,20 +1,20 @@
 /*!
- *  @file src/util/dirs.cpp
+ *  @file src/se/util/dirs.cpp
  * 
  *  Copyright 2019 Nicholas Hollander <nhhollander@wpi.edu>
  * 
  *  Licensed under the MIT license (see LICENSE for the complete text)
  */
 
-#include "util/dirs.hpp"
+#include "se/util/dirs.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <cstdlib>
 #include <sys/stat.h>
 #include <string.h>
 
-std::string util::dirs::user_data() {
+std::string se::util::dirs::user_data() {
     // Check for debug override
     const char* override = std::getenv("SE_DEBUG_USERDATA");
     if(override != nullptr) {
@@ -35,7 +35,7 @@ std::string util::dirs::user_data() {
     def_val += "/.local/.share";
     return def_val;
 }
-std::string util::dirs::temp_data() {
+std::string se::util::dirs::temp_data() {
     // Check for debug override
     const char* override = std::getenv("SE_DEBUG_TEMPDATA");
     if(override != nullptr) {
@@ -48,7 +48,7 @@ std::string util::dirs::temp_data() {
     return value;
 }
 
-std::string util::dirs::cache_data() {
+std::string se::util::dirs::cache_data() {
     // Check for debug override
     const char* override = std::getenv("SE_DEBUG_CACHEDATA");
     if(override != nullptr) {
@@ -61,7 +61,7 @@ std::string util::dirs::cache_data() {
     return value;
 }
 
-std::string util::dirs::app_data() {
+std::string se::util::dirs::app_data() {
     // Check for debug override
     const char* override = std::getenv("SE_DEBUG_APPDATA");
     if(override != nullptr) {

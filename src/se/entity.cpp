@@ -8,7 +8,7 @@
 
 #include "se/entity.hpp"
 
-#include "util/log.hpp"
+#include "se/util/log.hpp"
 
 #include <cstdio>
 #define GLM_ENABLE_EXPERIMENTAL

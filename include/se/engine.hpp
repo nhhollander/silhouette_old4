@@ -12,7 +12,6 @@
 #define _SE_ENGINE_H_
 
 #include "se/fwd.hpp"
-#include "util/fwd.hpp"
 
 namespace se {
 
