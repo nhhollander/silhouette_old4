@@ -1,3 +1,7 @@
+### *Moved to https://github.com/nhhollander/silhouette*
+
+I decided to rewrite this project from scratch to take advantage of and deal with the intricacies of development primarily targeting the browser as a platform.
+
 # Silhouette Engine
 
 Silhouette is a basic 3D engine written in OpenGL.  I started work on Silhouette in the summer of 2017 with a series of experiments in Vulkan and OpenGL, from which I leared a considerable amount of my knowledge about 3D graphics.  Since the original inception of this project, it has been cut down and re-built from the ground up several times, generally as a result of fundamental issues that could not be solved without re-writing a majority of the codebase.
